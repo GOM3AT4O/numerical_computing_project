@@ -1,0 +1,66 @@
+<div class="flex flex-col gap-24" [formGroup]="form">
+  <div class="flex flex-row items-center gap-8">
+    <label for="initial-guess" class="font-medium">Initial Guess:</label>
+    <table
+      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+    >
+      @for (i of equationCount() | range; track $index) {
+        <tr>
+          <td>
+            <span
+              >x<sub>{{ i + 1 }}</sub></span
+            >
+          </td>
+        </tr>
+      }
+    </table>
+    <span>=</span>
+    <table
+      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+    >
+      @for (i of equationCount() | range; track $index) {
+        <tr>
+          <td>
+            <input
+              class="min-w-[2rem] h-fit"
+              type="text"
+              placeholder="1"
+              [formControl]="form.controls.initialGuess.at(i)"
+              autoSizeInput
+            />
+          </td>
+        </tr>
+      }
+    </table>
+  </div>
+  <div class="flex flex-col gap-8">
+    <label for="stopping-condition" class="font-medium"
+      >Stopping Condition:</label
+    >
+    <div class="grid grid-cols-[max-content_max-content] gap-8">
+      @for (stoppingCondition of stoppingConditions; track $index) {
+        <div>
+          <input
+            id="stopping-condition-{{ stoppingCondition.value }}"
+            class="mr-8"
+            type="radio"
+            name="stoppingCondition"
+            [value]="stoppingCondition.value"
+            formControlName="stoppingCondition"
+          />
+          <label
+            for="stopping-condition-{{ stoppingCondition.value }}"
+            class="font-medium"
+            >{{ stoppingCondition.label }}:</label
+          >
+        </div>
+        <input
+          class="min-w-[4rem] h-fit"
+          type="text"
+          [formControlName]="stoppingCondition.controlName"
+          autoSizeInput
+        />
+      }
+    </div>
+  </div>
+</div>

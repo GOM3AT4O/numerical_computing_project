@@ -1,0 +1,8 @@
+<div class="flex flex-row items-center" [formGroup]="form">
+  <label for="format" class="font-medium">Format:</label>
+  <select id="format" class="ml-8" formControlName="format">
+    @for (format of formats; track format) {
+      <option [value]="format.value">{{ format.label }}</option>
+    }
+  </select>
+</div>

@@ -1,0 +1,33 @@
+<div
+  class="grid gap-6 items-center justify-items-center w-fit"
+  [style.gridTemplateColumns]="
+    'repeat(' + (equationCount() * 3 + 1) + ', auto)'
+  "
+  [formGroup]="form"
+>
+  @for (i of equationCount() | range; track $index) {
+    @for (j of equationCount() | range; track $index) {
+      <input
+        class="min-w-[2rem] h-fit"
+        type="text"
+        placeholder="0"
+        [formControl]="form.controls.coefficients.at(i).at(j)"
+        autoSizeInput
+      />
+      <span
+        >x<sub>{{ j + 1 }}</sub></span
+      >
+      @if (j < equationCount() - 1) {
+        <span>+</span>
+      }
+    }
+    <span>=</span>
+    <input
+      class="min-w-[2rem] h-fit"
+      type="text"
+      placeholder="0"
+      [formControl]="form.controls.constants.at(i)"
+      autoSizeInput
+    />
+  }
+</div>
