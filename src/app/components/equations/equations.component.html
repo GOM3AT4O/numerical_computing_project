@@ -8,7 +8,7 @@
   @for (i of equationCount() | range; track $index) {
     @for (j of equationCount() | range; track $index) {
       <input
-        class="min-w-[2rem] h-fit"
+        class="min-w-32 h-fit"
         type="text"
         placeholder="0"
         [formControl]="form.controls.coefficients.at(i).at(j)"
@@ -23,7 +23,7 @@
     }
     <span>=</span>
     <input
-      class="min-w-[2rem] h-fit"
+      class="min-w-32 h-fit"
       type="text"
       placeholder="0"
       [formControl]="form.controls.constants.at(i)"

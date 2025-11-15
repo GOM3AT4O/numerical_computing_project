@@ -9,7 +9,7 @@
           >
           <input
             id="equation-count"
-            class="min-w-[2rem] h-fit ml-8"
+            class="min-w-32 h-fit ml-8"
             type="text"
             [placeholder]="equationCount"
             formControlName="equationCount"
@@ -23,25 +23,30 @@
             [equationCount]="equationCount"
           />
         </div>
-        @if (form.invalid && (form.dirty || form.touched)) {
-          @if (form.get("equationCount")?.invalid) {
-            <div class="w-full flex justify-center">
-              <div
-                class="text-sm text-red-600 font-medium text-center mt-8 text-center max-w-2xs"
-              >
-                Please enter a valid number of equations.
-              </div>
+        @if (
+          form.get("equationCount")?.invalid &&
+          (form.get("equationCount")?.touched ||
+            form.get("equationCount")?.dirty)
+        ) {
+          <div class="w-full flex justify-center">
+            <div
+              class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+            >
+              Please enter a valid number of equations.
             </div>
-          }
-          @if (form.get("equations")?.invalid) {
-            <div class="w-full flex justify-center">
-              <div
-                class="text-sm text-red-600 font-medium text-center mt-8 text-center max-w-2xs"
-              >
-                Please ensure all coefficients and constants are valid numbers.
-              </div>
+          </div>
+        }
+        @if (
+          form.get("equations")?.invalid &&
+          (form.get("equations")?.touched || form.get("equations")?.dirty)
+        ) {
+          <div class="w-full flex justify-center">
+            <div
+              class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+            >
+              Please ensure all coefficients and constants are valid numbers.
             </div>
-          }
+          </div>
         }
       </div>
       <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
@@ -55,7 +60,7 @@
           <label for="precision" class="font-medium">Precision:</label>
           <input
             id="precision"
-            class="min-w-[2rem] h-fit"
+            class="min-w-32 h-fit"
             type="text"
             placeholder="10"
             formControlName="precision"
@@ -72,11 +77,14 @@
         }
         @case ("jacobi-iteration") {
           <div
-            class="p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
+            class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
           >
-            <h1 class="text-lg font-bold mb-8">Jacobi Iteration Parameters</h1>
+            <h1 class="text-lg font-bold mb-8 flex-0">
+              Jacobi Iteration Parameters
+            </h1>
             <app-iteration-parameters
               #parameters
+              class="flex-1"
               formControlName="parameters"
               [equationCount]="equationCount"
             />
@@ -84,13 +92,14 @@
         }
         @case ("gauss-seidel-iteration") {
           <div
-            class="p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
+            class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
           >
-            <h1 class="text-lg font-bold mb-8">
+            <h1 class="text-lg font-bold mb-8 flex-0">
               Gauss-Seidel Iteration Parameters
             </h1>
             <app-iteration-parameters
               #parameters
+              class="flex-1"
               formControlName="parameters"
               [equationCount]="equationCount"
             />
@@ -104,5 +113,9 @@
     >
       Solve
     </button>
+    <pre>
+			{{ form.value | json }}
+		</pre
+    >
   </div>
 </form>

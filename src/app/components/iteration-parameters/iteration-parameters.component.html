@@ -1,66 +1,100 @@
-<div class="flex flex-col gap-24" [formGroup]="form">
-  <div class="flex flex-row items-center gap-8">
-    <label for="initial-guess" class="font-medium">Initial Guess:</label>
-    <table
-      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
-    >
-      @for (i of equationCount() | range; track $index) {
-        <tr>
-          <td>
-            <span
-              >x<sub>{{ i + 1 }}</sub></span
-            >
-          </td>
-        </tr>
-      }
-    </table>
-    <span>=</span>
-    <table
-      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
-    >
-      @for (i of equationCount() | range; track $index) {
-        <tr>
-          <td>
+<div class="flex flex-col justify-between h-full" [formGroup]="form">
+  <div class="flex flex-col gap-24">
+    <div class="flex flex-row items-center gap-8">
+      <label for="initial-guess" class="font-medium">Initial Guess:</label>
+      <table
+        class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+      >
+        @for (i of equationCount() | range; track $index) {
+          <tr>
+            <td>
+              <span
+                >x<sub>{{ i + 1 }}</sub></span
+              >
+            </td>
+          </tr>
+        }
+      </table>
+      <span>=</span>
+      <table
+        class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+      >
+        @for (i of equationCount() | range; track $index) {
+          <tr>
+            <td>
+              <input
+                class="min-w-32 h-fit"
+                type="text"
+                placeholder="1"
+                [formControl]="form.controls.initialGuess.at(i)"
+                autoSizeInput
+              />
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+    <div class="flex flex-col gap-8">
+      <label for="stopping-condition" class="font-medium"
+        >Stopping Condition:</label
+      >
+      <div class="grid grid-cols-[max-content_max-content] gap-8">
+        @for (stoppingCondition of stoppingConditions; track $index) {
+          <div>
             <input
-              class="min-w-[2rem] h-fit"
-              type="text"
-              placeholder="1"
-              [formControl]="form.controls.initialGuess.at(i)"
-              autoSizeInput
+              id="stopping-condition-{{ stoppingCondition.value }}"
+              class="mr-8"
+              type="radio"
+              name="stoppingCondition"
+              [value]="stoppingCondition.value"
+              formControlName="stoppingCondition"
             />
-          </td>
-        </tr>
-      }
-    </table>
-  </div>
-  <div class="flex flex-col gap-8">
-    <label for="stopping-condition" class="font-medium"
-      >Stopping Condition:</label
-    >
-    <div class="grid grid-cols-[max-content_max-content] gap-8">
-      @for (stoppingCondition of stoppingConditions; track $index) {
-        <div>
+            <label
+              for="stopping-condition-{{ stoppingCondition.value }}"
+              class="font-medium"
+              >{{ stoppingCondition.label }}:</label
+            >
+          </div>
           <input
-            id="stopping-condition-{{ stoppingCondition.value }}"
-            class="mr-8"
-            type="radio"
-            name="stoppingCondition"
-            [value]="stoppingCondition.value"
-            formControlName="stoppingCondition"
+            class="min-w-64 h-fit"
+            type="text"
+            [formControlName]="stoppingCondition.controlName"
+            autoSizeInput
           />
-          <label
-            for="stopping-condition-{{ stoppingCondition.value }}"
-            class="font-medium"
-            >{{ stoppingCondition.label }}:</label
-          >
-        </div>
-        <input
-          class="min-w-[4rem] h-fit"
-          type="text"
-          [formControlName]="stoppingCondition.controlName"
-          autoSizeInput
-        />
-      }
+        }
+      </div>
     </div>
   </div>
+  @if (
+    form.get("initialGuess")?.invalid &&
+    (form.get("initialGuess")?.dirty || form.get("initialGuess")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please ensure all values of the initial guess are valid numbers.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("numberOfIterations")?.invalid &&
+    (form.get("numberOfIterations")?.dirty ||
+      form.get("numberOfIterations")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid number of iterations.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("absoluteRelativeError")?.invalid &&
+    (form.get("absoluteRelativeError")?.dirty ||
+      form.get("absoluteRelativeError")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid absolute relative error threshold.
+      </div>
+    </div>
+  }
 </div>

@@ -10,6 +10,7 @@ import { EquationsComponent } from "../equations/equations.component";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
 import { LUParametersComponent } from "../lu-parameters/lu-parameters.component";
 import { IterationParametersComponent } from "../iteration-parameters/iteration-parameters.component";
+import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: "app-equations-solver",
@@ -19,6 +20,7 @@ import { IterationParametersComponent } from "../iteration-parameters/iteration-
     EquationsComponent,
     LUParametersComponent,
     IterationParametersComponent,
+    JsonPipe,
   ],
   templateUrl: "./equations-solver.component.html",
   styleUrl: "./equations-solver.component.css",
