@@ -67,6 +67,7 @@ export class EquationsSolverComponent {
       setTimeout(() => {
         this.parameters()?.nativeElement.scrollIntoView({
           behavior: "smooth",
+					block: "center",
         });
       });
     });
