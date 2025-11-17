@@ -1,0 +1,18 @@
+<div
+  class="p-4 grid gap-6 items-center justify-items-center w-fit border-x-2 rounded-md"
+  [style.gridTemplateColumns]="'repeat(' + columnCount() + ', auto)'"
+>
+  @for (i of rowCount() | range; track $index) {
+    @for (j of columnCount() | range; track $index) {
+      <input
+        #input
+        class="min-w-32 h-fit"
+        type="text"
+        placeholder="0"
+        [formControl]="form.at(i).at(j)"
+        autoSizeInput
+        (keydown)="onKeyDown(i, j, $event)"
+      />
+    }
+  }
+</div>

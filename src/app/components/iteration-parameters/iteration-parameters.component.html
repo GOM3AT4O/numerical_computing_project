@@ -16,23 +16,11 @@
         }
       </table>
       <span>=</span>
-      <table
-        class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
-      >
-        @for (i of equationCount() | range; track $index) {
-          <tr>
-            <td>
-              <input
-                class="min-w-32 h-fit"
-                type="text"
-                placeholder="1"
-                [formControl]="form.controls.initialGuess.at(i)"
-                autoSizeInput
-              />
-            </td>
-          </tr>
-        }
-      </table>
+      <app-matrix
+        formControlName="initialGuess"
+        [rowCount]="equationCount()"
+        [columnCount]="1"
+      />
     </div>
     <div class="flex flex-col gap-8">
       <label for="stopping-condition" class="font-medium"

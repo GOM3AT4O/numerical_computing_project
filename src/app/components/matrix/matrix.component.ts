@@ -25,38 +25,36 @@ import { AutoSizeInputDirective } from "ngx-autosize-input";
 import { RangePipe } from "../../pipes/range.pipe";
 
 @Component({
-  selector: "app-equations",
+  selector: "app-matrix",
   imports: [ReactiveFormsModule, AutoSizeInputDirective, RangePipe],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => EquationsComponent),
+      useExisting: forwardRef(() => MatrixComponent),
       multi: true,
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: forwardRef(() => EquationsComponent),
+      useExisting: forwardRef(() => MatrixComponent),
       multi: true,
     },
   ],
-  templateUrl: "./equations.component.html",
-  styleUrl: "./equations.component.css",
+  templateUrl: "./matrix.component.html",
+  styleUrl: "./matrix.component.css",
 })
-export class EquationsComponent
+export class MatrixComponent
   implements ControlValueAccessor, Validator, OnChanges
 {
   private formBuilder = inject(NonNullableFormBuilder);
 
-  equationCount = input<number>(3);
+  rowCount = input<number>(3);
+  columnCount = input<number>(3);
 
   inputs = viewChildren<ElementRef<HTMLInputElement>>("input");
 
   numberValidator = Validators.pattern(/^[-+]?\d+(\.\d+)?$/);
 
-  form = this.formBuilder.group({
-    coefficients: this.formBuilder.array<FormArray<FormControl<string>>>([]),
-    constants: this.formBuilder.array<FormControl<string>>([]),
-  });
+  form = this.formBuilder.array<FormArray<FormControl<string>>>([]);
 
   private onChange: (_: any) => void = () => {};
   private onTouched: () => void = () => {};
@@ -73,61 +71,43 @@ export class EquationsComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["equationCount"]) {
+    if (changes["rowCount"] || changes["columnCount"]) {
       this.writeValue(this.form.value);
       this.onChange(this.form.value);
     }
   }
 
   writeValue(value: any): void {
-    while (this.form.controls.coefficients.length < this.equationCount()) {
+    while (this.form.length < this.rowCount()) {
       const row = this.formBuilder.array<FormControl<string>>(
-        Array.from({ length: this.equationCount() }, () =>
+        Array.from({ length: this.columnCount() }, () =>
           this.formBuilder.control<string>("", this.numberValidator),
         ),
       );
-      this.form.controls.coefficients.push(row);
+      this.form.push(row);
     }
 
-    while (this.form.controls.coefficients.length > this.equationCount()) {
-      this.form.controls.coefficients.removeAt(
-        this.form.controls.coefficients.length - 1,
-      );
+    while (this.form.length > this.rowCount()) {
+      this.form.removeAt(this.form.length - 1);
     }
 
-    for (let i = 0; i < this.form.controls.coefficients.length; i++) {
-      const row = this.form.controls.coefficients.at(i);
-      while (row.length < this.equationCount()) {
+    for (let i = 0; i < this.form.length; i++) {
+      const row = this.form.at(i);
+      while (row.length < this.columnCount()) {
         row.push(this.formBuilder.control<string>("", this.numberValidator));
       }
 
-      while (row.length > this.equationCount()) {
+      while (row.length > this.columnCount()) {
         row.removeAt(row.length - 1);
       }
     }
-
-    while (this.form.controls.constants.length < this.equationCount()) {
-      this.form.controls.constants.push(
-        this.formBuilder.control<string>("", this.numberValidator),
-      );
-    }
-
-    while (this.form.controls.constants.length > this.equationCount()) {
-      this.form.controls.constants.removeAt(
-        this.form.controls.constants.length - 1,
-      );
-    }
-
-    for (let i = 0; i < this.equationCount(); i++) {
-      for (let j = 0; j < this.equationCount(); j++) {
-        this.form.controls.coefficients
+    for (let i = 0; i < this.rowCount(); i++) {
+      for (let j = 0; j < this.columnCount(); j++) {
+        this.form
           .at(i)
           .at(j)
-          .setValue(value?.coefficients?.[i]?.[j] ?? "", { emitEvent: false });
+          .setValue(value?.[i]?.[j] ?? "", { emitEvent: false });
       }
-      this.form.controls.constants
-        .at(i)
-        .setValue(value?.constants?.[i] ?? "", { emitEvent: false });
     }
   }
 
@@ -148,19 +128,18 @@ export class EquationsComponent
   }
 
   validate(_: AbstractControl): ValidationErrors | null {
-    return this.form.valid ? null : { equationsInvalid: true };
+    return this.form.valid ? null : { matrixInvalid: true };
   }
 
   onKeyDown(i: number, j: number, event: KeyboardEvent) {
-    const input =
-      this.inputs()[i * (this.equationCount() + 1) + j].nativeElement;
+    const input = this.inputs()[i * this.columnCount() + j].nativeElement;
 
     switch (event.key) {
       case "ArrowUp":
         i = i > 0 ? i - 1 : i;
         break;
       case "ArrowDown":
-        i = i + 1 < this.equationCount() ? i + 1 : i;
+        i = i + 1 < this.rowCount() ? i + 1 : i;
         break;
       case "ArrowLeft":
         if (input.value.length !== 0 && input.selectionStart !== 0) {
@@ -175,13 +154,13 @@ export class EquationsComponent
         ) {
           return;
         }
-        j = j < this.equationCount() ? j + 1 : j;
+        j = j + 1 < this.columnCount() ? j + 1 : j;
         break;
       default:
         return;
     }
 
     event.preventDefault();
-    this.inputs()[i * (this.equationCount() + 1) + j].nativeElement.focus();
+    this.inputs()[i * this.columnCount() + j].nativeElement.focus();
   }
 }

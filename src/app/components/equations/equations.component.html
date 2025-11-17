@@ -8,11 +8,13 @@
   @for (i of equationCount() | range; track $index) {
     @for (j of equationCount() | range; track $index) {
       <input
+        #input
         class="min-w-32 h-fit"
         type="text"
         placeholder="0"
         [formControl]="form.controls.coefficients.at(i).at(j)"
         autoSizeInput
+        (keydown)="onKeyDown(i, j, $event)"
       />
       <span
         >x<sub>{{ j + 1 }}</sub></span
@@ -23,11 +25,13 @@
     }
     <span>=</span>
     <input
+      #input
       class="min-w-32 h-fit"
       type="text"
       placeholder="0"
       [formControl]="form.controls.constants.at(i)"
       autoSizeInput
+      (keydown)="onKeyDown(i, equationCount(), $event)"
     />
   }
 </div>

@@ -19,10 +19,16 @@ import {
   Validator,
   Validators,
 } from "@angular/forms";
+import { MatrixComponent } from "../matrix/matrix.component";
 
 @Component({
   selector: "app-iteration-parameters",
-  imports: [ReactiveFormsModule, AutoSizeInputDirective, RangePipe],
+  imports: [
+    ReactiveFormsModule,
+    AutoSizeInputDirective,
+    RangePipe,
+    MatrixComponent,
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -39,7 +45,7 @@ import {
   styleUrl: "./iteration-parameters.component.css",
 })
 export class IterationParametersComponent
-  implements ControlValueAccessor, Validator, OnChanges
+  implements ControlValueAccessor, Validator
 {
   private formBuilder = inject(FormBuilder);
 
@@ -61,7 +67,7 @@ export class IterationParametersComponent
   ];
 
   form = this.formBuilder.group({
-    initialGuess: this.formBuilder.nonNullable.array<string>([]),
+    initialGuess: [null],
     stoppingCondition: [this.stoppingConditions[0].value, Validators.required],
     numberOfIterations: [
       { value: "", disabled: false },
@@ -97,15 +103,13 @@ export class IterationParametersComponent
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes["equationCount"]) {
-      this.writeValue(this.form.value);
-      this.onChange(this.form.value);
-    }
-  }
-
   writeValue(value: any): void {
     if (value) {
+      if (value.initialGuess) {
+        this.form
+          .get("initialGuess")
+          ?.setValue(value.initialGuess, { emitEvent: false });
+      }
       if (value.stoppingCondition) {
         this.form
           .get("stoppingCondition")
@@ -120,24 +124,6 @@ export class IterationParametersComponent
             });
         }
       }
-    }
-
-    while (this.form.controls.initialGuess.length < this.equationCount()) {
-      this.form.controls.initialGuess.push(
-        this.formBuilder.nonNullable.control<string>("", this.numberValidator),
-      );
-    }
-
-    while (this.form.controls.initialGuess.length > this.equationCount()) {
-      this.form.controls.initialGuess.removeAt(
-        this.form.controls.initialGuess.length - 1,
-      );
-    }
-
-    for (let i = 0; i < this.equationCount(); i++) {
-      this.form.controls.initialGuess
-        .at(i)
-        .setValue(value?.initialGuess?.[i] ?? "", { emitEvent: false });
     }
   }
 
