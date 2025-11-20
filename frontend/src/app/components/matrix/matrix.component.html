@@ -8,7 +8,7 @@
         #input
         class="min-w-32 h-fit"
         type="text"
-        placeholder="0"
+        [placeholder]="0"
         [formControl]="form.at(i).at(j)"
         autoSizeInput
         (keydown)="onKeyDown(i, j, $event)"

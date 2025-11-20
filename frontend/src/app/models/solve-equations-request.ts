@@ -15,39 +15,35 @@ export type IterationParameters =
     }
   | {
       initialGuess: number[];
-      stoppingCondition: "relative-error";
-      relativeError: number;
+      stoppingCondition: "absolute-relative-error";
+      absoluteRelativeError: number;
     };
 
 export type SolveEquationsRequest =
   | {
-      equationCount: number;
       equations: Equations;
       method: "gauss-elimination";
       precision?: number;
     }
   | {
-      equationCount: number;
       equations: Equations;
       method: "gauss-jordan-elimination";
       precision?: number;
     }
   | {
-      equationCount: number;
       equations: Equations;
       method: "lu-decomposition";
       parameters: LUParameters;
       precision?: number;
     }
   | {
-      equationCount: number;
       equations: Equations;
       method: "jacobi-iteration";
       parameters: IterationParameters;
       precision?: number;
     }
   | {
-      equationCount: number;
+      equations: Equations;
       method: "gauss-seidel-iteration";
       parameters: IterationParameters;
       precision?: number;

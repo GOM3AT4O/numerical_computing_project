@@ -67,8 +67,6 @@
   }
 
   input:disabled {
-    background-color: var(--color-gray-200);
-    border-bottom-color: var(--color-gray-200);
     cursor: not-allowed;
   }
 

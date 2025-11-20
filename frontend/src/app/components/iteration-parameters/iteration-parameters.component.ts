@@ -1,25 +1,15 @@
-import {
-  Component,
-  forwardRef,
-  inject,
-  input,
-  OnChanges,
-  SimpleChanges,
-} from "@angular/core";
+import { Component, forwardRef, input } from "@angular/core";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
 import { RangePipe } from "../../pipes/range.pipe";
 import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormBuilder,
   NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
-  ValidationErrors,
-  Validator,
   Validators,
 } from "@angular/forms";
 import { MatrixComponent } from "../matrix/matrix.component";
+import { ParametersComponent } from "../parameters/parameters.component";
+import { IterationParameters } from "../../models/solve-equations-request";
 
 @Component({
   selector: "app-iteration-parameters",
@@ -44,16 +34,12 @@ import { MatrixComponent } from "../matrix/matrix.component";
   templateUrl: "./iteration-parameters.component.html",
   styleUrl: "./iteration-parameters.component.css",
 })
-export class IterationParametersComponent
-  implements ControlValueAccessor, Validator
-{
-  private formBuilder = inject(FormBuilder);
-
+export class IterationParametersComponent extends ParametersComponent {
   equationCount = input<number>(3);
 
   numberValidator = Validators.pattern(/^[-+]?\d+(\.\d+)?$/);
 
-  stoppingConditions = [
+  readonly stoppingConditions = [
     {
       label: "Number of Iterations",
       value: "number-of-iterations",
@@ -64,11 +50,15 @@ export class IterationParametersComponent
       value: "absolute-relative-error",
       controlName: "absoluteRelativeError",
     },
-  ];
+  ] as const;
 
   form = this.formBuilder.group({
-    initialGuess: [null],
-    stoppingCondition: [this.stoppingConditions[0].value, Validators.required],
+    initialGuess: [[] as string[], Validators.required],
+    stoppingCondition: [
+      this.stoppingConditions[0]
+        .value as (typeof this.stoppingConditions)[number]["value"],
+      Validators.required,
+    ],
     numberOfIterations: [
       { value: "", disabled: false },
       [Validators.required, Validators.pattern(/^[1-9]\d*$/)],
@@ -79,18 +69,30 @@ export class IterationParametersComponent
     ],
   });
 
-  private onChange: (_: any) => void = () => {};
-  private onTouched: () => void = () => {};
+  override get parameters(): IterationParameters {
+    const value = this.form.value!;
+    const initialGuess = value.initialGuess!.map((value: string) =>
+      isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+    );
 
-  ngOnInit() {
-    this.form.valueChanges.subscribe((value) => {
-      this.onChange(value);
-      this.onTouched();
-    });
+    switch (value.stoppingCondition!) {
+      case "number-of-iterations":
+        return {
+          initialGuess,
+          stoppingCondition: value.stoppingCondition!,
+          numberOfIterations: parseInt(value.numberOfIterations!, 10),
+        };
+      case "absolute-relative-error":
+        return {
+          initialGuess,
+          stoppingCondition: value.stoppingCondition!,
+          absoluteRelativeError: parseFloat(value.absoluteRelativeError!),
+        };
+    }
+  }
 
-    setTimeout(() => {
-      this.onChange(this.form.value);
-    });
+  override ngOnInit() {
+    super.ngOnInit();
 
     this.form.get("stoppingCondition")?.valueChanges.subscribe((value) => {
       for (const condition of this.stoppingConditions) {
@@ -127,29 +129,15 @@ export class IterationParametersComponent
     }
   }
 
-  registerOnChange(fn: (_: any) => void): void {
-    this.onChange = fn;
-  }
+  override setDisabledState?(isDisabled: boolean): void {
+    super.setDisabledState?.(isDisabled);
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    if (isDisabled) {
-      this.form.disable();
-    } else {
-      this.form.enable();
-
+    if (!isDisabled) {
       for (const condition of this.stoppingConditions) {
         if (condition.value !== this.form.get("stoppingCondition")?.value) {
           this.form.get(condition.controlName)?.disable();
         }
       }
     }
-  }
-
-  validate(_: AbstractControl): ValidationErrors | null {
-    return this.form.valid ? null : { parametersInvalid: true };
   }
 }
