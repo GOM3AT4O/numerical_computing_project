@@ -122,6 +122,44 @@
         >
           @if (response()!.solution) {
             <h1 class="text-lg font-bold">Solution of System</h1>
+            @if (response()!.L && response()!.U) {
+              <div class="flex flex-row items-center gap-16 self-center">
+                <div class="flex flex-row items-center gap-8 self-center">
+                  <span>L</span>
+                  <span>=</span>
+                  <table
+                    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                  >
+                    @for (row of response()!.L; track $index) {
+                      <tr>
+                        @for (value of row; track $index) {
+                          <td>
+                            <span>{{ value }}</span>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </table>
+                </div>
+                <div class="flex flex-row items-center gap-8 self-center">
+                  <span>U</span>
+                  <span>=</span>
+                  <table
+                    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                  >
+                    @for (row of response()!.U; track $index) {
+                      <tr>
+                        @for (value of row; track $index) {
+                          <td>
+                            <span>{{ value }}</span>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </table>
+                </div>
+              </div>
+            }
             <div class="flex flex-row items-center gap-8 self-center">
               <table
                 class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
@@ -144,11 +182,7 @@
               <table
                 class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
               >
-                @for (
-                  value of response()!.solution;
-                  track $index;
-                  let i = $index
-                ) {
+                @for (value of response()!.solution; track $index) {
                   <tr>
                     <td>
                       <span>{{ value }}</span>

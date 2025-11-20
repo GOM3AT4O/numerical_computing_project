@@ -25,7 +25,7 @@ export class EquationsSolverService {
       switch (request.method) {
         case "lu-decomposition":
           parameters = {
-            format: request.parameters.format,
+            form: request.parameters.format,
           };
           break;
         case "jacobi-iteration":
@@ -62,6 +62,8 @@ export class EquationsSolverService {
       solution: response.has_solution ? response.solution : null,
       executionTime: response.execution_time,
       numberOfIterations: response.iterations,
+      L: response.L,
+      U: response.U,
     };
   }
 
@@ -72,6 +74,8 @@ export class EquationsSolverService {
       .post<{
         has_solution: boolean;
         solution: number[];
+        L?: number[][];
+        U?: number[][];
         iterations?: number;
         execution_time: number;
         message: string;
