@@ -63,7 +63,7 @@
               id="precision"
               class="min-w-32 h-fit"
               type="text"
-              placeholder="10"
+              placeholder="6"
               formControlName="precision"
               autoSizeInput
             />
@@ -118,6 +118,7 @@
       </button>
       @if (response()) {
         <div
+          #result
           class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
         >
           @if (response()!.solution) {

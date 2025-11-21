@@ -65,6 +65,8 @@ export class EquationsSolverComponent {
 
   response = signal<SolveEquationsResponse | null>(null);
 
+  resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
+
   ngOnInit() {
     this.form.get("method")?.valueChanges.subscribe(() => {
       setTimeout(() => {
@@ -94,6 +96,8 @@ export class EquationsSolverComponent {
 
   solve() {
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.parameters()?.form.markAllAsTouched();
       return;
     }
 
@@ -118,7 +122,16 @@ export class EquationsSolverComponent {
     };
 
     this.equationSolverService.solveEquations(request).subscribe({
-      next: (response) => this.response.set(response),
+      next: (response) => {
+        this.response.set(response);
+        this.changeDetectorRef.detectChanges();
+        setTimeout(() => {
+          this.resultElement()?.nativeElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        });
+      },
       error: () => this.response.set(null),
     });
   }
