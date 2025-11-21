@@ -37,8 +37,8 @@ class LinearSystemValidator:
         
         try: 
             prec = int(precision)
-            if prec < 1 or prec > 10:
-                raise ValidationError("Precision must be between 1 to 10")
+            if prec < 1 :
+                raise ValidationError("Precision must be more than 1")
             return prec
         except (ValueError, TypeError):
             raise ValidationError("Precision  must be an integer")

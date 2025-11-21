@@ -28,14 +28,14 @@ class SolverFactory:
         
         elif method=="jacobi":
             initial_guess = params.get('initial_guess')
-            max_iterations= params.get('max_iterations',100)
-            tolerance =params.get('tolerance',1e-6)
+            max_iterations= params.get('max_iterations')
+            tolerance =params.get('tolerance')
             return JacobiSolver(A, b, precision, initial_guess, max_iterations, tolerance)
         
         elif method == "gaussseidel":
             initial_guess = params.get('initial_guess')
-            max_iterations = params.get('max_iterations',100)
-            tolerance = params.get('tolerance',1e-6)
+            max_iterations = params.get('max_iterations')
+            tolerance = params.get('tolerance')
             return GaussSeidelSolver(A, b, precision, initial_guess, max_iterations, tolerance)
         
         else:

@@ -1,13 +1,9 @@
-"""
-SolutionResult class to encapsulate solver results
-"""
-
 import numpy as np
 from typing import Dict, Optional, Any
 
 
 class SolutionResult:
-    """Class to encapsulate solution results"""
+
     
     def __init__(self, solution: Optional[np.ndarray] = None, 
                  iterations: Optional[int] = None,
@@ -20,13 +16,13 @@ class SolutionResult:
         self.message = message
         self.has_solution = has_solution
         
-        # Optional fields for LU decomposition
+        #optional fields for LU decomposition
         self.L = None
         self.U = None
         self.L_transpose = None
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convert result to dictionary for JSON response"""
+       
         result = {
             'has_solution': self.has_solution,
             'message': self.message,

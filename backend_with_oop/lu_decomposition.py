@@ -38,24 +38,44 @@ class LUDecompositionSolver(LinearSystemSolver):
                 A[[k,max_idx]]= A[[max_idx, k]]
                 P[[k,max_idx]] =P[[max_idx, k]]
 
+                A = self.round_to_sf(A)
+                P= self.round_to_sf(P)
+
+
         L = np.eye(n)
         U = np.zeros((n, n))
 
         for i in range(n):
             # Upper
             for j in range(i, n):
-                U[i, j] = A[i, j] -np.dot(L[i,:i], U[:i, j])
+                dot_product = 0
+                for k in range(i):
+                    product = self.round_to_sf(L[i,k]* U[k,j])
+                    dot_product = self.round_to_sf(dot_product + product)
 
-            if abs(U[i,i]) < 1e-12:
+                U[i, j] = self.round_to_sf(A[i,j]-dot_product)
+
+            if abs(U[i, i]) < 1e-12:
                 return SolutionResult(
                     has_solution=False,
-                    message="no unique solution sorrry",
-                    execution_time=time.time()-start_time
+                    message="No unique solution sorry find sth else to do",
+                    execution_time=time.time() - start_time
                 )
+
 
             # Lower
             for j in range(i+1,n):
-                L[j,i]= (A[j,i]- np.dot(L[j,:i],U[:i,i])) / U[i, i]
+                dot_product = 0
+                for k in range(i):
+                    product = self.round_to_sf(L[j,k]* U[k,i])
+                    dot_product = self.round_to_sf(dot_product + product)
+
+                numerator = self.round_to_sf(A[j, i] - dot_product)
+                L[j, i] = self.round_to_sf(numerator / U[i, i])
+
+
+
+              
 
         #permutation
         b = P @ b
@@ -63,24 +83,38 @@ class LUDecompositionSolver(LinearSystemSolver):
         # forward sub
         y = np.zeros(n)
         for i in range(n):
-            y[i] = b[i] - np.dot(L[i,:i], y[:i])
+            dot_product = 0
+            for j in range(i):
+                product = self.round_to_sf(L[i, j] * y[j])
+                dot_product = self.round_to_sf(dot_product + product)
+                
+            y[i] = self.round_to_sf(b[i] - dot_product)
+
 
         # back sub
         x = np.zeros(n)
-        for i in range(n- 1, -1, -1):
-            x[i] = (y[i] -np.dot(U[i, i+1:], x[i+1:]))/ U[i, i]
+        for i in range(n-1,-1, -1):
+            dot_product =0
+
+            for j in range(i+ 1, n):
+                product= self.round_to_sf(U[i,j]* x[j])
+                dot_product= self.round_to_sf(dot_product +product)
+            
+            numerator =self.round_to_sf(y[i] -dot_product)
+            x[i] =self.round_to_sf(numerator/ U[i,i])
         
-        execution_time = time.time()- start_time
+        execution_time = time.time()-start_time
 
         result = SolutionResult(
             solution=self.round_solution(x),
             execution_time=execution_time,
-            message="we got a solution using LU doolittle ?!"
+            message="we got a solution using LU doolittle ?!",
+            has_solution=True
         )
         # Add L and U matrices to result
-        result.L = np.round(L, self.precision).tolist()
-        result.U = np.round(U,self.precision).tolist()
-        result.P = np.round(P, self.precision).tolist()
+        result.L= self.round_to_sf(L).tolist()
+        result.U =self.round_to_sf(U).tolist()
+        result.P =self.round_to_sf(P).tolist()
         
         return result
     def _solve_crout(self) -> SolutionResult:
@@ -93,11 +127,17 @@ class LUDecompositionSolver(LinearSystemSolver):
         U = np.eye(n)
 
         for j in range(n):
-            # Lower triangular
+            #lower 
             for i in range(j, n):
-                L[i, j] = A[i,j] - np.dot(L[i,:j],U[:j,j])
+                dot_product =0
+                for k in range(j):
+                    product = self.round_to_sf(L[i,k]*U[k,j])
+                    dot_product =self.round_to_sf(dot_product +product)
 
-            # Check for singularity
+                L[i, j] = self.round_to_sf(A[i, j] - dot_product)
+
+
+            #check singularity
             if abs(L[j, j]) < 1e-12:
                 return SolutionResult(
                     has_solution=False,
@@ -107,17 +147,40 @@ class LUDecompositionSolver(LinearSystemSolver):
             
             # Upper triangular
             for i in range(j+ 1, n):
-                U[j, i] =(A[j,i]- np.dot(L[j, :j], U[:j, i])) / L[j, j]
+                dot_product = 0
+                for k in range(j):
+                    product = self.round_to_sf(L[j, k]* U[k, i])
+                    dot_product = self.round_to_sf(dot_product+ product)
 
-        # Forward substitution: Ly = b
+                numerator = self.round_to_sf(A[j, i] - dot_product)
+                U[j,i] =self.round_to_sf(numerator/ L[j, j])
+
+            
+
+                
+
+        #forward sub: Ly = b
         y = np.zeros(n)
         for i in range(n):
-            y[i] = (b[i] -np.dot(L[i, :i], y[:i])) / L[i, i]
+            dot_product = 0
+            for j in range(i):
+                product = self.round_to_sf(L[i, j] * y[j])
+                dot_product = self.round_to_sf(dot_product + product)
+
+            numerator = self.round_to_sf(b[i] - dot_product)
+            y[i] = self.round_to_sf(numerator / L[i, i])
+
         
-        # Backward substitution: Ux = y
+        # backwar sub: Ux = y
         x = np.zeros(n)
         for i in range(n-1,-1, -1):
-            x[i] = y[i] - np.dot(U[i,i+1:], x[i+1:])
+            dot_product = 0
+
+            for j in range(i + 1, n):
+                product = self.round_to_sf(U[i,j]*x[j])
+                dot_product=self.round_to_sf(dot_product +product)
+
+            x[i] =self.round_to_sf(y[i]-dot_product)
 
         execution_time = time.time()- start_time
 
@@ -150,37 +213,64 @@ class LUDecompositionSolver(LinearSystemSolver):
         for i in range(n):
             for j in range(i + 1):
                 if i == j:
-                    sum_sq = np.dot(L[i, :j], L[i, :j])
-                    val = A[i, i] - sum_sq
+                    sum_sq = 0
+                    for k in range(j):
+                        product = self.round_to_sf(L[i,k]* L[i, k])
+                        sum_sq = self.round_to_sf(sum_sq+ product)
+                    val = self.round_to_sf(A[i,i] -sum_sq)
                     if val <= 0:
+                        
                         return SolutionResult(
-                            has_solution=False,
-                            message="matrix is not positive definite sorry try sth else then",
-                            execution_time=time.time() - start_time
+                             has_solution=False,
+                            message="Matrix is not positive definite",
+                            execution_time=time.time()- start_time
                         )
-                    L[i, j] = np.sqrt(val)
+                        
+                    L[i,j] =self.round_to_sf(np.sqrt(val))
                 else:
-                    sum_prod = np.dot(L[i, :j], L[j, :j])
-                    L[i, j] = (A[i, j] - sum_prod) / L[j, j]
+                    sum_prod = 0
+                    for k in range(j):
+                        product = self.round_to_sf(L[i,k]*L[j,k])
+                        sum_prod =self.round_to_sf(sum_prod+product)
+                    numerator = self.round_to_sf(A[i,j] -sum_prod)
+                    L[i, j] = self.round_to_sf(numerator/ L[j, j])
+
+                
+
         
         #forward sub Ly = b
         y = np.zeros(n)
         for i in range(n):
-            y[i]= (b[i] -np.dot(L[i,:i],y[:i])) /L[i, i]
+            dot_product = 0
+            for j in range(i):
+                product = self.round_to_sf(L[i,j]* y[j])
+                dot_product = self.round_to_sf(dot_product+ product)
 
-        #backward sub L^T x = y
+            numerator = self.round_to_sf(b[i]- dot_product)
+            y[i] = self.round_to_sf(numerator/ L[i,i])
+
+        #backward sub 
         x = np.zeros(n)
-        for i in range(n- 1,-1, -1):
-            x[i] = (y[i]- np.dot(L[i+1:,i],x[i+1:])) /L[i, i]
+        for i in range(n-1,-1,-1):
+            dot_product = 0
+            for j in range(i+1,n):
+                product = self.round_to_sf(L[j, i] * x[j])
+                product = self.round_to_sf(dot_product+ product)
+            
+            numerator = self.round_to_sf(y[i] - dot_product)
+            x[i] = self.round_to_sf(numerator / L[i,i])
+
+
         
         execution_time=time.time()-start_time
 
         result =SolutionResult(
             solution=self.round_solution(x),
             execution_time=execution_time,
-            message="we got a solution using LU (Cholesky)"
+            message="we got a solution using LU cholesky",
+            has_solution=True
         )
-        result.L = np.round(L, self.precision).tolist()
-        result.U = np.round(L.T, self.precision).tolist()
+        result.L = self.round_to_sf(L).tolist()
+        result.U = self.round_to_sf(L.T).tolist()
         
         return result
