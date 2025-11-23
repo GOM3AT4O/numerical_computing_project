@@ -76,7 +76,7 @@ class GaussSeidelSolver(IterativeSolver):
             # tolerance mode
             iteration_count =0
 
-            max_safe_iterations =10000
+            max_safe_iterations =100
             
             for iteration in range(max_safe_iterations):
 
@@ -123,6 +123,6 @@ class GaussSeidelSolver(IterativeSolver):
                 solution=self.round_solution(x),
                 iterations=iteration_count,
                 execution_time=execution_time,
-                message=f"{warning_msg} Gauss-Seidel method did not converge within { max_safe_iterations } iterations (tolerance:{self.tolerance})",
+                message=f"{warning_msg} Gauss-Seidel method did not converge within { max_safe_iterations } iterations (tolerance:{self.tolerance} bad system cuz it diverges)",
                 has_solution=True
             )

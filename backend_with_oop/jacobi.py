@@ -76,7 +76,7 @@ class JacobiSolver(IterativeSolver):
         else:
             # tolerance mode
             iteration_count=0
-            max_safe_iterations=10000
+            max_safe_iterations=100
             
             for iteration in range(max_safe_iterations):
                 x_new = np.zeros(self.n)
@@ -120,7 +120,7 @@ class JacobiSolver(IterativeSolver):
                 solution=self.round_solution(x_new),
                 iterations=iteration_count,
                 execution_time=execution_time,
-                message=f"{warning_msg}jacobi method did not converge within {max_safe_iterations} iterations ( tolerance:{self.tolerance})",
+                message=f"{warning_msg}jacobi method did not converge within {max_safe_iterations} iterations ( tolerance:{self.tolerance} bad system cuz it diverges)",
                 has_solution=True
 
             )

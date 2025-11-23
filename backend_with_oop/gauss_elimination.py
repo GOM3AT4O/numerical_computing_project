@@ -3,9 +3,7 @@ import time
 from base_solver import LinearSystemSolver
 from solution_result import SolutionResult
 
-
 class GaussEliminationSolver(LinearSystemSolver):
-
     def solve(self) -> SolutionResult:
         start_time = time.time()
 
@@ -13,54 +11,46 @@ class GaussEliminationSolver(LinearSystemSolver):
         b = self.b.copy()
         n = self.n
 
-        # forward 
-        for k in range(n- 1):
-            # pivoting
-            A, b = self.partial_pivot(A, b, k)
+        for k in range(n -1):
+            A, b = self.partial_pivot(A,b, k)
 
-            #  singular matrix
-            if abs(A[k, k]) < 1e-12:
+            if abs(A[k,k]) <1e-12:
                 return SolutionResult(
                     has_solution=False,
-                    message="nuh bro no solution sorry.",
+                    message="No unique solution exists.",
                     execution_time=time.time() - start_time
                 )
             
-            # elimination
-            for i in range(k+1,n):
-                if A[k,k]!= 0:
-                    factor = self.round_to_sf(A[i,k]/A[k, k])
+            for i in range(k + 1,n):
+                factor = self.safe_divide(A[i,k],A[k,k])
+                
 
-                    update = self.round_to_sf(factor * A[k, k+1:])
-                    A[i, k+1:] = self.round_to_sf(A[i, k+1:] - update)
-                    A[i, k] = 0
+                A[i,k+1:] = self.update_matrix_row(A[i,k+1:],A[k,k+1:],factor)
+                
+                b[i]=self.update_vector_element(b[i], b[k], factor)
+                
+                A[i,k] = 0  
 
-                    b_update = self.round_to_sf(factor * b[k])
-                    b[i] = self.round_to_sf(b[i] - b_update)
-
-        # check the last diagonal element
-        if abs(A[n-1,  n-1])<1e-16:
+        if abs(A[n-1, n-1]) < 1e-12:
             return SolutionResult(
                 has_solution=False,
-                message="System has no unique solution singular",
+                message="system has no unique solution sorry.",
                 execution_time=time.time() - start_time
             )
 
-        # back sub
+        # Back substitution using base methods
         x = np.zeros(n)
-        for i in range(n-1,-1,-1):
-            x[i] = b[i]
-            for j in range(i+1,n):
-                subtract_val = self.round_to_sf(A[i, j] * x[j])
-                x[i] = self.round_to_sf(x[i] - subtract_val)
+        for i in range(n -1,-1, -1):
+            sum_val = b[i]
+            for j in range(i+1, n):
+                sum_val = self.update_vector_element(sum_val,A[i,j]*x[j], 1.0)
+            x[i] = self.safe_divide(sum_val,A[i,i])
 
-            x[i] = self.round_to_sf(x[i] / A[i, i])
-
-        execution_time = time.time() - start_time
-
+        execution_time = time.time()-start_time
+        
         return SolutionResult(
-            solution=x,  
+            solution=self.round_solution(x),
             execution_time=execution_time,
-            message="we got you a solution using gauss eleimination !!!!!!",
+            message="solution  found using Gauss Elimination finally,",
             has_solution=True
         )
