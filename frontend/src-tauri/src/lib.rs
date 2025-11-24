@@ -10,7 +10,7 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let child = Command::new("python")
-                .args(["../../backend_with_oop/app.py"])
+                .args(["../../backend/app.py"])
                 .stdout(Stdio::inherit())
                 .stderr(Stdio::inherit())
                 .spawn()

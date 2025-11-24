@@ -64,6 +64,7 @@ export class EquationsSolverComponent {
   parametersElement = viewChild("parameters", { read: ElementRef });
 
   response = signal<SolveEquationsResponse | null>(null);
+  errorResponse = signal<string | null>(null);
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 
@@ -132,7 +133,11 @@ export class EquationsSolverComponent {
           });
         });
       },
-      error: () => this.response.set(null),
+      error: (error) => {
+        this.response.set(null);
+        console.log(error);
+        console.log(error.error.text);
+      },
     });
   }
 }

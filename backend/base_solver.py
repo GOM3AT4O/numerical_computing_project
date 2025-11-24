@@ -82,4 +82,3 @@ class LinearSystemSolver(ABC):
             A[[k, max_idx]] = A[[max_idx, k]]
             b[[k, max_idx]] = b[[max_idx, k]]
         return A, b
-

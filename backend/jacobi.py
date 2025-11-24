@@ -73,7 +73,7 @@ class JacobiSolver(IterativeSolver):
         else:
             # tolerance mode
             iteration_count = 0
-            max_safe_iterations = 100
+            max_safe_iterations = 1000
 
             for iteration in range(max_safe_iterations):
                 x_new = np.zeros(self.n)
