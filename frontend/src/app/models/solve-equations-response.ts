@@ -4,4 +4,5 @@ export type SolveEquationsResponse = {
   numberOfIterations?: number;
   L?: number[][];
   U?: number[][];
+  message?: string;
 };

@@ -64,6 +64,7 @@ export class EquationsSolverService {
       numberOfIterations: response.iterations,
       L: response.L,
       U: response.U,
+      message: response.message,
     };
   }
 
