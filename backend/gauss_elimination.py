@@ -1,3 +1,4 @@
+from decimal import Decimal
 import numpy as np
 import time
 from base_solver import LinearSystemSolver
@@ -41,19 +42,20 @@ class GaussEliminationSolver(LinearSystemSolver):
             )
 
         # Back substitution using base methods
-        x = np.zeros(n)
+        x = np.full(n, +Decimal(0))
         for i in range(n - 1, -1, -1):
             sum_val = b[i]
             for j in range(i + 1, n):
-                sum_val = self.update_vector_element(sum_val, A[i, j] * x[j], 1.0)
+                sum_val = self.update_vector_element(
+                    sum_val, A[i, j] * x[j], +Decimal("1")
+                )
             x[i] = self.safe_divide(sum_val, A[i, i])
 
         execution_time = time.time() - start_time
 
         return SolutionResult(
-            solution=self.round_solution(x),
+            solution=x,
             execution_time=execution_time,
             message="Solution found using Gauss Elimination.",
             has_solution=True,
         )
-

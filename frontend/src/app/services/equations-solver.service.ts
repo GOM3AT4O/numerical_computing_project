@@ -11,36 +11,25 @@ export class EquationsSolverService {
   private http = inject(HttpClient);
   private readonly baseUrl = "http://localhost:5000/api";
 
-  private readonly mapMethod = {
-    "gauss-elimination": "gauss-elimination",
-    "gauss-jordan-elimination": "gauss-jordan",
-    "lu-decomposition": "lu-decomposition",
-    "jacobi-iteration": "jacobi",
-    "gauss-seidel-iteration": "gauss-seidel",
-  } as const;
-
   private mapRequest(request: SolveEquationsRequest) {
     let parameters = undefined;
     if ("parameters" in request) {
+      parameters = request.parameters;
       switch (request.method) {
-        case "lu-decomposition":
-          parameters = {
-            form: request.parameters.format,
-          };
-          break;
         case "jacobi-iteration":
         case "gauss-seidel-iteration":
           switch (request.parameters.stoppingCondition) {
             case "number-of-iterations":
               parameters = {
                 initial_guess: request.parameters.initialGuess,
-                max_iterations: request.parameters.numberOfIterations,
+                number_of_iterations: request.parameters.numberOfIterations,
               };
               break;
             case "absolute-relative-error":
               parameters = {
                 initial_guess: request.parameters.initialGuess,
-                tolerance: request.parameters.absoluteRelativeError,
+                absolute_relative_error:
+                  request.parameters.absoluteRelativeError,
               };
               break;
           }
@@ -51,7 +40,7 @@ export class EquationsSolverService {
     return {
       A: request.equations.coefficients,
       b: request.equations.constants,
-      method: this.mapMethod[request.method],
+      method: request.method,
       precision: request.precision,
       parameters: parameters,
     };

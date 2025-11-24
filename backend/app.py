@@ -3,6 +3,7 @@ from flask_cors import CORS
 from exceptions import ValidationError
 from validator import LinearSystemValidator
 from solver_factory import SolverFactory
+from decimal import Decimal, getcontext
 
 app = Flask(__name__)
 CORS(app)
@@ -24,14 +25,20 @@ def solve_system():
         b = data.get("b")
         method = data.get("method")
         precision = data.get("precision")
-        params = data.get("parameters", {})
+        parameters = data.get("parameters", {})
 
         print(f"A: {A}")
         print(f"b: {b}")
         print(f"method: {method}")
         print(f"precision: {precision}")
-        print(f"params: {params}")
+        print(f"params: {parameters}")
         print("=" * 50 + "\n")
+
+        A = [[+Decimal(x) for x in y] for y in A]
+        b = [+Decimal(x) for x in b]
+
+        getcontext().prec = precision if precision is not None else 10
+        getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields
         if not all([A, b, method]):
@@ -45,7 +52,7 @@ def solve_system():
 
         # Create and run solver
         solver = SolverFactory.create_solver(
-            method, A_matrix, b_vector, precision_value, params
+            method, A_matrix, b_vector, precision_value, parameters
         )
         result = solver.solve()
 
@@ -68,13 +75,16 @@ def solve_system():
 def get_methods():
     """Get list of available methods and their parameters"""
     methods = {
-        "gauss_elimination": {"name": "Gauss Elimination", "parameters": []},
-        "gauss_jordan": {"name": "Gauss-Jordan", "parameters": []},
-        "lu_decomposition": {
+        "gauss-elimination": {"name": "Gauss Elimination", "parameters": []},
+        "gauss-jordan_elimination": {
+            "name": "Gauss-Jordan Elimination",
+            "parameters": [],
+        },
+        "lu-decomposition": {
             "name": "LU Decomposition",
             "parameters": [
                 {
-                    "name": "form",
+                    "name": "format",
                     "type": "select",
                     "options": ["doolittle", "crout", "cholesky"],
                     "default": "doolittle",
@@ -82,7 +92,7 @@ def get_methods():
                 }
             ],
         },
-        "jacobi": {
+        "jacobi-iteration": {
             "name": "Jacobi Iteration",
             "parameters": [
                 {
@@ -92,21 +102,21 @@ def get_methods():
                     "description": "Initial guess for solution (defaults to zeros)",
                 },
                 {
-                    "name": "max_iterations",
+                    "name": "number_of_iterations",
                     "type": "integer",
                     "default": 100,
                     "required": False,
                 },
                 {
-                    "name": "tolerance",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
                 },
             ],
         },
-        "gauss_seidel": {
-            "name": "Gauss-Seidel",
+        "gauss-seidel-iteration": {
+            "name": "Gauss-Seidel Iteration",
             "parameters": [
                 {
                     "name": "initial_guess",
@@ -115,13 +125,13 @@ def get_methods():
                     "description": "Initial guess for solution (defaults to zeros)",
                 },
                 {
-                    "name": "max_iterations",
+                    "name": "number_of_iterations",
                     "type": "integer",
                     "default": 100,
                     "required": False,
                 },
                 {
-                    "name": "tolerance",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -140,4 +150,3 @@ def health_check():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-

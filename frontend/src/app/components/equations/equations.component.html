@@ -9,11 +9,12 @@
     @for (j of equationCount() | range; track $index) {
       <input
         #input
-        class="min-w-32 h-fit"
+        class="min-w-full h-fit"
         type="text"
         placeholder="0"
         [formControl]="form.controls.coefficients.at(i).at(j)"
         autoSizeInput
+        [extraWidth]="10"
         (keydown)="onKeyDown(i, j, $event)"
       />
       <span
@@ -26,11 +27,12 @@
     <span>=</span>
     <input
       #input
-      class="min-w-32 h-fit"
+      class="min-w-full h-fit"
       type="text"
       placeholder="0"
       [formControl]="form.controls.constants.at(i)"
       autoSizeInput
+      [extraWidth]="10"
       (keydown)="onKeyDown(i, equationCount(), $event)"
     />
   }

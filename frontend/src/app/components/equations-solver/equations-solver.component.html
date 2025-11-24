@@ -63,7 +63,7 @@
               id="precision"
               class="min-w-32 h-fit"
               type="text"
-              placeholder="6"
+              placeholder="10"
               formControlName="precision"
               autoSizeInput
             />
@@ -121,8 +121,8 @@
           #result
           class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
         >
+          <h1 class="text-lg font-bold">Method Result</h1>
           @if (response()!.solution) {
-            <h1 class="text-lg font-bold">Solution of System</h1>
             @if (response()!.message) {
               <p>{{ response()!.message }}</p>
             }
@@ -137,7 +137,7 @@
                     @for (row of response()!.L; track $index) {
                       <tr>
                         @for (value of row; track $index) {
-                          <td>
+                          <td class="min-w-16">
                             <span>{{ value }}</span>
                           </td>
                         }
@@ -154,7 +154,7 @@
                     @for (row of response()!.U; track $index) {
                       <tr>
                         @for (value of row; track $index) {
-                          <td>
+                          <td class="min-w-16">
                             <span>{{ value }}</span>
                           </td>
                         }
@@ -174,7 +174,7 @@
                   let i = $index
                 ) {
                   <tr>
-                    <td>
+                    <td class="min-w-16">
                       <span
                         >x<sub>{{ i + 1 }}</sub></span
                       >
@@ -188,7 +188,7 @@
               >
                 @for (value of response()!.solution; track $index) {
                   <tr>
-                    <td>
+                    <td class="min-w-16">
                       <span>{{ value }}</span>
                     </td>
                   </tr>
@@ -196,7 +196,6 @@
               </table>
             </div>
           } @else {
-            <h1 class="text-lg font-bold">No solution</h1>
             @if (response()!.message) {
               <p>{{ response()!.message }}</p>
             }

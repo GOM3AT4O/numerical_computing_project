@@ -6,11 +6,12 @@
     @for (j of columnCount() | range; track $index) {
       <input
         #input
-        class="min-w-32 h-fit"
+        class="min-w-full h-fit"
         type="text"
         [placeholder]="0"
         [formControl]="form.at(i).at(j)"
         autoSizeInput
+        [extraWidth]="10"
         (keydown)="onKeyDown(i, j, $event)"
       />
     }

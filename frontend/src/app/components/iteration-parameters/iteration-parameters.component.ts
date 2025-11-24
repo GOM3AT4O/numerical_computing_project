@@ -53,7 +53,7 @@ export class IterationParametersComponent extends ParametersComponent {
   ] as const;
 
   form = this.formBuilder.group({
-    initialGuess: [[] as string[], Validators.required],
+    initialGuess: [[] as string[][], Validators.required],
     stoppingCondition: [
       this.stoppingConditions[0]
         .value as (typeof this.stoppingConditions)[number]["value"],
@@ -71,8 +71,9 @@ export class IterationParametersComponent extends ParametersComponent {
 
   override get parameters(): IterationParameters {
     const value = this.form.value!;
-    const initialGuess = value.initialGuess!.map((value: string) =>
-      isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+    console.log(value);
+    const initialGuess = value.initialGuess!.map((value: string[]) =>
+      value[0].trim() === "" ? "0" : value[0],
     );
 
     switch (value.stoppingCondition!) {
@@ -86,7 +87,7 @@ export class IterationParametersComponent extends ParametersComponent {
         return {
           initialGuess,
           stoppingCondition: value.stoppingCondition!,
-          absoluteRelativeError: parseFloat(value.absoluteRelativeError!),
+          absoluteRelativeError: value.absoluteRelativeError!,
         };
     }
   }

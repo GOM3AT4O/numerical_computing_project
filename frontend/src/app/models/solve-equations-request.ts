@@ -1,6 +1,6 @@
 export type Equations = {
-  coefficients: number[][];
-  constants: number[];
+  coefficients: string[][];
+  constants: string[];
 };
 
 export type LUParameters = {
@@ -9,14 +9,14 @@ export type LUParameters = {
 
 export type IterationParameters =
   | {
-      initialGuess: number[];
+      initialGuess: string[];
       stoppingCondition: "number-of-iterations";
       numberOfIterations: number;
     }
   | {
-      initialGuess: number[];
+      initialGuess: string[];
       stoppingCondition: "absolute-relative-error";
-      absoluteRelativeError: number;
+      absoluteRelativeError: string;
     };
 
 export type SolveEquationsRequest =

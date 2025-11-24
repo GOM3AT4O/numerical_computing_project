@@ -40,9 +40,8 @@ class GaussJordanSolver(LinearSystemSolver):
         execution_time = time.time() - start_time
 
         return SolutionResult(
-            solution=self.round_solution(b),
+            solution=b,
             execution_time=execution_time,
             message="Solution found using Gauss-Jordan Elimination.",
             has_solution=True,
         )
-

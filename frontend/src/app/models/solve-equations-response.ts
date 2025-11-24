@@ -1,8 +1,8 @@
 export type SolveEquationsResponse = {
-  solution?: number[];
+  solution?: string[];
   executionTime: number;
   numberOfIterations?: number;
-  L?: number[][];
-  U?: number[][];
+  L?: string[][];
+  U?: string[][];
   message?: string;
 };

@@ -107,12 +107,10 @@ export class EquationsSolverComponent {
     const request: SolveEquationsRequest = {
       equations: {
         coefficients: value.equations!.coefficients.map((row: string[]) =>
-          row.map((value: string) =>
-            isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-          ),
+          row.map((value: string) => (value.trim() === "" ? "0" : value)),
         ),
         constants: value.equations!.constants.map((value: string) =>
-          isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+          value.trim() === "" ? "0" : value,
         ),
       },
       method: value.method!,
