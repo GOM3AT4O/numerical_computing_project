@@ -255,7 +255,7 @@ class LUDecompositionSolver(LinearSystemSolver):
             dot_product = 0
             for j in range(i+1,n):
                 product = self.round_to_sf(L[j, i] * x[j])
-                product = self.round_to_sf(dot_product+ product)
+                dot_product = self.round_to_sf(dot_product + product)
             
             numerator = self.round_to_sf(y[i] - dot_product)
             x[i] = self.round_to_sf(numerator / L[i,i])
