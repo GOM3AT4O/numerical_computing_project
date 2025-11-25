@@ -1,6 +1,7 @@
 from decimal import Decimal
 import numpy as np
 import time
+from substitution import Substitution
 from row_operation import RowOperation
 from base_solver import LinearSystemSolver
 from solution_result import SolutionResult
@@ -59,7 +60,11 @@ class GaussEliminationSolver(LinearSystemSolver):
                 sum_val = self.update_vector_element(
                     sum_val, A[i, j] * x[j], +Decimal("1")
                 )
-            x[i] = self.safe_divide(sum_val, A[i, i])
+            x[i] = sum_val / A[i, i]
+
+        matrix = np.column_stack([A, b])
+
+        self.steps.append(Substitution.back(matrix, x))
 
         execution_time = time.time() - start_time
 

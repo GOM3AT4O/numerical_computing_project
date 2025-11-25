@@ -25,4 +25,11 @@ export type RowOperation =
       factor: string;
     };
 
-export type Step = RowOperation;
+export type Substitution = {
+  step_type: "substitution";
+  substitution_type: "forward" | "back";
+  matrix: string[][];
+  result: string[];
+};
+
+export type Step = RowOperation | Substitution;

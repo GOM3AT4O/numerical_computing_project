@@ -121,7 +121,7 @@
           #result
           class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
         >
-          <h1 class="text-lg font-bold">Method Result</h1>
+          <h1 class="text-lg font-bold">Result</h1>
           @if (response()!.solution) {
             @if (response()!.message) {
               <p>{{ response()!.message }}</p>
@@ -132,73 +132,91 @@
                 <div class="flex flex-col gap-8 mb-8">
                   <div class="flex flex-row items-center gap-8">
                     <span class="font-medium">Step {{ $index + 1 }}: </span>
-                    <table
-                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
-                    >
-                      @for (row of step.old_matrix; track $index) {
-                        <tr>
-                          @for (value of row; track $index) {
-                            <td class="min-w-16">
-                              <span>{{ value }}</span>
-                            </td>
-                          }
-                        </tr>
-                      }
-                    </table>
-                    <div class="inline-flex flex-col items-center">
-                      <div class="px-8 text-sm font-medium text-center">
-                        @switch (step.operation_type) {
-                          @case ("swap") {
-                            R<sub>{{ step.target_row + 1 }}</sub> &harr; R<sub
-                              >{{ step.source_row + 1 }}</sub
-                            >
-                          }
-                          @case ("scale") {
-                            R<sub>{{ step.target_row + 1 }}</sub> &rarr; R<sub
-                              >{{ step.target_row + 1 }}</sub
-                            >
-                          }
-                          @case ("add") {
-                            R<sub>{{ step.target_row + 1 }}</sub>
-                            {{ step.factor.startsWith("-") ? "-" : "+" }}
-                            {{
-                              step.factor.startsWith("-")
-                                ? step.factor.substring(1)
-                                : step.factor
-                            }}R<sub>{{ step.source_row + 1 }}</sub> &rarr; R<sub
-                              >{{ step.target_row + 1 }}</sub
-                            >
-                          }
-                        }
-                      </div>
-                      <div class="inline-flex items-center w-full">
-                        <div class="h-2 bg-black flex-1"></div>
-                        <svg
-                          class="w-10 h-10 -ml-6"
-                          viewBox="0 0 10 10"
-                          fill="none"
-                          stroke="black"
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
+                    @switch (step.step_type) {
+                      @case ("row-operation") {
+                        <table
+                          class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
                         >
-                          <polyline points="1,1 9,5 1,9" />
-                        </svg>
-                      </div>
-                    </div>
-                    <table
-                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
-                    >
-                      @for (row of step.new_matrix; track $index) {
-                        <tr>
-                          @for (value of row; track $index) {
-                            <td class="min-w-16">
-                              <span>{{ value }}</span>
-                            </td>
+                          @for (row of step.old_matrix; track $index) {
+                            <tr>
+                              @for (value of row; track $index) {
+                                <td class="min-w-16">
+                                  <span class="select-text">{{ value }}</span>
+                                </td>
+                              }
+                            </tr>
                           }
-                        </tr>
+                        </table>
+                        <div class="inline-flex flex-col items-center">
+                          <div class="px-8 text-sm font-medium text-center">
+                            @switch (step.operation_type) {
+                              @case ("swap") {
+                                R<sub>{{ step.target_row + 1 }}</sub> &harr;
+                                R<sub>{{ step.source_row + 1 }}</sub>
+                              }
+                              @case ("scale") {
+                                {{ step.factor }}R<sub>{{
+                                  step.target_row + 1
+                                }}</sub>
+                                &rarr; R<sub>{{ step.target_row + 1 }}</sub>
+                              }
+                              @case ("add") {
+                                R<sub>{{ step.target_row + 1 }}</sub>
+                                {{ step.factor.startsWith("-") ? "-" : "+" }}
+                                {{
+                                  step.factor.startsWith("-")
+                                    ? step.factor.substring(1)
+                                    : step.factor
+                                }}R<sub>{{ step.source_row + 1 }}</sub> &rarr;
+                                R<sub>{{ step.target_row + 1 }}</sub>
+                              }
+                            }
+                          </div>
+                          <div class="inline-flex items-center w-full">
+                            <div class="h-2 bg-black flex-1"></div>
+                            <svg
+                              class="w-10 h-10 -ml-8"
+                              viewBox="0 0 10 10"
+                              fill="none"
+                              stroke="black"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="1,1 9,5 1,9" />
+                            </svg>
+                          </div>
+                        </div>
+                        <table
+                          class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                        >
+                          @for (row of step.new_matrix; track $index) {
+                            <tr>
+                              @for (value of row; track $index) {
+                                <td class="min-w-16">
+                                  <span class="select-text">{{ value }}</span>
+                                </td>
+                              }
+                            </tr>
+                          }
+                        </table>
                       }
-                    </table>
+                      @case ("substitution") {
+                        <table
+                          class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                        >
+                          @for (row of step.matrix; track $index) {
+                            <tr>
+                              @for (value of row; track $index) {
+                                <td class="min-w-16">
+                                  <span class="select-text">{{ value }}</span>
+                                </td>
+                              }
+                            </tr>
+                          }
+                        </table>
+                      }
+                    }
                   </div>
                 </div>
               }
@@ -266,7 +284,7 @@
                 @for (value of response()!.solution; track $index) {
                   <tr>
                     <td class="min-w-16">
-                      <span>{{ value }}</span>
+                      <span class="select-text">{{ value }}</span>
                     </td>
                   </tr>
                 }
@@ -280,12 +298,14 @@
           @if (response()!.numberOfIterations) {
             <div class="flex flex-row items-center gap-8">
               <span class="font-medium">Number of Iterations:</span>
-              <span>{{ response()!.numberOfIterations }}</span>
+              <span class="select-text">{{
+                response()!.numberOfIterations
+              }}</span>
             </div>
           }
           <div class="flex flex-row items-center gap-8">
             <span class="font-medium">Execution Time:</span>
-            <span>{{ response()!.executionTime }}</span>
+            <span class="select-text">{{ response()!.executionTime }}</span>
           </div>
         </div>
       }
