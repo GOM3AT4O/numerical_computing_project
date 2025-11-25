@@ -37,7 +37,7 @@ def solve_system():
         A = [[+Decimal(x) for x in y] for y in A]
         b = [+Decimal(x) for x in b]
 
-        getcontext().prec = precision if precision is not None else 10
+        getcontext().prec = precision if precision is not None else 6
         getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields

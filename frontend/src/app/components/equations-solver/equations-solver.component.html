@@ -63,7 +63,7 @@
               id="precision"
               class="min-w-32 h-fit"
               type="text"
-              placeholder="10"
+              placeholder="6"
               formControlName="precision"
               autoSizeInput
             />
@@ -125,6 +125,83 @@
           @if (response()!.solution) {
             @if (response()!.message) {
               <p>{{ response()!.message }}</p>
+            }
+            @if (response()!.steps) {
+              <h1 class="text-md font-bold">Steps</h1>
+              @for (step of response()!.steps; track $index) {
+                <div class="flex flex-col gap-8 mb-8">
+                  <div class="flex flex-row items-center gap-8">
+                    <span class="font-medium">Step {{ $index + 1 }}: </span>
+                    <table
+                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                    >
+                      @for (row of step.old_matrix; track $index) {
+                        <tr>
+                          @for (value of row; track $index) {
+                            <td class="min-w-16">
+                              <span>{{ value }}</span>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </table>
+                    <div class="inline-flex flex-col items-center">
+                      <div class="px-8 text-sm font-medium text-center">
+                        @switch (step.operation_type) {
+                          @case ("swap") {
+                            R<sub>{{ step.target_row + 1 }}</sub> &harr; R<sub
+                              >{{ step.source_row + 1 }}</sub
+                            >
+                          }
+                          @case ("scale") {
+                            R<sub>{{ step.target_row + 1 }}</sub> &rarr; R<sub
+                              >{{ step.target_row + 1 }}</sub
+                            >
+                          }
+                          @case ("add") {
+                            R<sub>{{ step.target_row + 1 }}</sub>
+                            {{ step.factor.startsWith("-") ? "-" : "+" }}
+                            {{
+                              step.factor.startsWith("-")
+                                ? step.factor.substring(1)
+                                : step.factor
+                            }}R<sub>{{ step.source_row + 1 }}</sub> &rarr; R<sub
+                              >{{ step.target_row + 1 }}</sub
+                            >
+                          }
+                        }
+                      </div>
+                      <div class="inline-flex items-center w-full">
+                        <div class="h-2 bg-black flex-1"></div>
+                        <svg
+                          class="w-10 h-10 -ml-6"
+                          viewBox="0 0 10 10"
+                          fill="none"
+                          stroke="black"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="1,1 9,5 1,9" />
+                        </svg>
+                      </div>
+                    </div>
+                    <table
+                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                    >
+                      @for (row of step.new_matrix; track $index) {
+                        <tr>
+                          @for (value of row; track $index) {
+                            <td class="min-w-16">
+                              <span>{{ value }}</span>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </table>
+                  </div>
+                </div>
+              }
             }
             @if (response()!.L && response()!.U) {
               <div class="flex flex-row items-center gap-16 self-center">

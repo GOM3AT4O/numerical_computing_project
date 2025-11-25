@@ -1,5 +1,6 @@
-import numpy as np
+from decimal import Decimal
 import time
+from row_operation import RowOperation
 from base_solver import LinearSystemSolver
 from solution_result import SolutionResult
 
@@ -19,15 +20,16 @@ class GaussJordanSolver(LinearSystemSolver):
             # check for singularity
             if abs(A[k, k]) < 1e-12:
                 return SolutionResult(
-                    has_solution=False,
                     message="System doesn't have a unique solution.",
                     execution_time=time.time() - start_time,
                 )
 
             pivot = A[k, k]
             for j in range(n):
-                A[k, j] = self.safe_divide(A[k, j], pivot)
-            b[k] = self.safe_divide(b[k], pivot)
+                A[k, j] = A[k, j] / pivot
+            b[k] = b[k] / pivot
+
+            # self.steps.append(RowOperation.scale(k, +Decimal(1) / pivot))
 
             for i in range(n):
                 if i != k:
@@ -37,11 +39,13 @@ class GaussJordanSolver(LinearSystemSolver):
 
                     b[i] = self.update_vector_element(b[i], b[k], factor)
 
+                    # self.steps.append(RowOperation.add(i, k, -factor))
+
         execution_time = time.time() - start_time
 
         return SolutionResult(
             solution=b,
+            steps=self.steps,
             execution_time=execution_time,
             message="Solution found using Gauss-Jordan Elimination.",
-            has_solution=True,
         )

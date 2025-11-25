@@ -11,7 +11,7 @@ class LUDecompositionSolver(LinearSystemSolver):
         self,
         A: np.ndarray,
         b: np.ndarray,
-        precision: int = 10,
+        precision: int = 6,
         format: str = "doolittle",
     ):
         super().__init__(A, b, precision)
@@ -76,7 +76,6 @@ class LUDecompositionSolver(LinearSystemSolver):
 
             if abs(U[i, i]) < 1e-12:
                 return SolutionResult(
-                    has_solution=False,
                     message="System doesn't have a unique solution.",
                     execution_time=time.time() - start_time,
                 )
@@ -121,7 +120,6 @@ class LUDecompositionSolver(LinearSystemSolver):
             solution=x,
             execution_time=execution_time,
             message="Solution found using Doolittle LU Decomposition.",
-            has_solution=True,
         )
         # Add L and U matrices to result
         result.L = L
@@ -157,7 +155,6 @@ class LUDecompositionSolver(LinearSystemSolver):
             # check singularity
             if abs(L[j, j]) < 1e-12:
                 return SolutionResult(
-                    has_solution=False,
                     message="System doesn't have a unique solution.",
                     execution_time=time.time() - start_time,
                 )
@@ -230,7 +227,6 @@ class LUDecompositionSolver(LinearSystemSolver):
         # Check matrix symmetric or what
         if not self.allclose(A, A.T):
             return SolutionResult(
-                has_solution=False,
                 message="Coefficients matrix is not symmetric.",
                 execution_time=time.time() - start_time,
             )
@@ -246,7 +242,6 @@ class LUDecompositionSolver(LinearSystemSolver):
                     val = A[i, i] - sum_sq
                     if val <= 0:
                         return SolutionResult(
-                            has_solution=False,
                             message="Coefficients matrix is not positive definite.",
                             execution_time=time.time() - start_time,
                         )
@@ -288,7 +283,6 @@ class LUDecompositionSolver(LinearSystemSolver):
             solution=x,
             execution_time=execution_time,
             message="Solution found using Cholesky LU Decomposition.",
-            has_solution=True,
         )
         result.L = L
         result.U = L.T

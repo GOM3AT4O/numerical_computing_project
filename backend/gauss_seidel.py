@@ -11,7 +11,7 @@ class GaussSeidelSolver(IterativeSolver):
         self,
         A: np.ndarray,
         b: np.ndarray,
-        precision: int = 10,
+        precision: int = 6,
         initial_guess: Optional[List[Decimal]] = None,
         number_of_iterations: Optional[int] = None,
         absolute_relative_error: Optional[Decimal] = None,
@@ -31,7 +31,6 @@ class GaussSeidelSolver(IterativeSolver):
         system_analysis = self.analyze_system()
         if system_analysis:
             return SolutionResult(
-                has_solution=False,
                 message=system_analysis,
                 execution_time=time.time() - start_time,
             )
@@ -48,8 +47,6 @@ class GaussSeidelSolver(IterativeSolver):
 
         if self.number_of_iterations is not None:
             # iterations mode
-            iteration_count = 0
-
             for _ in range(self.number_of_iterations):
                 x_old = x.copy()
 
@@ -70,20 +67,17 @@ class GaussSeidelSolver(IterativeSolver):
                     numerator = b[i] - total_sum
                     x[i] = numerator / A[i, i]
 
-                iteration_count += 1
-
             execution_time = time.time() - start_time
             return SolutionResult(
                 solution=x,
-                iterations=iteration_count,
+                number_of_iterations=self.number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Gauss-Seidel method completed {self.number_of_iterations} iterations",
-                has_solution=True,
             )
 
         else:
             # absolute_relative_error mode
-            iteration_count = 0
+            number_of_iterations = 0
 
             maximum_number_of_iterations = 1000
 
@@ -107,25 +101,23 @@ class GaussSeidelSolver(IterativeSolver):
                     numerator = b[i] - total_sum
                     x[i] = numerator / A[i, i]
 
-                iteration_count += 1
+                number_of_iterations += 1
 
                 # check convergence
                 if self.check_convergence(x, x_old):
                     execution_time = time.time() - start_time
                     return SolutionResult(
                         solution=x,
-                        iterations=iteration_count,
+                        number_of_iterations=number_of_iterations,
                         execution_time=execution_time,
-                        message=f"{warning_message} Gauss-Seidel method converged after {iteration_count} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-                        has_solution=True,
+                        message=f"{warning_message} Gauss-Seidel method converged after {number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
                     )
 
             execution_time = time.time() - start_time
 
             return SolutionResult(
                 solution=x,
-                iterations=iteration_count,
+                number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Gauss-Seidel method did not converge within {maximum_number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-                has_solution=True,
             )

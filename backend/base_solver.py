@@ -1,16 +1,25 @@
 from decimal import Decimal
 import numpy as np
 from abc import ABC, abstractmethod
-from typing import Tuple, Union
+from typing import List, Tuple
+from row_operation import RowOperation
+from step import Step
 from solution_result import SolutionResult
 
 
 class LinearSystemSolver(ABC):
+    A: np.ndarray
+    b: np.ndarray
+    n: int
+    precision: int
+    steps: List[Step]
+
     def __init__(self, A: np.ndarray, b: np.ndarray, precision: int = 6):
         self.A = A.copy()
         self.b = b.copy()
         self.n = len(b)
         self.precision = precision
+        self.steps = []
 
     @abstractmethod
     def solve(self) -> SolutionResult:
@@ -36,12 +45,15 @@ class LinearSystemSolver(ABC):
         elimination_term = factor * source
         return target - elimination_term
 
-    @staticmethod
     def partial_pivot(
-        A: np.ndarray, b: np.ndarray, k: int
+        self, A: np.ndarray, b: np.ndarray, k: int
     ) -> Tuple[np.ndarray, np.ndarray]:
         max_idx = k + np.argmax(np.abs(A[k:, k]))
         if max_idx != k:
+            old_matrix = np.column_stack([A, b])
             A[[k, max_idx]] = A[[max_idx, k]]
             b[[k, max_idx]] = b[[max_idx, k]]
+            new_matrix = np.column_stack([A, b])
+            step = RowOperation.swap(old_matrix, new_matrix, k, int(max_idx))
+            self.steps.append(step)
         return A, b

@@ -11,7 +11,7 @@ class JacobiSolver(IterativeSolver):
         self,
         A: np.ndarray,
         b: np.ndarray,
-        precision: int = 10,
+        precision: int = 6,
         initial_guess: Optional[List[Decimal]] = None,
         number_of_iterations: Optional[int] = None,
         absolute_relative_error: Optional[Decimal] = None,
@@ -31,7 +31,6 @@ class JacobiSolver(IterativeSolver):
         system_analysis = self.analyze_system()
         if system_analysis:
             return SolutionResult(
-                has_solution=False,
                 message=system_analysis,
                 execution_time=time.time() - start_time,
             )
@@ -73,10 +72,9 @@ class JacobiSolver(IterativeSolver):
             execution_time = time.time() - start_time
             return SolutionResult(
                 solution=x,
-                iterations=number_of_iterations,
+                number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Jacobi method completed {self.number_of_iterations} iterations",
-                has_solution=True,
             )
         else:
             # absolute_relative_error mode
@@ -106,10 +104,9 @@ class JacobiSolver(IterativeSolver):
 
                     return SolutionResult(
                         solution=x_new,
-                        iterations=number_of_iterations,
+                        number_of_iterations=number_of_iterations,
                         execution_time=execution_time,
                         message=f"{warning_message} Jacobi method converged after {number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-                        has_solution=True,
                     )
 
                 x = x_new.copy()
@@ -118,8 +115,7 @@ class JacobiSolver(IterativeSolver):
 
             return SolutionResult(
                 solution=x,
-                iterations=number_of_iterations,
+                number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Jacobi method did not converge within {maximum_number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-                has_solution=True,
             )

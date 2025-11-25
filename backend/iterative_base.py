@@ -6,11 +6,15 @@ from exceptions import ValidationError
 
 
 class IterativeSolver(LinearSystemSolver):
+    x0: np.ndarray
+    number_of_iterations: Optional[int]
+    absolute_relative_error: Optional[Decimal]
+
     def __init__(
         self,
         A: np.ndarray,
         b: np.ndarray,
-        precision: int = 10,
+        precision: int = 6,
         initial_guess: Optional[List[Decimal]] = None,
         number_of_iterations: Optional[int] = None,
         absolute_relative_error: Optional[Decimal] = None,
