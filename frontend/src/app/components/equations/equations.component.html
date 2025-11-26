@@ -1,5 +1,5 @@
 <div
-  class="grid gap-6 items-center justify-items-center w-fit"
+  class="grid gap-y-6 items-center justify-items-center w-fit"
   [style.gridTemplateColumns]="
     'repeat(' + (equationCount() * 3 + 1) + ', auto)'
   "
@@ -17,14 +17,21 @@
         [extraWidth]="10"
         (keydown)="onKeyDown(i, j, $event)"
       />
-      <span
-        >x<sub>{{ j + 1 }}</sub></span
-      >
+      <math class="ml-4">
+        <msub>
+          <mi>x</mi>
+          <mn> {{ j + 1 }} </mn>
+        </msub>
+      </math>
       @if (j < equationCount() - 1) {
-        <span>+</span>
+        <math>
+          <mo>+</mo>
+        </math>
       }
     }
-    <span>=</span>
+    <math>
+      <mo>=</mo>
+    </math>
     <input
       #input
       class="min-w-full h-fit"

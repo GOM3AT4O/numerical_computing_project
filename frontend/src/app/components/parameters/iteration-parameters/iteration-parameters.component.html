@@ -8,9 +8,12 @@
         @for (i of equationCount() | range; track $index) {
           <tr>
             <td class="min-w-16">
-              <span
-                >x<sub>{{ i + 1 }}</sub></span
-              >
+              <math>
+                <msub>
+                  <mi>x</mi>
+                  <mn> {{ i + 1 }} </mn>
+                </msub>
+              </math>
             </td>
           </tr>
         }

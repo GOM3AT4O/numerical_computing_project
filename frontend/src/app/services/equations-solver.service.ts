@@ -52,7 +52,7 @@ export class EquationsSolverService {
       solution: response.solution,
       steps: response.steps,
       executionTime: response.execution_time,
-      numberOfIterations: response.iterations,
+      numberOfIterations: response.number_of_iterations,
       L: response.L,
       U: response.U,
       message: response.message,

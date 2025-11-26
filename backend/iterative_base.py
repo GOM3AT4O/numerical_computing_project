@@ -43,15 +43,20 @@ class IterativeSolver(LinearSystemSolver):
         else:
             self.x0 = np.full(self.n, +Decimal(0))
 
-    def check_convergence(self, x_new: np.ndarray, x_old: np.ndarray) -> bool:
-        if self.absolute_relative_error is None:
-            return False
-
+    @staticmethod
+    def calculate_absolute_relative_error(
+        x_new: np.ndarray, x_old: np.ndarray
+    ) -> Decimal:
         denominator = np.vectorize(lambda x: max(abs(x), Decimal("1e-10")))(
             np.abs(x_new)
         )
-        relative_error = np.max(np.abs(x_new - x_old) / denominator)
-        return relative_error < self.absolute_relative_error
+        return np.max(np.abs(x_new - x_old) / denominator)
+
+    def check_convergence(self, x_new: np.ndarray, x_old: np.ndarray) -> bool:
+        if self.absolute_relative_error is None:
+            return False
+        absolute_relative_error = self.calculate_absolute_relative_error(x_new, x_old)
+        return absolute_relative_error < self.absolute_relative_error
 
     def check_diagonal_dominance(self) -> bool:
         at_least_one_strict = False

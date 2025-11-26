@@ -71,7 +71,12 @@ class GaussSeidelSolver(IterativeSolver):
                     x[i] = numerator / A[i, i]
 
                 self.steps.append(
-                    Iteration.gauss_seidel(matrix, x_old.copy(), x.copy())
+                    Iteration.gauss_seidel(
+                        matrix,
+                        x_old.copy(),
+                        x.copy(),
+                        self.calculate_absolute_relative_error(x, x_old),
+                    )
                 )
 
             execution_time = time.time() - start_time
@@ -112,7 +117,12 @@ class GaussSeidelSolver(IterativeSolver):
                 number_of_iterations += 1
 
                 self.steps.append(
-                    Iteration.gauss_seidel(matrix, x_old.copy(), x.copy())
+                    Iteration.gauss_seidel(
+                        matrix,
+                        x_old.copy(),
+                        x.copy(),
+                        self.calculate_absolute_relative_error(x, x_old),
+                    )
                 )
 
                 # check convergence

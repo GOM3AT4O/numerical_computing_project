@@ -68,7 +68,14 @@ class JacobiSolver(IterativeSolver):
 
                     x_new[i] = numerator / A[i, i]
 
-                self.steps.append(Iteration.jacobi(matrix, x.copy(), x_new.copy()))
+                self.steps.append(
+                    Iteration.jacobi(
+                        matrix,
+                        x.copy(),
+                        x_new.copy(),
+                        self.calculate_absolute_relative_error(x_new, x),
+                    )
+                )
 
                 x = x_new.copy()
 
@@ -104,7 +111,14 @@ class JacobiSolver(IterativeSolver):
 
                 number_of_iterations += 1
 
-                self.steps.append(Iteration.jacobi(matrix, x.copy(), x_new.copy()))
+                self.steps.append(
+                    Iteration.jacobi(
+                        matrix,
+                        x.copy(),
+                        x_new.copy(),
+                        self.calculate_absolute_relative_error(x_new, x),
+                    )
+                )
 
                 # check convergence
                 if self.check_convergence(x_new, x):

@@ -38,6 +38,7 @@ export type Iteration = {
   matrix: string[][];
   old_solution: string[];
   new_solution: string[];
+  absolute_relative_error: string;
 };
 
 export type Step = RowOperation | Substitution | Iteration;

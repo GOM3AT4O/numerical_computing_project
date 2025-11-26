@@ -65,10 +65,13 @@ export class EquationsSolverComponent {
   parameters = viewChild<ParametersComponent>("parameters");
   parametersElement = viewChild("parameters", { read: ElementRef });
 
+  showSteps = signal<boolean>(false);
   response = signal<SolveEquationsResponse | null>(null);
   errorResponse = signal<string | null>(null);
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
+
+  stepsElement = viewChild<ElementRef<HTMLDivElement>>("steps");
 
   ngOnInit() {
     this.form.get("method")?.valueChanges.subscribe(() => {
@@ -97,6 +100,15 @@ export class EquationsSolverComponent {
     });
   }
 
+  clear() {
+    this.form.get("equations")?.setValue({
+      coefficients: Array.from({ length: this.equationCount }, () =>
+        Array.from({ length: this.equationCount }, () => ""),
+      ),
+      constants: Array.from({ length: this.equationCount }, () => ""),
+    });
+  }
+
   solve() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -122,22 +134,29 @@ export class EquationsSolverComponent {
         : parseInt(value.precision!, 10),
     };
 
-    this.equationSolverService.solveEquations(request).subscribe({
-      next: (response) => {
-        this.response.set(response);
-        this.changeDetectorRef.detectChanges();
-        setTimeout(() => {
-          this.resultElement()?.nativeElement.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
+    this.equationSolverService.solveEquations(request).subscribe((response) => {
+      this.showSteps.set(false);
+      this.response.set(response);
+      this.changeDetectorRef.detectChanges();
+      setTimeout(() => {
+        this.resultElement()?.nativeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
         });
-      },
-      error: (error) => {
-        this.response.set(null);
-        console.log(error);
-        console.log(error.error.text);
-      },
+      });
     });
+  }
+
+  toggleShowSteps() {
+    this.showSteps.update((value) => !value);
+    if (this.showSteps()) {
+      this.changeDetectorRef.detectChanges();
+      setTimeout(() => {
+        this.stepsElement()?.nativeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    }
   }
 }
