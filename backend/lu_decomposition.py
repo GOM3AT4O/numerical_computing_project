@@ -19,7 +19,6 @@ class LUDecompositionSolver(LinearSystemSolver):
         self.format = format.lower()
 
     def solve(self) -> SolutionResult:
-        
         if self.format == "doolittle":
             return self._solve_doolittle()
 
@@ -30,7 +29,7 @@ class LUDecompositionSolver(LinearSystemSolver):
             return self._solve_cholesky()
 
         else:
-            raise ValidationError(f"unlowun LU decomposition format: {self.format}")
+            raise ValidationError(f"Unknown LU Decomposition format: {self.format}")
 
     def _solve_doolittle(self) -> SolutionResult:
         start_time = time.time()
@@ -77,7 +76,7 @@ class LUDecompositionSolver(LinearSystemSolver):
 
             if abs(U[i, i]) < 1e-12:
                 return SolutionResult(
-                    message="system doesn't have a unique solution.",
+                    message="System doesn't have a unique solution.",
                     execution_time=time.time() - start_time,
                 )
 
@@ -129,7 +128,7 @@ class LUDecompositionSolver(LinearSystemSolver):
             solution=x,
             steps=self.steps,
             execution_time=execution_time,
-            message="solution found using doolittle LU decomposition yep.",
+            message="Solution found using doolittle LU decomposition.",
         )
         # Add L and U matrices to result
         result.L = L
@@ -316,4 +315,3 @@ class LUDecompositionSolver(LinearSystemSolver):
         result.U = L.T
 
         return result
-
