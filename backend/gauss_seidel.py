@@ -2,6 +2,7 @@ from decimal import Decimal
 import numpy as np
 import time
 from typing import List, Optional
+from iteration import Iteration
 from iterative_base import IterativeSolver
 from solution_result import SolutionResult
 
@@ -39,6 +40,8 @@ class GaussSeidelSolver(IterativeSolver):
         b = self.b
         x = self.x0.copy()
 
+        matrix = np.column_stack((A, b))
+
         # check if system might not converge
         if not self.check_diagonal_dominance():
             warning_message = "Warning: Matrix is not diagonally dominant. Thus, convergence is not really guaranteed."
@@ -67,9 +70,14 @@ class GaussSeidelSolver(IterativeSolver):
                     numerator = b[i] - total_sum
                     x[i] = numerator / A[i, i]
 
+                self.steps.append(
+                    Iteration.gauss_seidel(matrix, x_old.copy(), x.copy())
+                )
+
             execution_time = time.time() - start_time
             return SolutionResult(
                 solution=x,
+                steps=self.steps,
                 number_of_iterations=self.number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Gauss-Seidel method completed {self.number_of_iterations} iterations",
@@ -103,11 +111,16 @@ class GaussSeidelSolver(IterativeSolver):
 
                 number_of_iterations += 1
 
+                self.steps.append(
+                    Iteration.gauss_seidel(matrix, x_old.copy(), x.copy())
+                )
+
                 # check convergence
                 if self.check_convergence(x, x_old):
                     execution_time = time.time() - start_time
                     return SolutionResult(
                         solution=x,
+                        steps=self.steps,
                         number_of_iterations=number_of_iterations,
                         execution_time=execution_time,
                         message=f"{warning_message} Gauss-Seidel method converged after {number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
@@ -117,6 +130,7 @@ class GaussSeidelSolver(IterativeSolver):
 
             return SolutionResult(
                 solution=x,
+                steps=self.steps,
                 number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Gauss-Seidel method did not converge within {maximum_number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",

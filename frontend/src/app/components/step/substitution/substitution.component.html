@@ -1,0 +1,104 @@
+<div class="flex flex-col gap-8">
+  <div class="flex flex-row items-center gap-8">
+    <table
+      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+    >
+      @for (row of step().matrix; track $index) {
+        <tr>
+          @for (value of row.slice(0, -1); track $index) {
+            <td class="min-w-16">
+              <span class="select-text">{{ value }}</span>
+            </td>
+          }
+        </tr>
+      }
+    </table>
+    <table
+      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+    >
+      @for (value of step().matrix; track $index; let i = $index) {
+        <tr>
+          <td class="min-w-16">
+            <span
+              >{{ variable() }}<sub>{{ i + 1 }}</sub></span
+            >
+          </td>
+        </tr>
+      }
+    </table>
+    <span>=</span>
+    <table
+      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+    >
+      @for (row of step().matrix; track $index) {
+        <tr>
+          <td class="min-w-16">
+            <span class="select-text">{{ row.at(-1) }}</span>
+          </td>
+        </tr>
+      }
+    </table>
+  </div>
+  @for (i of orderSubstitutions(step().result.length | range); track $index) {
+    <div class="inline-flex flex-row items-center gap-8">
+      <div>
+        <math>
+          <mrow>
+            @for (
+              value of step().matrix[i].slice(0, -1);
+              track $index;
+              let j = $index
+            ) {
+              @if (value !== "0") {
+                @if (step().matrix[i].slice(0, j).some(isNotZero)) {
+                  <mo> {{ coefficientSign(value) }} </mo>
+                  <mrow>
+                    <mn> {{ formatCoefficient(value) }} </mn>
+                    <msub>
+                      <mi> x </mi>
+                      <mn> {{ j + 1 }} </mn>
+                    </msub>
+                  </mrow>
+                } @else {
+                  <mrow>
+                    <mn> {{ formatFirstCoefficient(value) }} </mn>
+                    <msub>
+                      <mi> x </mi>
+                      <mn> {{ j + 1 }} </mn>
+                    </msub>
+                  </mrow>
+                }
+              }
+            }
+          </mrow>
+          <mo>=</mo>
+          <mn> {{ step().matrix[i].at(-1) }} </mn>
+        </math>
+      </div>
+      <div class="inline-flex items-center w-32">
+        <div class="h-2 bg-black flex-1"></div>
+        <svg
+          class="w-10 h-10 -ml-8"
+          viewBox="0 0 10 10"
+          fill="none"
+          stroke="black"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="1,1 9,5 1,9" />
+        </svg>
+      </div>
+      <div>
+        <math>
+          <msub>
+            <mi> {{ variable() }} </mi>
+            <mn> {{ i + 1 }} </mn>
+          </msub>
+          <mo>=</mo>
+          <mn> {{ step().result[i] }} </mn>
+        </math>
+      </div>
+    </div>
+  }
+</div>

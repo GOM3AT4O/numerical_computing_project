@@ -2,6 +2,7 @@ from decimal import Decimal
 import numpy as np
 import time
 from typing import List, Optional
+from iteration import Iteration
 from iterative_base import IterativeSolver
 from solution_result import SolutionResult
 
@@ -39,6 +40,8 @@ class JacobiSolver(IterativeSolver):
         b = self.b
         x = self.x0.copy()
 
+        matrix = np.column_stack((A, b))
+
         # check if system might not converge
         if not self.check_diagonal_dominance():
             warning_message = "Warning: Matrix is not diagonally dominant. Thus, convergence is not really guaranteed."
@@ -65,6 +68,8 @@ class JacobiSolver(IterativeSolver):
 
                     x_new[i] = numerator / A[i, i]
 
+                self.steps.append(Iteration.jacobi(matrix, x.copy(), x_new.copy()))
+
                 x = x_new.copy()
 
                 number_of_iterations += 1
@@ -72,6 +77,7 @@ class JacobiSolver(IterativeSolver):
             execution_time = time.time() - start_time
             return SolutionResult(
                 solution=x,
+                steps=self.steps,
                 number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Jacobi method completed {self.number_of_iterations} iterations",
@@ -98,12 +104,15 @@ class JacobiSolver(IterativeSolver):
 
                 number_of_iterations += 1
 
+                self.steps.append(Iteration.jacobi(matrix, x.copy(), x_new.copy()))
+
                 # check convergence
                 if self.check_convergence(x_new, x):
                     execution_time = time.time() - start_time
 
                     return SolutionResult(
                         solution=x_new,
+                        steps=self.steps,
                         number_of_iterations=number_of_iterations,
                         execution_time=execution_time,
                         message=f"{warning_message} Jacobi method converged after {number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
@@ -115,6 +124,7 @@ class JacobiSolver(IterativeSolver):
 
             return SolutionResult(
                 solution=x,
+                steps=self.steps,
                 number_of_iterations=number_of_iterations,
                 execution_time=execution_time,
                 message=f"{warning_message} Jacobi method did not converge within {maximum_number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",

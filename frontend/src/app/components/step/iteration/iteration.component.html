@@ -1,0 +1,121 @@
+<div class="flex flex-col gap-8">
+  @for (row of step().matrix; track $index; let i = $index) {
+    <div>
+      <math>
+        <msubsup>
+          <mi> x </mi>
+          <mn> {{ i + 1 }} </mn>
+          <mtext>new</mtext>
+        </msubsup>
+        <mo>=</mo>
+        <mfrac>
+          <mrow class="pb-2 px-4">
+            @if (isNotZero(step().matrix[i].at(-1)!)) {
+              <mn> {{ step().matrix[i].at(-1) }} </mn>
+            }
+            @for (
+              value of step().matrix[i].slice(0, -1);
+              track $index;
+              let j = $index
+            ) {
+              @if (isNotZeroOrIndex(i)(value, j)) {
+                @if (
+                  isNotZero(step().matrix[i].at(-1)!) ||
+                  step().matrix[i].slice(0, j).some(isNotZeroOrIndex(i))
+                ) {
+                  <mo> {{ coefficientSign(negate(value)) }} </mo>
+                  <mrow>
+                    <mn> {{ formatCoefficient(negate(value)) }} </mn>
+                    @if (shouldUseNew(i, j)) {
+                      <msubsup>
+                        <mi> x </mi>
+                        <mn> {{ j + 1 }} </mn>
+                        <mtext>new</mtext>
+                      </msubsup>
+                    } @else {
+                      <msub>
+                        <mi> x </mi>
+                        <mn> {{ j + 1 }} </mn>
+                      </msub>
+                    }
+                  </mrow>
+                } @else {
+                  <mrow>
+                    <mn> {{ formatFirstCoefficient(negate(value)) }} </mn>
+                    @if (shouldUseNew(i, j)) {
+                      <msubsup>
+                        <mi> x </mi>
+                        <mn> {{ j + 1 }} </mn>
+                        <mtext>new</mtext>
+                      </msubsup>
+                    } @else {
+                      <msub>
+                        <mi> x </mi>
+                        <mn> {{ j + 1 }} </mn>
+                      </msub>
+                    }
+                  </mrow>
+                }
+              }
+            }
+          </mrow>
+          <mrow class="pt-4 px-4"
+            ><mn> {{ step().matrix[i][i] }} </mn></mrow
+          >
+        </mfrac>
+        <mo>=</mo>
+        <mfrac>
+          <mrow class="pb-2 px-4">
+            @if (isNotZero(step().matrix[i].at(-1)!)) {
+              <mn> {{ step().matrix[i].at(-1) }} </mn>
+            }
+            @for (
+              value of step().matrix[i].slice(0, -1);
+              track $index;
+              let j = $index
+            ) {
+              @if (isNotZeroOrIndex(i)(value, j)) {
+                @if (
+                  isNotZero(step().matrix[i].at(-1)!) ||
+                  step().matrix[i].slice(0, j).some(isNotZeroOrIndex(i))
+                ) {
+                  <mo> {{ coefficientSign(negate(value)) }} </mo>
+                  <mrow>
+                    <mn> {{ formatCoefficient(negate(value)) }} </mn>
+                    <mo>(</mo>
+                    <mn>
+                      {{
+                        shouldUseNew(i, j)
+                          ? step().new_solution[j]
+                          : step().old_solution[j]
+                      }}
+                    </mn>
+                    <mo>)</mo>
+                  </mrow>
+                } @else {
+                  <mrow>
+                    <mn> {{ formatFirstCoefficient(negate(value)) }} </mn>
+                    <mo>(</mo>
+                    <mn>
+                      {{
+                        shouldUseNew(i, j)
+                          ? step().new_solution[j]
+                          : step().old_solution[j]
+                      }}
+                    </mn>
+                    <mo>)</mo>
+                  </mrow>
+                }
+              }
+            }
+          </mrow>
+          <mrow class="pt-4 px-4"
+            ><mn> {{ step().matrix[i][i] }} </mn></mrow
+          >
+        </mfrac>
+        <mo>=</mo>
+        <mn> {{ step().new_solution[i] }} </mn>
+      </math>
+    </div>
+  }
+</div>

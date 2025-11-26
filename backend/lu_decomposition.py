@@ -1,6 +1,7 @@
 from decimal import Decimal
 import numpy as np
 import time
+from substitution import Substitution
 from base_solver import LinearSystemSolver
 from solution_result import SolutionResult
 from exceptions import ValidationError
@@ -103,6 +104,10 @@ class LUDecompositionSolver(LinearSystemSolver):
 
             y[i] = b[i] - dot_product
 
+        matrix = np.column_stack([L, b])
+
+        self.steps.append(Substitution.forward(matrix, y))
+
         # back sub
         x = np.full(n, +Decimal(0))
         for i in range(n - 1, -1, -1):
@@ -114,10 +119,15 @@ class LUDecompositionSolver(LinearSystemSolver):
             numerator = y[i] - dot_product
             x[i] = numerator / U[i, i]
 
+        matrix = np.column_stack([U, y])
+
+        self.steps.append(Substitution.back(matrix, x))
+
         execution_time = time.time() - start_time
 
         result = SolutionResult(
             solution=x,
+            steps=self.steps,
             execution_time=execution_time,
             message="Solution found using Doolittle LU Decomposition.",
         )
@@ -180,6 +190,10 @@ class LUDecompositionSolver(LinearSystemSolver):
             numerator = b[i] - dot_product
             y[i] = numerator / L[i, i]
 
+        matrix = np.column_stack([L, b])
+
+        self.steps.append(Substitution.forward(matrix, y))
+
         # backwar sub: Ux = y
         x = np.full(n, +Decimal(0))
         for i in range(n - 1, -1, -1):
@@ -191,10 +205,15 @@ class LUDecompositionSolver(LinearSystemSolver):
 
             x[i] = y[i] - dot_product
 
+        matrix = np.column_stack([U, y])
+
+        self.steps.append(Substitution.back(matrix, x))
+
         execution_time = time.time() - start_time
 
         result = SolutionResult(
             solution=x,
+            steps=self.steps,
             execution_time=execution_time,
             message="Solution found using Crout LU Decomposition.",
         )
@@ -266,6 +285,10 @@ class LUDecompositionSolver(LinearSystemSolver):
             numerator = b[i] - dot_product
             y[i] = numerator / L[i, i]
 
+        matrix = np.column_stack([L, b])
+
+        self.steps.append(Substitution.forward(matrix, y))
+
         # backward sub
         x = np.full(n, +Decimal(0))
         for i in range(n - 1, -1, -1):
@@ -277,10 +300,15 @@ class LUDecompositionSolver(LinearSystemSolver):
             numerator = y[i] - dot_product
             x[i] = numerator / L[i, i]
 
+        matrix = np.column_stack([L.T, y])
+
+        self.steps.append(Substitution.back(matrix, x))
+
         execution_time = time.time() - start_time
 
         result = SolutionResult(
             solution=x,
+            steps=self.steps,
             execution_time=execution_time,
             message="Solution found using Cholesky LU Decomposition.",
         )

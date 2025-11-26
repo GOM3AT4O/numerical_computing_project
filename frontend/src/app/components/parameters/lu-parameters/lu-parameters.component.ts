@@ -5,8 +5,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { ParametersComponent } from "../parameters/parameters.component";
-import { LUParameters } from "../../models/solve-equations-request";
+import { ParametersComponent } from "../../parameters/parameters.component";
+import { LUParameters } from "../../../models/solve-equations-request";
 
 @Component({
   selector: "app-lu-parameters",

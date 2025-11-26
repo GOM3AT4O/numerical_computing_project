@@ -32,4 +32,12 @@ export type Substitution = {
   result: string[];
 };
 
-export type Step = RowOperation | Substitution;
+export type Iteration = {
+  step_type: "iteration";
+  iteration_type: "jacobi" | "gauss-seidel";
+  matrix: string[][];
+  old_solution: string[];
+  new_solution: string[];
+};
+
+export type Step = RowOperation | Substitution | Iteration;

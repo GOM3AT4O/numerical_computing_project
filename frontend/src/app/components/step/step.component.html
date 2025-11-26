@@ -1,0 +1,11 @@
+@switch (step().step_type) {
+  @case ("row-operation") {
+    <app-row-operation [step]="$any(step())" />
+  }
+  @case ("substitution") {
+    <app-substitution [step]="$any(step())" />
+  }
+  @case ("iteration") {
+    <app-iteration [step]="$any(step())" />
+  }
+}

@@ -1,15 +1,15 @@
 import { Component, forwardRef, input } from "@angular/core";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { RangePipe } from "../../pipes/range.pipe";
+import { RangePipe } from "../../../pipes/range.pipe";
 import {
   NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { MatrixComponent } from "../matrix/matrix.component";
-import { ParametersComponent } from "../parameters/parameters.component";
-import { IterationParameters } from "../../models/solve-equations-request";
+import { MatrixComponent } from "../../matrix/matrix.component";
+import { ParametersComponent } from "../../parameters/parameters.component";
+import { IterationParameters } from "../../../models/solve-equations-request";
 
 @Component({
   selector: "app-iteration-parameters",

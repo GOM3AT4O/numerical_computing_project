@@ -96,4 +96,11 @@
     background-position: right 8px center;
     background-size: 16px;
   }
+
+  math {
+    font-family: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+  }
 }

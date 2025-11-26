@@ -9,12 +9,13 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { EquationsComponent } from "../equations/equations.component";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { LUParametersComponent } from "../lu-parameters/lu-parameters.component";
-import { IterationParametersComponent } from "../iteration-parameters/iteration-parameters.component";
+import { LUParametersComponent } from "../parameters/lu-parameters/lu-parameters.component";
+import { IterationParametersComponent } from "../parameters/iteration-parameters/iteration-parameters.component";
 import { EquationsSolverService } from "../../services/equations-solver.service";
 import { SolveEquationsRequest } from "../../models/solve-equations-request";
 import { SolveEquationsResponse } from "../../models/solve-equations-response";
 import { ParametersComponent } from "../parameters/parameters.component";
+import { StepComponent } from "../step/step.component";
 
 @Component({
   selector: "app-equations-solver",
@@ -24,6 +25,7 @@ import { ParametersComponent } from "../parameters/parameters.component";
     EquationsComponent,
     LUParametersComponent,
     IterationParametersComponent,
+    StepComponent,
   ],
   templateUrl: "./equations-solver.component.html",
   styleUrl: "./equations-solver.component.css",

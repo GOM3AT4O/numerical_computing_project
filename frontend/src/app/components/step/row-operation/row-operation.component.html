@@ -1,0 +1,100 @@
+<div class="flex flex-row items-center gap-8">
+  <table
+    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+  >
+    @for (row of step().old_matrix; track $index) {
+      <tr>
+        @for (value of row; track $index) {
+          <td class="min-w-16">
+            <span class="select-text">{{ value }}</span>
+          </td>
+        }
+      </tr>
+    }
+  </table>
+  <div class="inline-flex flex-col items-center">
+    <div class="px-8 text-sm font-medium text-center">
+      @switch (step().operation_type) {
+        @case ("swap") {
+          <math>
+            <msub>
+              <mi> R </mi>
+              <mn> {{ step().target_row + 1 }} </mn>
+            </msub>
+            <mo> &harr; </mo>
+            <msub>
+              <mi> R </mi>
+              <mn> {{ $any(step()).source_row + 1 }} </mn>
+            </msub>
+          </math>
+        }
+        @case ("scale") {
+          <math>
+            <mrow>
+              <mn> {{ $any(step()).factor }} </mn>
+              <msub>
+                <mi> R </mi>
+                <mn> {{ step().target_row + 1 }} </mn>
+              </msub>
+            </mrow>
+            <mo> &rarr; </mo>
+            <msub>
+              <mi> R </mi>
+              <mn> {{ step().target_row + 1 }} </mn>
+            </msub>
+          </math>
+        }
+        @case ("add") {
+          <math>
+            <mrow>
+              <msub>
+                <mi> R </mi>
+                <mn> {{ step().target_row + 1 }} </mn>
+              </msub>
+              <mo> {{ coefficientSign($any(step()).factor) }} </mo>
+              <mrow>
+                <mn> {{ formatCoefficient($any(step()).factor) }} </mn>
+                <msub>
+                  <mi> R </mi>
+                  <mn> {{ $any(step()).source_row + 1 }} </mn>
+                </msub>
+              </mrow>
+            </mrow>
+            <mo> &rarr; </mo>
+            <msub>
+              <mi> R </mi>
+              <mn> {{ step().target_row + 1 }} </mn>
+            </msub>
+          </math>
+        }
+      }
+    </div>
+    <div class="inline-flex items-center w-full">
+      <div class="h-2 bg-black flex-1"></div>
+      <svg
+        class="w-10 h-10 -ml-8"
+        viewBox="0 0 10 10"
+        fill="none"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="1,1 9,5 1,9" />
+      </svg>
+    </div>
+  </div>
+  <table
+    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+  >
+    @for (row of step().new_matrix; track $index) {
+      <tr>
+        @for (value of row; track $index) {
+          <td class="min-w-16">
+            <span class="select-text">{{ value }}</span>
+          </td>
+        }
+      </tr>
+    }
+  </table>
+</div>
