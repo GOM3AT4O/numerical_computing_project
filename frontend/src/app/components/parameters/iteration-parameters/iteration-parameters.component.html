@@ -26,35 +26,34 @@
       />
     </div>
     <div class="flex flex-col gap-8">
-      <label for="stopping-condition" class="font-medium"
-        >Stopping Condition:</label
-      >
+      <span class="font-medium">Stopping Condition:</span>
       <div class="grid grid-cols-[max-content_max-content] gap-8">
-        @for (stoppingCondition of stoppingConditions; track $index) {
-          <div>
-            <input
-              id="stopping-condition-{{ stoppingCondition.value }}"
-              class="mr-8"
-              type="radio"
-              name="stoppingCondition"
-              [value]="stoppingCondition.value"
-              formControlName="stoppingCondition"
-            />
-            <label
-              for="stopping-condition-{{ stoppingCondition.value }}"
-              class="font-medium"
-              >{{ stoppingCondition.label }}:</label
-            >
-          </div>
-          <input
-            class="min-w-full h-fit"
-            type="text"
-            [formControlName]="stoppingCondition.controlName"
-            autoSizeInput
-            [minWidth]="64"
-            [extraWidth]="10"
-          />
-        }
+        <label for="stopping-condition-number-of-iterations" class="font-medium"
+          >Number of Iterations:</label
+        >
+        <input
+          id="stopping-condition-number-of-iterations"
+          class="min-w-full h-fit"
+          type="text"
+          formControlName="numberOfIterations"
+          autoSizeInput
+          [minWidth]="64"
+          [extraWidth]="10"
+        />
+        <label
+          for="stopping-condition-absolute-relative-error"
+          class="font-medium"
+          >Absolute Relative Error:</label
+        >
+        <input
+          id="stopping-condition-absolute-relative-error"
+          class="min-w-full h-fit"
+          type="text"
+          formControlName="absoluteRelativeError"
+          autoSizeInput
+          [minWidth]="64"
+          [extraWidth]="10"
+        />
       </div>
     </div>
   </div>

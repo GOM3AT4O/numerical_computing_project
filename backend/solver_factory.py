@@ -31,8 +31,8 @@ class SolverFactory:
 
         elif method == "jacobi-iteration":
             initial_guess = parameters.get("initial_guess")
-            number_of_iterations = parameters.get("number_of_iterations")
-            absolute_relative_error = parameters.get("absolute_relative_error")
+            number_of_iterations = parameters.get("number_of_iterations", 100)
+            absolute_relative_error = parameters.get("absolute_relative_error", 10e-6)
             return JacobiIterationSolver(
                 A,
                 b,
@@ -44,8 +44,8 @@ class SolverFactory:
 
         elif method == "gauss-seidel-iteration":
             initial_guess = parameters.get("initial_guess")
-            number_of_iterations = parameters.get("number_of_iterations")
-            absolute_relative_error = parameters.get("absolute_relative_error")
+            number_of_iterations = parameters.get("number_of_iterations", 100)
+            absolute_relative_error = parameters.get("absolute_relative_error", 10e-6)
             return GaussSeidelIterationSolver(
                 A,
                 b,

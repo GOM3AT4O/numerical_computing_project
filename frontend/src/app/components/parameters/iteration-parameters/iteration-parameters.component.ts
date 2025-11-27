@@ -39,71 +39,28 @@ export class IterationParametersComponent extends ParametersComponent {
 
   numberValidator = Validators.pattern(/^[-+]?\d+(\.\d+)?$/);
 
-  readonly stoppingConditions = [
-    {
-      label: "Number of Iterations",
-      value: "number-of-iterations",
-      controlName: "numberOfIterations",
-    },
-    {
-      label: "Absolute Relative Error",
-      value: "absolute-relative-error",
-      controlName: "absoluteRelativeError",
-    },
-  ] as const;
-
   form = this.formBuilder.group({
     initialGuess: [[] as string[][], Validators.required],
-    stoppingCondition: [
-      this.stoppingConditions[0]
-        .value as (typeof this.stoppingConditions)[number]["value"],
-      Validators.required,
-    ],
     numberOfIterations: [
-      { value: "", disabled: false },
+      "",
       [Validators.required, Validators.pattern(/^[1-9]\d*$/)],
     ],
     absoluteRelativeError: [
-      { value: "", disabled: true },
+      "",
       [Validators.required, Validators.pattern(/^[-+]?\d+(\.\d+)?$/)],
     ],
   });
 
   override get parameters(): IterationParameters {
     const value = this.form.value!;
-    console.log(value);
-    const initialGuess = value.initialGuess!.map((value: string[]) =>
-      value[0].trim() === "" ? "0" : value[0],
-    );
 
-    switch (value.stoppingCondition!) {
-      case "number-of-iterations":
-        return {
-          initialGuess,
-          stoppingCondition: value.stoppingCondition!,
-          numberOfIterations: parseInt(value.numberOfIterations!, 10),
-        };
-      case "absolute-relative-error":
-        return {
-          initialGuess,
-          stoppingCondition: value.stoppingCondition!,
-          absoluteRelativeError: value.absoluteRelativeError!,
-        };
-    }
-  }
-
-  override ngOnInit() {
-    super.ngOnInit();
-
-    this.form.get("stoppingCondition")?.valueChanges.subscribe((value) => {
-      for (const condition of this.stoppingConditions) {
-        if (condition.value === value) {
-          this.form.get(condition.controlName)?.enable();
-        } else {
-          this.form.get(condition.controlName)?.disable();
-        }
-      }
-    });
+    return {
+      initialGuess: value.initialGuess!.map((value: string[]) =>
+        value[0].trim() === "" ? "0" : value[0],
+      ),
+      numberOfIterations: parseInt(value.numberOfIterations!, 10),
+      absoluteRelativeError: value.absoluteRelativeError!,
+    };
   }
 
   writeValue(value: any): void {
@@ -113,31 +70,21 @@ export class IterationParametersComponent extends ParametersComponent {
           .get("initialGuess")
           ?.setValue(value.initialGuess, { emitEvent: false });
       }
-      if (value.stoppingCondition) {
+
+      if (value.numberOfIterations) {
         this.form
-          .get("stoppingCondition")
-          ?.setValue(value.stoppingCondition, { emitEvent: false });
+          .get("numberOfIterations")
+          ?.setValue(value.numberOfIterations, {
+            emitEvent: false,
+          });
       }
-      for (const condition of this.stoppingConditions) {
-        if (value[condition.controlName]) {
-          this.form
-            .get(condition.controlName)
-            ?.setValue(value[condition.controlName], {
-              emitEvent: false,
-            });
-        }
-      }
-    }
-  }
 
-  override setDisabledState?(isDisabled: boolean): void {
-    super.setDisabledState?.(isDisabled);
-
-    if (!isDisabled) {
-      for (const condition of this.stoppingConditions) {
-        if (condition.value !== this.form.get("stoppingCondition")?.value) {
-          this.form.get(condition.controlName)?.disable();
-        }
+      if (value.absoluteRelativeError) {
+        this.form
+          .get("absoluteRelativeError")
+          ?.setValue(value.absoluteRelativeError, {
+            emitEvent: false,
+          });
       }
     }
   }

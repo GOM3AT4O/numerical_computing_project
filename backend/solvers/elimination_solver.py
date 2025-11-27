@@ -42,10 +42,10 @@ class EliminationSolver(Solver):
         x = np.full(self.n, +Decimal(0))
 
         for i in range(self.n - 1, -1, -1):
-            sum_value = b[i]
+            x[i] = b[i]
             for j in range(i + 1, self.n):
-                sum_value -= A[i, j] * x[j]
-            x[i] = sum_value / A[i, i]
+                x[i] -= A[i, j] * x[j]
+            x[i] /= A[i, i]
 
         matrix = np.column_stack([A, b])
 

@@ -15,26 +15,17 @@ export class EquationsSolverService {
   private mapRequest(request: SolveEquationsRequest) {
     let parameters = undefined;
     if ("parameters" in request) {
-      parameters = request.parameters;
       switch (request.method) {
         case "jacobi-iteration":
         case "gauss-seidel-iteration":
-          switch (request.parameters.stoppingCondition) {
-            case "number-of-iterations":
-              parameters = {
-                initial_guess: request.parameters.initialGuess,
-                number_of_iterations: request.parameters.numberOfIterations,
-              };
-              break;
-            case "absolute-relative-error":
-              parameters = {
-                initial_guess: request.parameters.initialGuess,
-                absolute_relative_error:
-                  request.parameters.absoluteRelativeError,
-              };
-              break;
-          }
+          parameters = {
+            initial_guess: request.parameters.initialGuess,
+            number_of_iterations: request.parameters.numberOfIterations,
+            absolute_relative_error: request.parameters.absoluteRelativeError,
+          };
           break;
+        default:
+          parameters = request.parameters;
       }
     }
 

@@ -1,147 +1,34 @@
-from decimal import Decimal
 import numpy as np
-import time
-from typing import List, Optional
 from steps.iteration import Iteration
 from solvers.iteration_solver import IterationSolver
-from solution_result import SolutionResult
 
 
 class GaussSeidelIterationSolver(IterationSolver):
-    def __init__(
-        self,
-        A: np.ndarray,
-        b: np.ndarray,
-        precision: int = 6,
-        initial_guess: Optional[List[Decimal]] = None,
-        number_of_iterations: Optional[int] = None,
-        absolute_relative_error: Optional[Decimal] = None,
-    ):
-        super().__init__(
-            A,
-            b,
-            precision,
-            initial_guess,
-            number_of_iterations,
-            absolute_relative_error,
-        )
+    @property
+    def method_name(self) -> str:
+        return "Gauss-Seidel Iteration"
 
-    def solve(self) -> SolutionResult:
-        start_time = time.time()
+    def iterate(self, A: np.ndarray, b: np.ndarray, x: np.ndarray) -> np.ndarray:
+        x_new = x.copy()
 
-        system_analysis = self.analyze_system()
-        if system_analysis:
-            return SolutionResult(
-                message=system_analysis,
-                execution_time=time.time() - start_time,
-            )
+        for i in range(self.n):
+            x_new[i] = b[i]
 
-        A = self.A
-        b = self.b
-        x = self.x0.copy()
+            for j in range(self.n):
+                if j != i:
+                    x_new[i] -= A[i, j] * x_new[j]
+
+            x_new[i] /= A[i, i]
 
         matrix = np.column_stack((A, b))
 
-        # check if system might not converge
-        if not self.check_diagonal_dominance():
-            warning_message = "Warning: Matrix is not diagonally dominant. Thus, convergence is not really guaranteed."
-        else:
-            warning_message = ""
-
-        if self.number_of_iterations is not None:
-            # iterations mode
-            for _ in range(self.number_of_iterations):
-                x_old = x.copy()
-
-                for i in range(self.n):
-                    sum1 = 0
-
-                    for j in range(i):
-                        product = A[i, j] * x[j]
-                        sum1 = sum1 + product
-
-                    sum2 = 0
-
-                    for j in range(i + 1, self.n):
-                        product = A[i, j] * x_old[j]
-                        sum2 = sum2 + product
-
-                    total_sum = sum1 + sum2
-                    numerator = b[i] - total_sum
-                    x[i] = numerator / A[i, i]
-
-                self.steps.append(
-                    Iteration.gauss_seidel(
-                        matrix,
-                        x_old.copy(),
-                        x.copy(),
-                        self.calculate_absolute_relative_error(x, x_old),
-                    )
-                )
-
-            execution_time = time.time() - start_time
-            return SolutionResult(
-                solution=x,
-                steps=self.steps,
-                number_of_iterations=self.number_of_iterations,
-                execution_time=execution_time,
-                message=f"{warning_message} Gauss-Seidel method completed {self.number_of_iterations} iterations",
+        self.steps.append(
+            Iteration.gauss_seidel(
+                matrix,
+                x.copy(),
+                x_new.copy(),
+                self.calculate_absolute_relative_error(x_new, x),
             )
+        )
 
-        else:
-            # absolute_relative_error mode
-            number_of_iterations = 0
-
-            maximum_number_of_iterations = 1000
-
-            for _ in range(maximum_number_of_iterations):
-                x_old = x.copy()
-
-                for i in range(self.n):
-                    sum1 = 0
-                    for j in range(i):
-                        product = A[i, j] * x[j]
-                        sum1 = sum1 + product
-
-                    sum2 = 0
-
-                    for j in range(i + 1, self.n):
-                        product = A[i, j] * x_old[j]
-                        sum2 = sum2 + product
-
-                    total_sum = sum1 + sum2
-
-                    numerator = b[i] - total_sum
-                    x[i] = numerator / A[i, i]
-
-                number_of_iterations += 1
-
-                self.steps.append(
-                    Iteration.gauss_seidel(
-                        matrix,
-                        x_old.copy(),
-                        x.copy(),
-                        self.calculate_absolute_relative_error(x, x_old),
-                    )
-                )
-
-                # check convergence
-                if self.check_convergence(x, x_old):
-                    execution_time = time.time() - start_time
-                    return SolutionResult(
-                        solution=x,
-                        steps=self.steps,
-                        number_of_iterations=number_of_iterations,
-                        execution_time=execution_time,
-                        message=f"{warning_message} Gauss-Seidel method converged after {number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-                    )
-
-            execution_time = time.time() - start_time
-
-            return SolutionResult(
-                solution=x,
-                steps=self.steps,
-                number_of_iterations=number_of_iterations,
-                execution_time=execution_time,
-                message=f"{warning_message} Gauss-Seidel method did not converge within {maximum_number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
-            )
+        return x_new
