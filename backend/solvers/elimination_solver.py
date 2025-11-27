@@ -25,6 +25,7 @@ class EliminationSolver(Solver):
 
         factor = A[i, k] / A[k, k]
 
+        # multiply pivot row by factor and subtract from current row
         for j in range(k + 1, self.n):
             A[i, j] -= factor * A[k, j]
 
@@ -34,6 +35,7 @@ class EliminationSolver(Solver):
 
         new_matrix = np.column_stack([A, b])
 
+        # add elimination step
         self.steps.append(RowOperation.add(old_matrix, new_matrix, i, k, -factor))
 
     def back_substitution(self, A: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -47,6 +49,7 @@ class EliminationSolver(Solver):
 
         matrix = np.column_stack([A, b])
 
+        # add back substitution step
         self.steps.append(Substitution.back(matrix, x))
 
         return x
@@ -86,9 +89,13 @@ class EliminationSolver(Solver):
                 self.scaling_factors[[k, pivot_index]] = self.scaling_factors[
                     [pivot_index, k]
                 ]
+
             new_matrix = np.column_stack([A, b])
-            step = RowOperation.swap(old_matrix, new_matrix, k, int(pivot_index))
-            self.steps.append(step)
+
+            # add row swap step
+            self.steps.append(
+                RowOperation.swap(old_matrix, new_matrix, k, int(pivot_index))
+            )
 
         # returning the updated A and b
         return A, b
