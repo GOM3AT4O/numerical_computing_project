@@ -1,13 +1,13 @@
 from decimal import Decimal
 import numpy as np
 import time
-from substitution import Substitution
-from base_solver import LinearSystemSolver
+from steps.substitution import Substitution
+from solver import Solver
 from solution_result import SolutionResult
 from exceptions import ValidationError
 
 
-class LUDecompositionSolver(LinearSystemSolver):
+class LUDecompositionSolver(Solver):
     def __init__(
         self,
         A: np.ndarray,

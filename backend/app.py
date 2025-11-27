@@ -55,16 +55,7 @@ def solve_system():
             method, A_matrix, b_vector, precision_value, parameters
         )
 
-        use_scaling = parameters.get("use_scaling", False) if parameters else False
-
-        if method in ["gauss-elimination", "gauss-jordan_elimination"] and use_scaling:
-            if hasattr(solver, 'solve_using_scaling'):
-                print("Using Scaling Method...")
-                result = solver.solve_using_scaling()
-            else:
-                result = solver.solve()
-        else:
-            result = solver.solve()
+        result = solver.solve()
 
         return jsonify(result.to_dict()), 200
 
@@ -85,19 +76,22 @@ def solve_system():
 def get_methods():
     """Get list of available methods and their parameters"""
     methods = {
-        "gauss-elimination": {"name": "Gauss Elimination", "parameters": [
-            {
-                    "name": "use_scaling",
+        "gauss-elimination": {
+            "name": "Gauss Elimination",
+            "parameters": [
+                {
+                    "name": "scaling",
                     "type": "boolean",
                     "default": False,
                     "required": False,
                 }
-        ]},
+            ],
+        },
         "gauss-jordan_elimination": {
             "name": "Gauss-Jordan Elimination",
             "parameters": [
                 {
-                    "name": "use_scaling",
+                    "name": "scaling",
                     "type": "boolean",
                     "default": False,
                     "required": False,
@@ -173,4 +167,4 @@ def health_check():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
