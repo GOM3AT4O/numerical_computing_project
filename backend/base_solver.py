@@ -54,6 +54,7 @@ class LinearSystemSolver(ABC):
             A[[k, max_idx]] = A[[max_idx, k]]
             b[[k, max_idx]] = b[[max_idx, k]]
             new_matrix = np.column_stack([A, b])
-            step = RowOperation.swap(old_matrix, new_matrix, k, int(max_idx))
-            self.steps.append(step)
+            self.steps.append(
+                RowOperation.swap(old_matrix, new_matrix, k, int(max_idx))
+            )
         return A, b

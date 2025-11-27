@@ -16,6 +16,7 @@ import { SolveEquationsRequest } from "../../models/solve-equations-request";
 import { SolveEquationsResponse } from "../../models/solve-equations-response";
 import { ParametersComponent } from "../parameters/parameters.component";
 import { StepComponent } from "../step/step.component";
+import { EliminationParametersComponent } from "../parameters/elimination-parameters/elimination-parameters.component";
 
 @Component({
   selector: "app-equations-solver",
@@ -25,6 +26,7 @@ import { StepComponent } from "../step/step.component";
     EquationsComponent,
     LUParametersComponent,
     IterationParametersComponent,
+    EliminationParametersComponent,
     StepComponent,
   ],
   templateUrl: "./equations-solver.component.html",
@@ -74,13 +76,6 @@ export class EquationsSolverComponent {
   stepsElement = viewChild<ElementRef<HTMLDivElement>>("steps");
 
   ngOnInit() {
-    this.form.get("method")?.valueChanges.subscribe(() => {
-      setTimeout(() => {
-        console.log(typeof this.parameters());
-        console.log(this.parameters());
-      });
-    });
-
     this.form.get("equationCount")?.valueChanges.subscribe((count) => {
       if (this.form.get("equationCount")?.valid) {
         this.equationCount = parseInt(count!, 10);

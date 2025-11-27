@@ -41,4 +41,9 @@ export type Iteration = {
   absolute_relative_error: string;
 };
 
-export type Step = RowOperation | Substitution | Iteration;
+export type ShowMatrices = {
+  step_type: "show-matrices";
+  matrices: { [key: string]: string[][] };
+};
+
+export type Step = RowOperation | Substitution | Iteration | ShowMatrices;

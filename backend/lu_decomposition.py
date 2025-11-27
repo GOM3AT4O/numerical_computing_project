@@ -1,6 +1,8 @@
 from decimal import Decimal
 import numpy as np
 import time
+from show_matrices import ShowMatrices
+from row_operation import RowOperation
 from substitution import Substitution
 from base_solver import LinearSystemSolver
 from solution_result import SolutionResult
@@ -37,7 +39,7 @@ class LUDecompositionSolver(LinearSystemSolver):
         A = self.A.copy()
         b = self.b.copy()
         n = self.n
-        # Pivoting
+
         P = np.array(
             [
                 [+Decimal(1) if i == j else +Decimal(0) for j in range(n)]
@@ -45,16 +47,6 @@ class LUDecompositionSolver(LinearSystemSolver):
             ],
             dtype=Decimal,
         )
-
-        for k in range(n):
-            max_idx = k + np.argmax(np.abs(A[k:, k]))
-            if max_idx != k:
-                A[[k, max_idx]] = A[[max_idx, k]]
-                P[[k, max_idx]] = P[[max_idx, k]]
-
-                A = A
-                P = P
-
         L = np.array(
             [
                 [+Decimal(1) if i == j else +Decimal(0) for j in range(n)]
@@ -62,33 +54,57 @@ class LUDecompositionSolver(LinearSystemSolver):
             ],
             dtype=Decimal,
         )
-        U = np.full((n, n), +Decimal(0))
+        U = A.copy()
 
-        for i in range(n):
-            # Upper
-            for j in range(i, n):
-                dot_product = +Decimal(0)
-                for k in range(i):
-                    product = L[i, k] * U[k, j]
-                    dot_product = dot_product + product
+        for k in range(n - 1):
+            max_idx = k + np.argmax(np.abs(U[k:, k]))
+            if max_idx != k:
+                old_matrix = U.copy()
+                L[[k, max_idx], :k] = L[[max_idx, k], :k]
+                U[[k, max_idx]] = U[[max_idx, k]]
+                P[[k, max_idx]] = P[[max_idx, k]]
+                new_matrix = U.copy()
+                self.steps.append(
+                    RowOperation.swap(old_matrix, new_matrix, k, int(max_idx))
+                )
+                self.steps.append(ShowMatrices({"L": L.copy(), "P": P.copy()}))
 
-                U[i, j] = A[i, j] - dot_product
-
-            if abs(U[i, i]) < 1e-12:
+            if abs(U[k, k]) < 1e-12:
                 return SolutionResult(
                     message="System doesn't have a unique solution.",
                     execution_time=time.time() - start_time,
                 )
 
-            # Lower
-            for j in range(i + 1, n):
-                dot_product = +Decimal(0)
-                for k in range(i):
-                    product = L[j, k] * U[k, i]
-                    dot_product = dot_product + product
+            for i in range(k + 1, n):
+                if abs(U[i, k]) < 1e-12:
+                    continue
 
-                numerator = A[j, i] - dot_product
-                L[j, i] = numerator / U[i, i]
+                factor = U[i, k] / U[k, k]
+
+                L[i, k] = factor
+
+                old_matrix = U.copy()
+
+                U[i, k + 1 :] = self.update_matrix_row(
+                    U[i, k + 1 :], U[k, k + 1 :], factor
+                )
+
+                U[i, k] = +Decimal(0)
+
+                new_matrix = U.copy()
+
+                self.steps.append(
+                    RowOperation.add(old_matrix, new_matrix, i, k, -factor)
+                )
+                self.steps.append(ShowMatrices({"L": L.copy()}))
+
+        if abs(U[n - 1, n - 1]) < 1e-12:
+            return SolutionResult(
+                message="System doesn't have a unique solution.",
+                execution_time=time.time() - start_time,
+            )
+
+        self.steps.append(ShowMatrices({"L": L, "U": U, "P": P}))
 
         # permutation
         b = P @ b
@@ -133,6 +149,7 @@ class LUDecompositionSolver(LinearSystemSolver):
         # Add L and U matrices to result
         result.L = L
         result.U = U
+        result.P = P
 
         return result
 

@@ -12,6 +12,7 @@ class SolutionResult:
     message: str
     L: Optional[np.ndarray]
     U: Optional[np.ndarray]
+    P: Optional[np.ndarray]
 
     def __init__(
         self,
@@ -30,6 +31,7 @@ class SolutionResult:
         # optional fields for LU decomposition
         self.L = None
         self.U = None
+        self.P = None
 
     def to_dict(self) -> Dict[str, Any]:
         result = {
@@ -53,5 +55,8 @@ class SolutionResult:
 
         if self.U is not None:
             result["U"] = np.vectorize(remove_trailing_zeros)(self.U).tolist()
+
+        if self.P is not None:
+            result["P"] = np.vectorize(remove_trailing_zeros)(self.P).tolist()
 
         return result

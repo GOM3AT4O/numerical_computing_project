@@ -21,7 +21,7 @@ class RowOperation(Step):
         target_row: int,
         source_row: Optional[int] = None,
         factor: Optional[Decimal] = None,
-    ) -> None:
+    ):
         super().__init__("row-operation")
 
         self.operation_type = operation_type

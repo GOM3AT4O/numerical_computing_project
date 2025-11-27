@@ -6,7 +6,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { ParametersComponent } from "../../parameters/parameters.component";
-import { LUParameters } from "../../../models/solve-equations-request";
+import { LUParameters } from "../../../models/parameters";
 
 @Component({
   selector: "app-lu-parameters",

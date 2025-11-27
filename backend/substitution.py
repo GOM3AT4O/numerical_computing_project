@@ -9,9 +9,7 @@ class Substitution(Step):
     matrix: np.ndarray
     result: np.ndarray
 
-    def __init__(
-        self, substitution_type: str, matrix: np.ndarray, result: np.ndarray
-    ) -> None:
+    def __init__(self, substitution_type: str, matrix: np.ndarray, result: np.ndarray):
         super().__init__("substitution")
 
         self.substitution_type = substitution_type

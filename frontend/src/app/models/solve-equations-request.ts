@@ -1,33 +1,25 @@
+import {
+  EliminationParameters,
+  IterationParameters,
+  LUParameters,
+} from "./parameters";
+
 export type Equations = {
   coefficients: string[][];
   constants: string[];
 };
 
-export type LUParameters = {
-  format: "doolittle" | "crout" | "cholesky";
-};
-
-export type IterationParameters =
-  | {
-      initialGuess: string[];
-      stoppingCondition: "number-of-iterations";
-      numberOfIterations: number;
-    }
-  | {
-      initialGuess: string[];
-      stoppingCondition: "absolute-relative-error";
-      absoluteRelativeError: string;
-    };
-
 export type SolveEquationsRequest =
   | {
       equations: Equations;
       method: "gauss-elimination";
+      parameters: EliminationParameters;
       precision?: number;
     }
   | {
       equations: Equations;
       method: "gauss-jordan-elimination";
+      parameters: EliminationParameters;
       precision?: number;
     }
   | {

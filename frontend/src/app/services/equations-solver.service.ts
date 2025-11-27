@@ -55,6 +55,7 @@ export class EquationsSolverService {
       numberOfIterations: response.number_of_iterations,
       L: response.L,
       U: response.U,
+      P: response.P,
       message: response.message,
     };
   }
@@ -68,6 +69,7 @@ export class EquationsSolverService {
         steps?: Step[];
         L?: string[][];
         U?: string[][];
+        P?: string[][];
         number_of_iterations?: number;
         execution_time: number;
         message: string;
