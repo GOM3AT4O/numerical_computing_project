@@ -1,11 +1,47 @@
 <div
   class="grid gap-y-6 items-center justify-items-center w-fit"
   [style.gridTemplateColumns]="
-    'repeat(' + (equationCount() * 3 + 1) + ', auto)'
+    'repeat(' + (equationCount() * 3 + 2) + ', auto)'
   "
   [formGroup]="form"
 >
   @for (i of equationCount() | range; track $index) {
+    <div class="flex flex-col gap-4 mr-12">
+      <button class="px-4 py-0" type="button" (click)="moveEquationUp(i)">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6 15 L12 9 L18 15"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+          />
+        </svg>
+      </button>
+      <button class="px-4 py-0" type="button" (click)="moveEquationDown(i)">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6 9L12 15L18 9"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+          />
+        </svg>
+      </button>
+    </div>
     @for (j of equationCount() | range; track $index) {
       <input
         #input

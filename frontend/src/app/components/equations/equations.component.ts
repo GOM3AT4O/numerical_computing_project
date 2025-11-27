@@ -184,4 +184,38 @@ export class EquationsComponent
     event.preventDefault();
     this.inputs()[i * (this.equationCount() + 1) + j].nativeElement.focus();
   }
+
+  moveEquationUp(i: number) {
+    if (i === 0) return;
+
+    const temporaryCoefficients = this.form.controls.coefficients.at(i).value;
+    const temporaryConstant = this.form.controls.constants.at(i).value;
+
+    this.form.controls.coefficients
+      .at(i)
+      .setValue(this.form.controls.coefficients.at(i - 1).value);
+    this.form.controls.constants
+      .at(i)
+      .setValue(this.form.controls.constants.at(i - 1).value);
+
+    this.form.controls.coefficients.at(i - 1).setValue(temporaryCoefficients);
+    this.form.controls.constants.at(i - 1).setValue(temporaryConstant);
+  }
+
+  moveEquationDown(i: number) {
+    if (i === this.equationCount() - 1) return;
+
+    const temporaryCoefficients = this.form.controls.coefficients.at(i).value;
+    const temporaryConstant = this.form.controls.constants.at(i).value;
+
+    this.form.controls.coefficients
+      .at(i)
+      .setValue(this.form.controls.coefficients.at(i + 1).value);
+    this.form.controls.constants
+      .at(i)
+      .setValue(this.form.controls.constants.at(i + 1).value);
+
+    this.form.controls.coefficients.at(i + 1).setValue(temporaryCoefficients);
+    this.form.controls.constants.at(i + 1).setValue(temporaryConstant);
+  }
 }

@@ -110,12 +110,20 @@
     display: grid;
     width: 16px;
     height: 16px;
-    background-color: var(--color-white);
+    outline: none;
     border-radius: 0.15em;
+    background-color: var(--color-white);
     font: inherit;
     color: currentColor;
     box-shadow: var(--shadow-sm);
     place-content: center;
+    transition: box-shadow, transform;
+    transition-duration: 200ms;
+  }
+
+  input[type="checkbox"]:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
   }
 
   input[type="checkbox"]::before {
