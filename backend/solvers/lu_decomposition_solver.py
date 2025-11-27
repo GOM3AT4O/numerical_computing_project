@@ -33,37 +33,6 @@ class LUDecompositionSolver(Solver):
         else:
             raise ValidationError(f"Unknown LU Decomposition format: {self.format}")
 
-    def back_substitution(self, U: np.ndarray, y: np.ndarray) -> np.ndarray:
-        x = np.full(self.n, +Decimal(0))
-
-        for i in range(self.n - 1, -1, -1):
-            x[i] = y[i]
-            for j in range(i + 1, self.n):
-                x[i] -= U[i, j] * x[j]
-            x[i] /= U[i, i]
-
-        matrix = np.column_stack([U, y])
-
-        # add back substitution step
-        self.steps.append(Substitution.back(matrix, x))
-
-        return x
-
-    def forward_substitution(self, L: np.ndarray, b: np.ndarray) -> np.ndarray:
-        y = np.full(self.n, +Decimal(0))
-
-        for i in range(self.n):
-            y[i] = b[i]
-            for j in range(i + 1, self.n):
-                y[i] -= L[i, j] * y[j]
-
-        matrix = np.column_stack([L, b])
-
-        # add forward substitution step
-        self.steps.append(Substitution.forward(matrix, y))
-
-        return y
-
     def _solve_doolittle(self) -> SolutionResult:
         start_time = time.time()
 
@@ -122,8 +91,6 @@ class LUDecompositionSolver(Solver):
 
                 U[i, k] = +Decimal(0)
 
-                b[i] -= factor * b[k]
-
                 new_matrix = U.copy()
 
                 # add elimination step
@@ -146,10 +113,31 @@ class LUDecompositionSolver(Solver):
         b = P @ b
 
         # forward substitution: Ly = b
-        y = self.forward_substitution(L, b)
+        y = np.full(n, +Decimal(0))
+
+        for i in range(n):
+            y[i] = b[i]
+            for j in range(i):
+                y[i] -= L[i, j] * y[j]
+
+        matrix = np.column_stack([L, b])
+
+        # add forward substitution step
+        self.steps.append(Substitution.forward(matrix, y))
 
         # back substitution: Ux = y
-        x = self.back_substitution(U, y)
+        x = np.full(n, +Decimal(0))
+
+        for i in range(n - 1, -1, -1):
+            x[i] = y[i]
+            for j in range(i + 1, n):
+                x[i] -= U[i, j] * x[j]
+            x[i] /= U[i, i]
+
+        matrix = np.column_stack([U, y])
+
+        # add back substitution step
+        self.steps.append(Substitution.back(matrix, x))
 
         execution_time = time.time() - start_time
 
@@ -209,10 +197,31 @@ class LUDecompositionSolver(Solver):
                 U[j, i] = numerator / L[j, j]
 
         # forward substitution: Ly = b
-        y = self.forward_substitution(L, b)
+        y = np.full(n, +Decimal(0))
+
+        for i in range(n):
+            y[i] = b[i]
+            for j in range(i):
+                y[i] -= L[i, j] * y[j]
+            y[i] /= L[i, i]
+
+        matrix = np.column_stack([L, b])
+
+        # add forward substitution step
+        self.steps.append(Substitution.forward(matrix, y))
 
         # back substitution: Ux = y
-        x = self.back_substitution(U, y)
+        x = np.full(n, +Decimal(0))
+
+        for i in range(n - 1, -1, -1):
+            x[i] = y[i]
+            for j in range(i + 1, n):
+                x[i] -= U[i, j] * x[j]
+
+        matrix = np.column_stack([U, y])
+
+        # add back substitution step
+        self.steps.append(Substitution.back(matrix, x))
 
         execution_time = time.time() - start_time
 
