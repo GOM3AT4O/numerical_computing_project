@@ -1,0 +1,21 @@
+<div class="flex flex-row items-center gap-16 self-center flex-wrap">
+  @for (matrix of step().matrices | keyvalue: null; track $index) {
+    <div class="flex flex-row items-center gap-8 self-center">
+      <span>{{ matrix.key }}</span>
+      <span>=</span>
+      <table
+        class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+      >
+        @for (row of matrix.value; track $index) {
+          <tr>
+            @for (value of row; track $index) {
+              <td class="min-w-24">
+                <span>{{ value }}</span>
+              </td>
+            }
+          </tr>
+        }
+      </table>
+    </div>
+  }
+</div>

@@ -9,7 +9,7 @@ import {
 } from "@angular/forms";
 import { MatrixComponent } from "../../matrix/matrix.component";
 import { ParametersComponent } from "../../parameters/parameters.component";
-import { IterationParameters } from "../../../models/solve-equations-request";
+import { IterationParameters } from "../../../models/parameters";
 
 @Component({
   selector: "app-iteration-parameters",

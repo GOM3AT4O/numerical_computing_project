@@ -7,5 +7,6 @@ export type SolveEquationsResponse = {
   numberOfIterations?: number;
   L?: string[][];
   U?: string[][];
+  P?: string[][];
   message?: string;
 };
