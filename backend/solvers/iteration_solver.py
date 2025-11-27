@@ -5,7 +5,6 @@ from typing import List, Optional
 from solver import Solver
 from exceptions import ValidationError
 import time
-from steps.iteration import Iteration
 from solution_result import SolutionResult
 
 

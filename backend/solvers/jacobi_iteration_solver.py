@@ -1,6 +1,6 @@
 from decimal import Decimal
 import numpy as np
-from steps.iteration import Iteration
+from steps.iteration_step import IterationStep
 from solvers.iteration_solver import IterationSolver
 
 
@@ -24,7 +24,7 @@ class JacobiIterationSolver(IterationSolver):
         matrix = np.column_stack((A, b))
 
         self.steps.append(
-            Iteration.jacobi(
+            IterationStep.jacobi(
                 matrix,
                 x.copy(),
                 x_new.copy(),

@@ -4,7 +4,7 @@ from utils import remove_trailing_zeros
 from step import Step
 
 
-class ShowMatrices(Step):
+class ShowMatricesStep(Step):
     matrices: Dict[str, np.ndarray]
 
     def __init__(self, matrices: Dict[str, np.ndarray]):

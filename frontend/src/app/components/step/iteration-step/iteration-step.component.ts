@@ -1,14 +1,14 @@
 import { Component, input } from "@angular/core";
-import { Iteration } from "../../../models/step";
+import { IterationStep } from "../../../models/step";
 
 @Component({
-  selector: "app-iteration",
+  selector: "app-iteration-step",
   imports: [],
-  templateUrl: "./iteration.component.html",
-  styleUrl: "./iteration.component.css",
+  templateUrl: "./iteration-step.component.html",
+  styleUrl: "./iteration-step.component.css",
 })
-export class IterationComponent {
-  step = input.required<Iteration>();
+export class IterationStepComponent {
+  step = input.required<IterationStep>();
 
   isNotZero = (x: string) => x !== "0";
   isNotZeroOrIndex = (i: number) => (x: string, j: number) =>

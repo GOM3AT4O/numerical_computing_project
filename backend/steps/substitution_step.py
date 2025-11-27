@@ -4,7 +4,7 @@ from utils import remove_trailing_zeros
 from step import Step
 
 
-class Substitution(Step):
+class SubstitutionStep(Step):
     substitution_type: str
     matrix: np.ndarray
     result: np.ndarray
@@ -17,7 +17,7 @@ class Substitution(Step):
         self.result = result
 
     @classmethod
-    def forward(cls, matrix: np.ndarray, result: np.ndarray) -> "Substitution":
+    def forward(cls, matrix: np.ndarray, result: np.ndarray) -> "SubstitutionStep":
         return cls(
             substitution_type="forward",
             matrix=matrix,
@@ -25,7 +25,7 @@ class Substitution(Step):
         )
 
     @classmethod
-    def back(cls, matrix: np.ndarray, result: np.ndarray) -> "Substitution":
+    def back(cls, matrix: np.ndarray, result: np.ndarray) -> "SubstitutionStep":
         return cls(
             substitution_type="back",
             matrix=matrix,

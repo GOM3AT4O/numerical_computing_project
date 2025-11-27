@@ -5,7 +5,7 @@ from step import Step
 from utils import remove_trailing_zeros
 
 
-class RowOperation(Step):
+class RowOperationStep(Step):
     operation_type: str
     old_matrix: np.ndarray
     new_matrix: np.ndarray
@@ -38,7 +38,7 @@ class RowOperation(Step):
         new_matrix: np.ndarray,
         target_row: int,
         source_row: int,
-    ) -> "RowOperation":
+    ) -> "RowOperationStep":
         return cls(
             operation_type="swap",
             old_matrix=old_matrix,
@@ -50,7 +50,7 @@ class RowOperation(Step):
     @classmethod
     def scale(
         cls, old_matrix: np.ndarray, new_matrix: np.ndarray, row: int, factor: Decimal
-    ) -> "RowOperation":
+    ) -> "RowOperationStep":
         return cls(
             operation_type="scale",
             old_matrix=old_matrix,
@@ -67,7 +67,7 @@ class RowOperation(Step):
         target_row: int,
         source_row: int,
         factor: Decimal,
-    ) -> "RowOperation":
+    ) -> "RowOperationStep":
         return cls(
             operation_type="add",
             old_matrix=old_matrix,

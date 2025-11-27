@@ -5,7 +5,7 @@ from utils import remove_trailing_zeros
 from step import Step
 
 
-class Iteration(Step):
+class IterationStep(Step):
     iteration_type: str
     matrix: np.ndarray
     old_solution: np.ndarray
@@ -35,7 +35,7 @@ class Iteration(Step):
         old_solution: np.ndarray,
         new_solution: np.ndarray,
         absolute_relative_error: Decimal,
-    ) -> "Iteration":
+    ) -> "IterationStep":
         return cls(
             iteration_type="jacobi",
             matrix=matrix,
@@ -51,7 +51,7 @@ class Iteration(Step):
         old_solution: np.ndarray,
         new_solution: np.ndarray,
         absolute_relative_error: Decimal,
-    ) -> "Iteration":
+    ) -> "IterationStep":
         return cls(
             iteration_type="gauss-seidel",
             matrix=matrix,

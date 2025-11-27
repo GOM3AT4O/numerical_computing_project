@@ -1,15 +1,15 @@
 import { Component, computed, input } from "@angular/core";
-import { Substitution } from "../../../models/step";
+import { SubstitutionStep } from "../../../models/step";
 import { RangePipe } from "../../../pipes/range.pipe";
 
 @Component({
-  selector: "app-substitution",
+  selector: "app-substitution-step",
   imports: [RangePipe],
-  templateUrl: "./substitution.component.html",
-  styleUrl: "./substitution.component.css",
+  templateUrl: "./substitution-step.component.html",
+  styleUrl: "./substitution-step.component.css",
 })
-export class SubstitutionComponent {
-  step = input.required<Substitution>();
+export class SubstitutionStepComponent {
+  step = input.required<SubstitutionStep>();
 
   variable = computed<string>(() =>
     this.step().substitution_type == "back" ? "x" : "y",

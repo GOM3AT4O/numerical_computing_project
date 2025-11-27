@@ -1,14 +1,14 @@
 import { Component, input } from "@angular/core";
-import { RowOperation } from "../../../models/step";
+import { RowOperationStep } from "../../../models/step";
 
 @Component({
-  selector: "app-row-operation",
+  selector: "app-row-operation-step",
   imports: [],
-  templateUrl: "./row-operation.component.html",
-  styleUrl: "./row-operation.component.css",
+  templateUrl: "./row-operation-step.component.html",
+  styleUrl: "./row-operation-step.component.css",
 })
-export class RowOperationComponent {
-  step = input.required<RowOperation>();
+export class RowOperationStepComponent {
+  step = input.required<RowOperationStep>();
 
   coefficientSign = (x: string) => {
     return x.startsWith("-") ? "-" : "+";

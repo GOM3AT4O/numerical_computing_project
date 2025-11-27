@@ -1,9 +1,9 @@
 from decimal import Decimal
 import numpy as np
-from steps.substitution import Substitution
+from steps.substitution_step import SubstitutionStep
 from solver import Solver
 from typing import Tuple
-from steps.row_operation import RowOperation
+from steps.row_operation_step import RowOperationStep
 
 
 class EliminationSolver(Solver):
@@ -36,7 +36,7 @@ class EliminationSolver(Solver):
         new_matrix = np.column_stack([A, b])
 
         # add elimination step
-        self.steps.append(RowOperation.add(old_matrix, new_matrix, i, k, -factor))
+        self.steps.append(RowOperationStep.add(old_matrix, new_matrix, i, k, -factor))
 
     def back_substitution(self, A: np.ndarray, b: np.ndarray) -> np.ndarray:
         x = np.full(self.n, +Decimal(0))
@@ -50,7 +50,7 @@ class EliminationSolver(Solver):
         matrix = np.column_stack([A, b])
 
         # add back substitution step
-        self.steps.append(Substitution.back(matrix, x))
+        self.steps.append(SubstitutionStep.back(matrix, x))
 
         return x
 
@@ -94,7 +94,7 @@ class EliminationSolver(Solver):
 
             # add row swap step
             self.steps.append(
-                RowOperation.swap(old_matrix, new_matrix, k, int(pivot_index))
+                RowOperationStep.swap(old_matrix, new_matrix, k, int(pivot_index))
             )
 
         # returning the updated A and b

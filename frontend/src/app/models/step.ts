@@ -1,4 +1,4 @@
-export type RowOperation =
+export type RowOperationStep =
   | {
       step_type: "row-operation";
       operation_type: "swap";
@@ -25,14 +25,14 @@ export type RowOperation =
       factor: string;
     };
 
-export type Substitution = {
+export type SubstitutionStep = {
   step_type: "substitution";
   substitution_type: "forward" | "back";
   matrix: string[][];
   result: string[];
 };
 
-export type Iteration = {
+export type IterationStep = {
   step_type: "iteration";
   iteration_type: "jacobi" | "gauss-seidel";
   matrix: string[][];
@@ -41,9 +41,13 @@ export type Iteration = {
   absolute_relative_error: string;
 };
 
-export type ShowMatrices = {
+export type ShowMatricesStep = {
   step_type: "show-matrices";
   matrices: { [key: string]: string[][] };
 };
 
-export type Step = RowOperation | Substitution | Iteration | ShowMatrices;
+export type Step =
+  | RowOperationStep
+  | SubstitutionStep
+  | IterationStep
+  | ShowMatricesStep;

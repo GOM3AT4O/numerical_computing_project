@@ -1,5 +1,5 @@
 import numpy as np
-from steps.iteration import Iteration
+from steps.iteration_step import IterationStep
 from solvers.iteration_solver import IterationSolver
 
 
@@ -23,7 +23,7 @@ class GaussSeidelIterationSolver(IterationSolver):
         matrix = np.column_stack((A, b))
 
         self.steps.append(
-            Iteration.gauss_seidel(
+            IterationStep.gauss_seidel(
                 matrix,
                 x.copy(),
                 x_new.copy(),

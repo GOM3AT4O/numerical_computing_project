@@ -1,9 +1,9 @@
 from decimal import Decimal
 import numpy as np
 import time
-from steps.substitution import Substitution
-from steps.show_matrices import ShowMatrices
-from steps.row_operation import RowOperation
+from steps.substitution_step import SubstitutionStep
+from steps.show_matrices_step import ShowMatricesStep
+from steps.row_operation_step import RowOperationStep
 from solver import Solver
 from solution_result import SolutionResult
 from exceptions import ValidationError
@@ -65,9 +65,9 @@ class LUDecompositionSolver(Solver):
                 P[[k, max_idx]] = P[[max_idx, k]]
                 new_matrix = U.copy()
                 self.steps.append(
-                    RowOperation.swap(old_matrix, new_matrix, k, int(max_idx))
+                    RowOperationStep.swap(old_matrix, new_matrix, k, int(max_idx))
                 )
-                self.steps.append(ShowMatrices({"L": L.copy(), "P": P.copy()}))
+                self.steps.append(ShowMatricesStep({"L": L.copy(), "P": P.copy()}))
 
             if abs(U[k, k]) < 1e-12:
                 return SolutionResult(
@@ -95,11 +95,11 @@ class LUDecompositionSolver(Solver):
 
                 # add elimination step
                 self.steps.append(
-                    RowOperation.add(old_matrix, new_matrix, i, k, -factor)
+                    RowOperationStep.add(old_matrix, new_matrix, i, k, -factor)
                 )
 
                 # show L matrix to see what changed
-                self.steps.append(ShowMatrices({"L": L.copy()}))
+                self.steps.append(ShowMatricesStep({"L": L.copy()}))
 
         if abs(U[n - 1, n - 1]) < 1e-12:
             return SolutionResult(
@@ -107,7 +107,7 @@ class LUDecompositionSolver(Solver):
                 execution_time=time.time() - start_time,
             )
 
-        self.steps.append(ShowMatrices({"L": L, "U": U, "P": P}))
+        self.steps.append(ShowMatricesStep({"L": L, "U": U, "P": P}))
 
         # permutation
         b = P @ b
@@ -123,7 +123,7 @@ class LUDecompositionSolver(Solver):
         matrix = np.column_stack([L, b])
 
         # add forward substitution step
-        self.steps.append(Substitution.forward(matrix, y))
+        self.steps.append(SubstitutionStep.forward(matrix, y))
 
         # back substitution: Ux = y
         x = np.full(n, +Decimal(0))
@@ -137,7 +137,7 @@ class LUDecompositionSolver(Solver):
         matrix = np.column_stack([U, y])
 
         # add back substitution step
-        self.steps.append(Substitution.back(matrix, x))
+        self.steps.append(SubstitutionStep.back(matrix, x))
 
         execution_time = time.time() - start_time
 
@@ -196,6 +196,8 @@ class LUDecompositionSolver(Solver):
                 numerator = A[j, i] - dot_product
                 U[j, i] = numerator / L[j, j]
 
+        self.steps.append(ShowMatricesStep({"L": L, "U": U}))
+
         # forward substitution: Ly = b
         y = np.full(n, +Decimal(0))
 
@@ -208,7 +210,7 @@ class LUDecompositionSolver(Solver):
         matrix = np.column_stack([L, b])
 
         # add forward substitution step
-        self.steps.append(Substitution.forward(matrix, y))
+        self.steps.append(SubstitutionStep.forward(matrix, y))
 
         # back substitution: Ux = y
         x = np.full(n, +Decimal(0))
@@ -221,7 +223,7 @@ class LUDecompositionSolver(Solver):
         matrix = np.column_stack([U, y])
 
         # add back substitution step
-        self.steps.append(Substitution.back(matrix, x))
+        self.steps.append(SubstitutionStep.back(matrix, x))
 
         execution_time = time.time() - start_time
 
@@ -288,6 +290,8 @@ class LUDecompositionSolver(Solver):
                     numerator = A[i, j] - sum_prod
                     L[i, j] = numerator / L[j, j]
 
+        self.steps.append(ShowMatricesStep({"L": L, "U": L.T}))
+
         # forward sub Ly = b
         y = np.full(n, +Decimal(0))
         for i in range(n):
@@ -301,7 +305,7 @@ class LUDecompositionSolver(Solver):
 
         matrix = np.column_stack([L, b])
 
-        self.steps.append(Substitution.forward(matrix, y))
+        self.steps.append(SubstitutionStep.forward(matrix, y))
 
         # back substitution
         x = np.full(n, +Decimal(0))
@@ -316,7 +320,7 @@ class LUDecompositionSolver(Solver):
 
         matrix = np.column_stack([L.T, y])
 
-        self.steps.append(Substitution.back(matrix, x))
+        self.steps.append(SubstitutionStep.back(matrix, x))
 
         execution_time = time.time() - start_time
 

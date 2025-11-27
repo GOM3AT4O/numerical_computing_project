@@ -2,7 +2,7 @@ import numpy as np
 from decimal import Decimal
 import time
 from solvers.elimination_solver import EliminationSolver
-from steps.row_operation import RowOperation
+from steps.row_operation_step import RowOperationStep
 from solution_result import SolutionResult
 
 
@@ -38,7 +38,7 @@ class GaussJordanEliminationSolver(EliminationSolver):
             new_matrix = np.column_stack([A, b])
 
             self.steps.append(
-                RowOperation.scale(old_matrix, new_matrix, k, +Decimal(1) / pivot)
+                RowOperationStep.scale(old_matrix, new_matrix, k, +Decimal(1) / pivot)
             )
 
             for i in range(n):

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowMatricesComponent } from './show-matrices.component';
+import { IterationStepComponent } from './iteration-step.component';
 
-describe('ShowMatricesComponent', () => {
-  let component: ShowMatricesComponent;
-  let fixture: ComponentFixture<ShowMatricesComponent>;
+describe('IterationStepComponent', () => {
+  let component: IterationStepComponent;
+  let fixture: ComponentFixture<IterationStepComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ShowMatricesComponent]
+      imports: [IterationStepComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ShowMatricesComponent);
+    fixture = TestBed.createComponent(IterationStepComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

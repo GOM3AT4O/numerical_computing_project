@@ -1,14 +1,14 @@
 @switch (step().step_type) {
   @case ("row-operation") {
-    <app-row-operation [step]="$any(step())" />
+    <app-row-operation-step [step]="$any(step())" />
   }
   @case ("substitution") {
-    <app-substitution [step]="$any(step())" />
+    <app-substitution-step [step]="$any(step())" />
   }
   @case ("iteration") {
-    <app-iteration [step]="$any(step())" />
+    <app-iteration-step [step]="$any(step())" />
   }
   @case ("show-matrices") {
-    <app-show-matrices [step]="$any(step())" />
+    <app-show-matrices-step [step]="$any(step())" />
   }
 }
