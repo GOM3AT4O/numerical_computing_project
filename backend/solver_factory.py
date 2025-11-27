@@ -1,11 +1,11 @@
 import numpy as np
 from typing import Dict, Any
 from exceptions import ValidationError
-from gauss_elimination import GaussEliminationSolver
-from gauss_jordan import GaussJordanSolver
-from lu_decomposition import LUDecompositionSolver
-from jacobi import JacobiSolver
-from gauss_seidel import GaussSeidelSolver
+from solvers.gauss_elimination_solver import GaussEliminationSolver
+from solvers.gauss_jordan_elimination_solver import GaussJordanEliminationSolver
+from solvers.lu_decomposition_solver import LUDecompositionSolver
+from solvers.jacobi_iteration_solver import JacobiIterationSolver
+from solvers.gauss_seidel_iteration_solver import GaussSeidelIterationSolver
 
 
 class SolverFactory:
@@ -15,23 +15,25 @@ class SolverFactory:
         A: np.ndarray,
         b: np.ndarray,
         precision: int,
-        params: Dict[str, Any],
+        parameters: Dict[str, Any],
     ):
         if method == "gauss-elimination":
-            return GaussEliminationSolver(A, b, precision)
+            scaling = parameters.get("scaling", False)
+            return GaussEliminationSolver(A, b, precision, scaling)
 
         elif method == "gauss-jordan-elimination":
-            return GaussJordanSolver(A, b, precision)
+            scaling = parameters.get("scaling", False)
+            return GaussJordanEliminationSolver(A, b, precision, scaling)
 
         elif method == "lu-decomposition":
-            format = params.get("format", "doolittle").lower()
+            format = parameters.get("format", "doolittle").lower()
             return LUDecompositionSolver(A, b, precision, format)
 
         elif method == "jacobi-iteration":
-            initial_guess = params.get("initial_guess")
-            number_of_iterations = params.get("number_of_iterations")
-            absolute_relative_error = params.get("absolute_relative_error")
-            return JacobiSolver(
+            initial_guess = parameters.get("initial_guess")
+            number_of_iterations = parameters.get("number_of_iterations")
+            absolute_relative_error = parameters.get("absolute_relative_error")
+            return JacobiIterationSolver(
                 A,
                 b,
                 precision,
@@ -41,10 +43,10 @@ class SolverFactory:
             )
 
         elif method == "gauss-seidel-iteration":
-            initial_guess = params.get("initial_guess")
-            number_of_iterations = params.get("number_of_iterations")
-            absolute_relative_error = params.get("absolute_relative_error")
-            return GaussSeidelSolver(
+            initial_guess = parameters.get("initial_guess")
+            number_of_iterations = parameters.get("number_of_iterations")
+            absolute_relative_error = parameters.get("absolute_relative_error")
+            return GaussSeidelIterationSolver(
                 A,
                 b,
                 precision,

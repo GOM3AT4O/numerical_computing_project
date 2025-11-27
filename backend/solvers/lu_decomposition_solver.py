@@ -1,15 +1,15 @@
 from decimal import Decimal
 import numpy as np
 import time
-from show_matrices import ShowMatrices
-from row_operation import RowOperation
-from substitution import Substitution
-from base_solver import LinearSystemSolver
+from steps.substitution import Substitution
+from steps.show_matrices import ShowMatrices
+from steps.row_operation import RowOperation
+from solver import Solver
 from solution_result import SolutionResult
 from exceptions import ValidationError
 
 
-class LUDecompositionSolver(LinearSystemSolver):
+class LUDecompositionSolver(Solver):
     def __init__(
         self,
         A: np.ndarray,

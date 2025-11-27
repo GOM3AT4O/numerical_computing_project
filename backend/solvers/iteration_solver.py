@@ -1,11 +1,11 @@
 from decimal import Decimal
 import numpy as np
 from typing import List, Optional
-from base_solver import LinearSystemSolver
+from solver import Solver
 from exceptions import ValidationError
 
 
-class IterativeSolver(LinearSystemSolver):
+class IterationSolver(Solver):
     x0: np.ndarray
     number_of_iterations: Optional[int]
     absolute_relative_error: Optional[Decimal]

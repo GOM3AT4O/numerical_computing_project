@@ -1,12 +1,12 @@
 import numpy as np
 from decimal import Decimal
 import time
-from row_operation import RowOperation
-from base_solver import LinearSystemSolver
+from solvers.elimination_solver import EliminationSolver
+from steps.row_operation import RowOperation
 from solution_result import SolutionResult
 
 
-class GaussJordanSolver(LinearSystemSolver):
+class GaussJordanEliminationSolver(EliminationSolver):
     def solve(self) -> SolutionResult:
         start_time = time.time()
 
@@ -14,9 +14,12 @@ class GaussJordanSolver(LinearSystemSolver):
         b = self.b.copy()
         n = self.n
 
+        if self.scaling:
+            self.calculating_scaling_values(A)
+
         for k in range(n):
             # pivoting
-            A, b = self.partial_pivot(A, b, k)
+            A, b = self.pivot(A, b, k)
 
             # check for singularity
             if abs(A[k, k]) < 1e-12:
@@ -43,21 +46,7 @@ class GaussJordanSolver(LinearSystemSolver):
                     if abs(A[i, k]) < 1e-12:
                         continue
 
-                    factor = A[i, k]
-
-                    old_matrix = np.column_stack([A, b])
-
-                    A[i] = self.update_matrix_row(A[i], A[k], factor)
-
-                    b[i] = self.update_vector_element(b[i], b[k], factor)
-
-                    A[i, k] = +Decimal(0)
-
-                    new_matrix = np.column_stack([A, b])
-
-                    self.steps.append(
-                        RowOperation.add(old_matrix, new_matrix, i, k, -factor)
-                    )
+                    self.eliminate_row(A, b, i, k)
 
         execution_time = time.time() - start_time
 

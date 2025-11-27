@@ -54,6 +54,7 @@ def solve_system():
         solver = SolverFactory.create_solver(
             method, A_matrix, b_vector, precision_value, parameters
         )
+
         result = solver.solve()
 
         return jsonify(result.to_dict()), 200
@@ -75,10 +76,27 @@ def solve_system():
 def get_methods():
     """Get list of available methods and their parameters"""
     methods = {
-        "gauss-elimination": {"name": "Gauss Elimination", "parameters": []},
+        "gauss-elimination": {
+            "name": "Gauss Elimination",
+            "parameters": [
+                {
+                    "name": "scaling",
+                    "type": "boolean",
+                    "default": False,
+                    "required": False,
+                }
+            ],
+        },
         "gauss-jordan_elimination": {
             "name": "Gauss-Jordan Elimination",
-            "parameters": [],
+            "parameters": [
+                {
+                    "name": "scaling",
+                    "type": "boolean",
+                    "default": False,
+                    "required": False,
+                }
+            ],
         },
         "lu-decomposition": {
             "name": "LU Decomposition",
