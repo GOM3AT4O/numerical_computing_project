@@ -54,7 +54,17 @@ def solve_system():
         solver = SolverFactory.create_solver(
             method, A_matrix, b_vector, precision_value, parameters
         )
-        result = solver.solve()
+
+        use_scaling = parameters.get("use_scaling", False) if parameters else False
+
+        if method in ["gauss-elimination", "gauss-jordan_elimination"] and use_scaling:
+            if hasattr(solver, 'solve_using_scaling'):
+                print("Using Scaling Method...")
+                result = solver.solve_using_scaling()
+            else:
+                result = solver.solve()
+        else:
+            result = solver.solve()
 
         return jsonify(result.to_dict()), 200
 
@@ -75,10 +85,24 @@ def solve_system():
 def get_methods():
     """Get list of available methods and their parameters"""
     methods = {
-        "gauss-elimination": {"name": "Gauss Elimination", "parameters": []},
+        "gauss-elimination": {"name": "Gauss Elimination", "parameters": [
+            {
+                    "name": "use_scaling",
+                    "type": "boolean",
+                    "default": False,
+                    "required": False,
+                }
+        ]},
         "gauss-jordan_elimination": {
             "name": "Gauss-Jordan Elimination",
-            "parameters": [],
+            "parameters": [
+                {
+                    "name": "use_scaling",
+                    "type": "boolean",
+                    "default": False,
+                    "required": False,
+                }
+            ],
         },
         "lu-decomposition": {
             "name": "LU Decomposition",
