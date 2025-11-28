@@ -9,6 +9,8 @@ class GaussSeidelIterationSolver(IterationSolver):
         return "Gauss-Seidel Iteration"
 
     def iterate(self, A: np.ndarray, b: np.ndarray, x: np.ndarray) -> np.ndarray:
+        # copy current solution and we will update it in place, so we that we
+        # always use the most recent values
         x_new = x.copy()
 
         for i in range(self.n):
@@ -19,6 +21,8 @@ class GaussSeidelIterationSolver(IterationSolver):
                     x_new[i] -= A[i, j] * x_new[j]
 
             x_new[i] /= A[i, i]
+
+        # add iteration step
 
         matrix = np.column_stack((A, b))
 

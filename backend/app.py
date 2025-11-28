@@ -4,6 +4,8 @@ from exceptions import ValidationError
 from validator import LinearSystemValidator
 from solver_factory import SolverFactory
 from decimal import Decimal, getcontext
+import signal
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -37,6 +39,7 @@ def solve_system():
         A = [[+Decimal(x) for x in y] for y in A]
         b = [+Decimal(x) for x in b]
 
+        # set precision and rounding method for Decimal operations
         getcontext().prec = precision if precision is not None else 6
         getcontext().rounding = "ROUND_HALF_UP"
 
@@ -123,13 +126,13 @@ def get_methods():
                     "name": "number_of_iterations",
                     "type": "integer",
                     "default": 100,
-                    "required": False,
+                    "required": True,
                 },
                 {
                     "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
-                    "required": False,
+                    "required": True,
                 },
             ],
         },
@@ -146,13 +149,13 @@ def get_methods():
                     "name": "number_of_iterations",
                     "type": "integer",
                     "default": 100,
-                    "required": False,
+                    "required": True,
                 },
                 {
                     "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
-                    "required": False,
+                    "required": True,
                 },
             ],
         },
@@ -166,5 +169,12 @@ def health_check():
     return jsonify({"status": "healthy", "message": "Linear Equations Solver API"}), 200
 
 
+@app.route("/shutdown", methods=["POST"])
+def shutdown():
+    """Gracefully stop the Flask server."""
+    os.kill(os.getpid(), signal.SIGTERM)
+    return jsonify({"status": "shutting down"})
+
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)

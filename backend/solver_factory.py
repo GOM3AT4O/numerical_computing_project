@@ -8,6 +8,7 @@ from solvers.jacobi_iteration_solver import JacobiIterationSolver
 from solvers.gauss_seidel_iteration_solver import GaussSeidelIterationSolver
 
 
+# class for creating solver instances based on the specified method and parameters
 class SolverFactory:
     @staticmethod
     def create_solver(

@@ -6,6 +6,7 @@ from typing import Tuple
 from steps.row_operation_step import RowOperationStep
 
 
+# base class for elimination solvers (like Gauss elimination, Gauss-Jordan elimination, etc.)
 class EliminationSolver(Solver):
     scaling: bool  # whether to use scaling or not
     scaling_factors: np.ndarray  # scaling factors array
@@ -20,6 +21,7 @@ class EliminationSolver(Solver):
         super().__init__(A, b, precision)
         self.scaling = scaling
 
+    # eliminate the element in row i using the pivot row k
     def eliminate_row(self, A: np.ndarray, b: np.ndarray, i: int, k: int):
         old_matrix = np.column_stack([A, b])
 
@@ -38,6 +40,7 @@ class EliminationSolver(Solver):
         # add elimination step
         self.steps.append(RowOperationStep.add(old_matrix, new_matrix, i, k, -factor))
 
+    # back substitution to solve for x using the matrix A in row echelon form
     def back_substitution(self, A: np.ndarray, b: np.ndarray) -> np.ndarray:
         x = np.full(self.n, +Decimal(0))
 
@@ -62,9 +65,11 @@ class EliminationSolver(Solver):
             s[i] = np.max(np.abs(A[i, :]))  # find the maximum absolute value in the row
         self.scaling_factors = s  # set the array of scaling factors
 
+    # find the pivot index using partial pivoting
     def partial_pivot_index(self, A: np.ndarray, k: int) -> int:
         return int(k + np.argmax(np.abs(A[k:, k])))
 
+    # find the pivot index using scaled partial pivoting
     def scaling_pivot_index(self, A: np.ndarray, k: int) -> int:
         ratios = (
             np.abs(A[k:, k]) / self.scaling_factors[k:]
@@ -75,6 +80,7 @@ class EliminationSolver(Solver):
     def pivot(
         self, A: np.ndarray, b: np.ndarray, k: int
     ) -> Tuple[np.ndarray, np.ndarray]:
+        # choose pivoting method
         if self.scaling:
             pivot_index = self.scaling_pivot_index(A, k)
         else:

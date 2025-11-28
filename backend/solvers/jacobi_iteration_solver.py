@@ -10,6 +10,7 @@ class JacobiIterationSolver(IterationSolver):
         return "Jacobi Iteration"
 
     def iterate(self, A: np.ndarray, b: np.ndarray, x: np.ndarray) -> np.ndarray:
+        # the new x values, computed using only the old x values
         x_new = np.full(self.n, +Decimal(0))
 
         for i in range(self.n):
@@ -22,6 +23,8 @@ class JacobiIterationSolver(IterationSolver):
             x_new[i] /= A[i, i]
 
         matrix = np.column_stack((A, b))
+
+        # add iteration step
 
         self.steps.append(
             IterationStep.jacobi(

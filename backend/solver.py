@@ -5,6 +5,7 @@ from step import Step
 from solution_result import SolutionResult
 
 
+# base class for all solvers
 class Solver(ABC):
     A: np.ndarray
     b: np.ndarray
@@ -19,6 +20,7 @@ class Solver(ABC):
         self.precision = precision
         self.steps = []
 
+    # solve the system of linear equations
     @abstractmethod
     def solve(self) -> SolutionResult:
         pass

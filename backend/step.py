@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict
 
 
+# base class for a step in the solution process
 class Step(ABC):
     step_type: str
 
