@@ -65,7 +65,6 @@ export class EquationsSolverService {
         execution_time: number;
         message: string;
       }>(`${this.baseUrl}/solve`, this.mapRequest(request))
-      .pipe(tap((response) => console.log(response)))
       .pipe(map((response) => this.mapResponse(response)));
   }
 }
