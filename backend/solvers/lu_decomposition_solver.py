@@ -1,6 +1,8 @@
 from decimal import Decimal
 import numpy as np
 import time
+from steps.crout_decomposition_step import CroutDecompositionStep
+from steps.cholesky_decomposition_step import CholeskyDecompositionStep
 from steps.substitution_step import SubstitutionStep
 from steps.show_matrices_step import ShowMatricesStep
 from steps.row_operation_step import RowOperationStep
@@ -196,6 +198,8 @@ class LUDecompositionSolver(Solver):
                 numerator = A[j, i] - dot_product
                 U[j, i] = numerator / L[j, j]
 
+        self.steps.append(CroutDecompositionStep(A, L, U))
+
         self.steps.append(ShowMatricesStep({"L": L, "U": U}))
 
         # forward substitution: Ly = b
@@ -289,6 +293,8 @@ class LUDecompositionSolver(Solver):
                         sum_prod = sum_prod + product
                     numerator = A[i, j] - sum_prod
                     L[i, j] = numerator / L[j, j]
+
+        self.steps.append(CholeskyDecompositionStep(A, L))
 
         self.steps.append(ShowMatricesStep({"L": L, "U": L.T}))
 

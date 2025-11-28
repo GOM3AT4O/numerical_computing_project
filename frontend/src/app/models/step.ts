@@ -46,8 +46,23 @@ export type ShowMatricesStep = {
   matrices: { [key: string]: string[][] };
 };
 
+export type CroutDecompositionStep = {
+  step_type: "crout-decomposition";
+  A: string[][];
+  L: string[][];
+  U: string[][];
+};
+
+export type CholeskyDecompositionStep = {
+  step_type: "cholesky-decomposition";
+  A: string[][];
+  L: string[][];
+};
+
 export type Step =
   | RowOperationStep
   | SubstitutionStep
   | IterationStep
-  | ShowMatricesStep;
+  | ShowMatricesStep
+  | CroutDecompositionStep
+  | CholeskyDecompositionStep;

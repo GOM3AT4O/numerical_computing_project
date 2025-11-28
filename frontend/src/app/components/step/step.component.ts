@@ -4,6 +4,8 @@ import { RowOperationStepComponent } from "./row-operation-step/row-operation-st
 import { SubstitutionStepComponent } from "./substitution-step/substitution-step.component";
 import { IterationStepComponent } from "./iteration-step/iteration-step.component";
 import { ShowMatricesStepComponent } from "./show-matrices-step/show-matrices-step.component";
+import { CroutDecompositionStepComponent } from "./crout-decomposition-step/crout-decomposition-step.component";
+import { CholeskyDecompositionStepComponent } from "./cholesky-decomposition-step/cholesky-decomposition-step.component";
 
 @Component({
   selector: "app-step",
@@ -12,6 +14,8 @@ import { ShowMatricesStepComponent } from "./show-matrices-step/show-matrices-st
     SubstitutionStepComponent,
     IterationStepComponent,
     ShowMatricesStepComponent,
+    CroutDecompositionStepComponent,
+    CholeskyDecompositionStepComponent,
   ],
   templateUrl: "./step.component.html",
   styleUrl: "./step.component.css",

@@ -93,6 +93,15 @@ export class EquationsSolverComponent {
         });
       });
     });
+
+    this.form.get("equations")?.setValue({
+      coefficients: [
+        [2, -1, 1].map(String),
+        [3, 3, 9].map(String),
+        [3, 3, 5].map(String),
+      ],
+      constants: [0, 0, 0].map(String),
+    });
   }
 
   clear() {

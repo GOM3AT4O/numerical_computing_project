@@ -1,0 +1,77 @@
+<div class="flex flex-col gap-8">
+  @for (row of step().L; track $index; let i = $index) {
+    @for (value of row; track $index; let j = $index) {
+      @if (j <= i) {
+        <div>
+          <math>
+            <msub>
+              <mi> l </mi>
+              <mrow>
+                <mn> {{ i + 1 }} </mn>
+                <mo>,</mo>
+                <mn> {{ j + 1 }} </mn>
+              </mrow>
+            </msub>
+            <mo>=</mo>
+            @if (i === j) {
+              <mrow>
+                <msqrt>
+                  <mrow class="pt-2 px-4">
+                    <mn> {{ step().A[i][i] }} </mn>
+                    @for (
+                      value of step().L[i].slice(0, j);
+                      track $index;
+                      let k = $index
+                    ) {
+                      <mo>-</mo>
+                      <msup>
+                        <mrow>
+                          <mo>(</mo>
+                          <mn> {{ value }} </mn>
+                          <mo>)</mo>
+                        </mrow>
+                        <mn> 2 </mn>
+                      </msup>
+                    }
+                  </mrow>
+                </msqrt>
+              </mrow>
+            } @else {
+              <mrow>
+                <mfrac>
+                  <mrow class="pb-2 px-4">
+                    <mn> {{ step().A[i][j] }} </mn>
+                    @for (
+                      value of step().L[i].slice(0, j);
+                      track $index;
+                      let k = $index
+                    ) {
+                      <mo>-</mo>
+                      <mrow>
+                        <mrow>
+                          <mo>(</mo>
+                          <mn> {{ step().L[j][k] }} </mn>
+                          <mo>)</mo>
+                        </mrow>
+                        <mrow>
+                          <mo>(</mo>
+                          <mn> {{ value }} </mn>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    }
+                  </mrow>
+                  <mn class="pt-4 px-4"> {{ step().L[j][j] }} </mn>
+                </mfrac>
+              </mrow>
+            }
+            <mo>=</mo>
+            <mrow class="pb-2 px-4">
+              <mn> {{ value }} </mn>
+            </mrow>
+          </math>
+        </div>
+      }
+    }
+  }
+</div>
