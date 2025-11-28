@@ -30,6 +30,8 @@ class GaussJordanEliminationSolver(EliminationSolver):
 
             old_matrix = np.column_stack([A, b])
 
+            # scale row to make the pivot equal to 1
+
             pivot = A[k, k]
             for j in range(n):
                 A[k, j] = A[k, j] / pivot
@@ -37,10 +39,13 @@ class GaussJordanEliminationSolver(EliminationSolver):
 
             new_matrix = np.column_stack([A, b])
 
+            # add scaling step
+
             self.steps.append(
                 RowOperationStep.scale(old_matrix, new_matrix, k, +Decimal(1) / pivot)
             )
 
+            # eliminate all other rows
             for i in range(n):
                 if i != k:
                     if abs(A[i, k]) < 1e-12:

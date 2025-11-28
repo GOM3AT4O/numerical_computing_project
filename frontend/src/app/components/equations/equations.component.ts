@@ -74,12 +74,14 @@ export class EquationsComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["equationCount"]) {
+      // update the equations to match the new equation count
       this.writeValue(this.form.value);
       this.onChange(this.form.value);
     }
   }
 
   writeValue(value: any): void {
+    // add rows to the coeffiecients matrix until it matches the equation count
     while (this.form.controls.coefficients.length < this.equationCount()) {
       const row = this.formBuilder.array<FormControl<string>>(
         Array.from({ length: this.equationCount() }, () =>
@@ -89,6 +91,7 @@ export class EquationsComponent
       this.form.controls.coefficients.push(row);
     }
 
+    // remove rows from the coeffiecients matrix until it matches the equation count
     while (this.form.controls.coefficients.length > this.equationCount()) {
       this.form.controls.coefficients.removeAt(
         this.form.controls.coefficients.length - 1,
@@ -97,27 +100,32 @@ export class EquationsComponent
 
     for (let i = 0; i < this.form.controls.coefficients.length; i++) {
       const row = this.form.controls.coefficients.at(i);
+      // add columns to the coeffiecients matrix row until it matches the equation count
       while (row.length < this.equationCount()) {
         row.push(this.formBuilder.control<string>("", this.numberValidator));
       }
 
+      // remove columns from the coeffiecients matrix row until it matches the equation count
       while (row.length > this.equationCount()) {
         row.removeAt(row.length - 1);
       }
     }
 
+    // add constants until it matches the equation count
     while (this.form.controls.constants.length < this.equationCount()) {
       this.form.controls.constants.push(
         this.formBuilder.control<string>("", this.numberValidator),
       );
     }
 
+    // remove constants until it matches the equation count
     while (this.form.controls.constants.length > this.equationCount()) {
       this.form.controls.constants.removeAt(
         this.form.controls.constants.length - 1,
       );
     }
 
+    // set the values of the coeffiecients matrix and constants vector
     for (let i = 0; i < this.equationCount(); i++) {
       for (let j = 0; j < this.equationCount(); j++) {
         this.form.controls.coefficients
@@ -153,6 +161,7 @@ export class EquationsComponent
     const input =
       this.inputs()[i * (this.equationCount() + 1) + j].nativeElement;
 
+    // navigate inputs based on arrow key pressed, if possible
     switch (event.key) {
       case "ArrowUp":
         i = i > 0 ? i - 1 : i;
@@ -164,6 +173,7 @@ export class EquationsComponent
         if (input.value.length !== 0 && input.selectionStart !== 0) {
           return;
         }
+        // if at the first input in a row, move to the last input of the previous row
         if (j > 0) {
           j--;
         } else if (i > 0) {
@@ -178,6 +188,7 @@ export class EquationsComponent
         ) {
           return;
         }
+        // if at the last input in a row, move to the first input of the next row
         if (j < this.equationCount()) {
           j++;
         } else if (i < this.equationCount() - 1) {
@@ -190,9 +201,11 @@ export class EquationsComponent
     }
 
     event.preventDefault();
+    // set focus to the new input
     this.inputs()[i * (this.equationCount() + 1) + j].nativeElement.focus();
   }
 
+  // swap equations at index i and i-1, effictively moving equation i up
   moveEquationUp(i: number) {
     if (i === 0) return;
 
@@ -210,6 +223,7 @@ export class EquationsComponent
     this.form.controls.constants.at(i - 1).setValue(temporaryConstant);
   }
 
+  // swap equations at index i and i+1, effictively moving equation i down
   moveEquationDown(i: number) {
     if (i === this.equationCount() - 1) return;
 

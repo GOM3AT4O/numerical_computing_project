@@ -12,6 +12,7 @@ export class EquationsSolverService {
   private http = inject(HttpClient);
   private readonly baseUrl = "http://localhost:5000/api";
 
+  // maps the SolveEquationsRequest to the format expected by the backend API.
   private mapRequest(request: SolveEquationsRequest) {
     let parameters = undefined;
     if ("parameters" in request) {
@@ -38,6 +39,7 @@ export class EquationsSolverService {
     };
   }
 
+  // maps the backend API response to the SolveEquationsResponse format.
   private mapResponse(response: any): SolveEquationsResponse {
     return {
       solution: response.solution,

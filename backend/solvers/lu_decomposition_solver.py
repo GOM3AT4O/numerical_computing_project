@@ -23,6 +23,7 @@ class LUDecompositionSolver(Solver):
         self.format = format.lower()
 
     def solve(self) -> SolutionResult:
+        # choose method based on format
         if self.format == "doolittle":
             return self._solve_doolittle()
 
@@ -42,6 +43,7 @@ class LUDecompositionSolver(Solver):
         b = self.b.copy()
         n = self.n
 
+        # set the permutation matrix as identity
         P = np.array(
             [
                 [+Decimal(1) if i == j else +Decimal(0) for j in range(n)]
@@ -49,6 +51,7 @@ class LUDecompositionSolver(Solver):
             ],
             dtype=Decimal,
         )
+        # set L as identity
         L = np.array(
             [
                 [+Decimal(1) if i == j else +Decimal(0) for j in range(n)]
@@ -56,6 +59,7 @@ class LUDecompositionSolver(Solver):
             ],
             dtype=Decimal,
         )
+        # set U as copy of A
         U = A.copy()
 
         for k in range(n - 1):
@@ -108,6 +112,8 @@ class LUDecompositionSolver(Solver):
                 message="System doesn't have a unique solution.",
                 execution_time=time.time() - start_time,
             )
+
+        # show the final L, U and P matrices
 
         self.steps.append(ShowMatricesStep({"L": L, "U": U, "P": P}))
 
@@ -199,6 +205,8 @@ class LUDecompositionSolver(Solver):
                 U[j, i] = numerator / L[j, j]
 
         self.steps.append(CroutDecompositionStep(A, L, U))
+
+        # show the final L and U matrices
 
         self.steps.append(ShowMatricesStep({"L": L, "U": U}))
 
@@ -295,6 +303,8 @@ class LUDecompositionSolver(Solver):
                     L[i, j] = numerator / L[j, j]
 
         self.steps.append(CholeskyDecompositionStep(A, L))
+
+        # show the final L and U matrices
 
         self.steps.append(ShowMatricesStep({"L": L, "U": L.T}))
 

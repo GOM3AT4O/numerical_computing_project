@@ -72,12 +72,14 @@ export class MatrixComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["rowCount"] || changes["columnCount"]) {
+      // update the matrix value to match the new dimensions
       this.writeValue(this.form.value);
       this.onChange(this.form.value);
     }
   }
 
   writeValue(value: any): void {
+    // add rows to the matrix until it matches the row count
     while (this.form.length < this.rowCount()) {
       const row = this.formBuilder.array<FormControl<string>>(
         Array.from({ length: this.columnCount() }, () =>
@@ -87,20 +89,25 @@ export class MatrixComponent
       this.form.push(row);
     }
 
+    // remove rows from the matrix until it matches the row count
     while (this.form.length > this.rowCount()) {
       this.form.removeAt(this.form.length - 1);
     }
 
     for (let i = 0; i < this.form.length; i++) {
       const row = this.form.at(i);
+      // add columns to the row until it matches the column count
       while (row.length < this.columnCount()) {
         row.push(this.formBuilder.control<string>("", this.numberValidator));
       }
 
+      // remove columns from the row until it matches the column count
       while (row.length > this.columnCount()) {
         row.removeAt(row.length - 1);
       }
     }
+
+    // set the values of the matrix
     for (let i = 0; i < this.rowCount(); i++) {
       for (let j = 0; j < this.columnCount(); j++) {
         this.form
@@ -134,6 +141,7 @@ export class MatrixComponent
   onKeyDown(i: number, j: number, event: KeyboardEvent) {
     const input = this.inputs()[i * this.columnCount() + j].nativeElement;
 
+    // navigate inputs based on arrow key pressed, if possible
     switch (event.key) {
       case "ArrowUp":
         i = i > 0 ? i - 1 : i;
@@ -161,6 +169,7 @@ export class MatrixComponent
     }
 
     event.preventDefault();
+    // set focus to the new input
     this.inputs()[i * this.columnCount() + j].nativeElement.focus();
   }
 }

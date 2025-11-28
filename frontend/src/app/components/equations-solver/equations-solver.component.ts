@@ -39,6 +39,7 @@ export class EquationsSolverComponent {
 
   equationCount = 3;
 
+  // available methods for solving equations
   readonly methods = [
     { label: "Gauss Elimination", value: "gauss-elimination" },
     { label: "Gauss-Jordan Elimination", value: "gauss-jordan-elimination" },
@@ -77,6 +78,7 @@ export class EquationsSolverComponent {
 
   ngOnInit() {
     this.form.get("equationCount")?.valueChanges.subscribe((count) => {
+      // only update equation count if the input is valid
       if (this.form.get("equationCount")?.valid) {
         this.equationCount = parseInt(count!, 10);
         this.changeDetectorRef.detectChanges();
@@ -86,6 +88,7 @@ export class EquationsSolverComponent {
     this.form.get("method")?.valueChanges.subscribe(() => {
       this.form.setControl("parameters", this.formBuilder.control(null));
       this.changeDetectorRef.detectChanges();
+      // scroll to show the parameters section
       setTimeout(() => {
         this.parametersElement()?.nativeElement.scrollIntoView({
           behavior: "smooth",
@@ -95,6 +98,7 @@ export class EquationsSolverComponent {
     });
   }
 
+  // clear all coeffiicents and constants of equations
   clear() {
     this.form.get("equations")?.setValue({
       coefficients: Array.from({ length: this.equationCount }, () =>
@@ -105,6 +109,7 @@ export class EquationsSolverComponent {
   }
 
   solve() {
+    // check if the form is valid, otherwise mark all fields as touched to show validation errors
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.parameters()?.form.markAllAsTouched();
@@ -113,6 +118,7 @@ export class EquationsSolverComponent {
 
     const value = this.form.value;
 
+    // construct the request object, replacing empty strings with the default values
     const request: SolveEquationsRequest = {
       equations: {
         coefficients: value.equations!.coefficients.map((row: string[]) =>
@@ -129,10 +135,13 @@ export class EquationsSolverComponent {
         : parseInt(value.precision!, 10),
     };
 
+    // send the request to the service
     this.equationSolverService.solveEquations(request).subscribe((response) => {
+      // hide steps and show the result
       this.showSteps.set(false);
       this.response.set(response);
       this.changeDetectorRef.detectChanges();
+      // scroll to show the result
       setTimeout(() => {
         this.resultElement()?.nativeElement.scrollIntoView({
           behavior: "smooth",
