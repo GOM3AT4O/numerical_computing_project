@@ -166,7 +166,12 @@ export class EquationsComponent
         if (input.value.length !== 0 && input.selectionStart !== 0) {
           return;
         }
-        j = j > 0 ? j - 1 : j;
+        if (j > 0) {
+          j--;
+        } else if (i > 0) {
+          i--;
+          j = this.equationCount() - 1;
+        }
         break;
       case "ArrowRight":
         if (
@@ -175,7 +180,12 @@ export class EquationsComponent
         ) {
           return;
         }
-        j = j < this.equationCount() ? j + 1 : j;
+        if (j < this.equationCount()) {
+          j++;
+        } else if (i < this.equationCount() - 1) {
+          i++;
+          j = 0;
+        }
         break;
       default:
         return;
