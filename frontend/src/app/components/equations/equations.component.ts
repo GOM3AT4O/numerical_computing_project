@@ -123,11 +123,9 @@ export class EquationsComponent
         this.form.controls.coefficients
           .at(i)
           .at(j)
-          .setValue(value?.coefficients?.[i]?.[j] ?? "", { emitEvent: false });
+          .setValue(value?.coefficients?.[i]?.[j] ?? "");
       }
-      this.form.controls.constants
-        .at(i)
-        .setValue(value?.constants?.[i] ?? "", { emitEvent: false });
+      this.form.controls.constants.at(i).setValue(value?.constants?.[i] ?? "");
     }
   }
 

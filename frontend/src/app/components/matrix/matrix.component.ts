@@ -106,7 +106,7 @@ export class MatrixComponent
         this.form
           .at(i)
           .at(j)
-          .setValue(value?.[i]?.[j] ?? "", { emitEvent: false });
+          .setValue(value?.[i]?.[j] ?? "");
       }
     }
   }
