@@ -22,7 +22,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { RangePipe } from "../../pipes/range.pipe";
+import { RangePipe } from "../../../../shared/pipes/range.pipe";
 
 @Component({
   selector: "app-matrix",

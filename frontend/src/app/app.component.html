@@ -1,3 +1,23 @@
-<main class="box-border p-32 flex flex-col overflow-auto">
-  <router-outlet />
-</main>
+<div class="overflow-auto box-border p-32 flex flex-col gap-16">
+  <header class="flex w-full items-center justify-center">
+    <div class="relative flex flex-row w-fit rounded-md bg-gray-100 shadow-md">
+      @for (tab of tabs; track tab.path) {
+        <a
+          [routerLink]="tab.path"
+          animate.enter="slide-in-left"
+          animate.leave="slide-out-right"
+          class="w-fit px-16 py-6 rounded-md border-b-3 border-transparent cursor-pointer transition duration-200"
+          >{{ tab.label }}</a
+        >
+      }
+      <div
+        class="absolute bottom-0 left-0 h-3 bg-blue-500 rounded-md transition-transform duration-300"
+        [style.transform]="'translateX(' + activeTabIndex * 100 + '%)'"
+        [style.width.%]="100 / tabs.length"
+      ></div>
+    </div>
+  </header>
+  <main>
+    <router-outlet />
+  </main>
+</div>

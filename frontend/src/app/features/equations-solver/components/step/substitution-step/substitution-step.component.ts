@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { SubstitutionStep } from "../../../models/step";
-import { RangePipe } from "../../../pipes/range.pipe";
+import { RangePipe } from "../../../../../shared/pipes/range.pipe";
 
 @Component({
   selector: "app-substitution-step",
