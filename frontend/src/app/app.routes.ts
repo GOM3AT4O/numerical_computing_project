@@ -8,10 +8,12 @@ export const routes: Routes = [
     path: "equations-solver",
     component: EquationsSolverComponent,
     title: "System of Linear Equations Solver",
+    data: { order: 0 },
   },
   {
     path: "root-finder",
     component: RootFinderComponent,
     title: "Root Finder",
+    data: { order: 1 },
   },
 ];
