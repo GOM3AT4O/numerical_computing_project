@@ -1,1 +1,93 @@
-<p>root-finder works!</p>
+<form [formGroup]="form" (ngSubmit)="solve()">
+  <div class="flex flex-col items-center">
+    <div class="flex flex-col gap-16 items-center">
+      <div class="grid gap-16 w-full">
+        <div
+          class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md row-1 col-1"
+        >
+          <h1 class="text-lg font-bold mb-8">Function</h1>
+          <div
+            class="size-fit p-8 mb-16 rounded-md overflow-hidden shadow-md bg-white"
+          >
+            <plotly-plot
+              [data]="graph.data"
+              [layout]="graph.layout"
+              (relayout)="onRelayout($event)"
+            ></plotly-plot>
+          </div>
+          <div class="flex flex-row items-center">
+            <label for="function" class="font-medium">
+              <math>
+                <mrow>
+                  <mi>f</mi>
+                  <mo>(</mo>
+                  <mi>x</mi>
+                  <mo>)</mo>
+                </mrow>
+                <mo>=</mo>
+              </math>
+            </label>
+            <input
+              id="function"
+              class="min-w-128 h-fit text-left"
+              type="text"
+              formControlName="function"
+              autoSizeInput
+            />
+          </div>
+          @if (
+            form.get("function")?.invalid &&
+            (form.get("function")?.touched || form.get("function")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid function of x.
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
+          <div
+            class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+          >
+            <label for="method" class="font-medium">Method:</label>
+            <select id="method" formControlName="method">
+              @for (method of methods; track method) {
+                <option [value]="method.value">{{ method.label }}</option>
+              }
+            </select>
+            <label for="precision" class="font-medium">Precision:</label>
+            <input
+              id="precision"
+              class="min-w-32 h-fit"
+              type="text"
+              placeholder="6"
+              formControlName="precision"
+              autoSizeInput
+            />
+          </div>
+          @if (
+            form.get("precision")?.invalid &&
+            (form.get("precision")?.touched || form.get("precision")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid precision.
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="w-fit px-16 py-6 border-none rounded-lg outline-none bg-blue-500 text-white shadow-sm cursor-pointer transition duration-200 hover:bg-blue-400 hover:-translate-y-2 hover:shadow-md active:bg-blue-600 active:translate-y-0 active:shadow-sm"
+      >
+        Solve
+      </button>
+    </div>
+  </div>
+</form>

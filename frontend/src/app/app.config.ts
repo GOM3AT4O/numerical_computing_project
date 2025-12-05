@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  importProvidersFrom,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from "@angular/core";
@@ -11,6 +12,8 @@ import {
 
 import { routes } from "./app.routes";
 import { provideHttpClient } from "@angular/common/http";
+import * as PlotlyJS from "plotly.js-dist-min";
+import { PlotlyModule } from "angular-plotly.js";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,10 +23,12 @@ export const appConfig: ApplicationConfig = {
       routes,
       withViewTransitions({
         onViewTransitionCreated: ({ transition, from, to }) => {
+          console.log(from, to);
+
           const getOrder = (
-            snapshot: ActivatedRouteSnapshot | null,
+            snapshot: ActivatedRouteSnapshot,
           ): number | undefined => {
-            return (snapshot?.firstChild?.data as { order: number | undefined })
+            return (snapshot.firstChild?.data as { order: number | undefined })
               ?.order;
           };
 
@@ -39,9 +44,9 @@ export const appConfig: ApplicationConfig = {
 
           let directionClass = "";
           if (toOrder > fromOrder) {
-            directionClass = "slide-right";
-          } else if (toOrder < fromOrder) {
             directionClass = "slide-left";
+          } else if (toOrder < fromOrder) {
+            directionClass = "slide-right";
           }
 
           if (directionClass) {
@@ -57,5 +62,6 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(),
+    importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
   ],
 };

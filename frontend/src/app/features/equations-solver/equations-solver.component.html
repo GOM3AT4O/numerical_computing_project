@@ -52,7 +52,9 @@
           }
         </div>
         <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
-          <div class="grid grid-cols-[max-content_max-content] gap-8">
+          <div
+            class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+          >
             <label for="method" class="font-medium">Method:</label>
             <select id="method" formControlName="method">
               @for (method of methods; track method) {
@@ -69,6 +71,18 @@
               autoSizeInput
             />
           </div>
+          @if (
+            form.get("precision")?.invalid &&
+            (form.get("precision")?.touched || form.get("precision")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid precision.
+              </div>
+            </div>
+          }
         </div>
         @switch (form.get("method")?.value) {
           @case ("gauss-elimination") {
