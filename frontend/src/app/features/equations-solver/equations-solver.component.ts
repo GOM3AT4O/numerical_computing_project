@@ -48,6 +48,10 @@ export class EquationsSolverComponent {
     { label: "Gauss-Seidel Iteration", value: "gauss-seidel-iteration" },
   ] as const;
 
+  methodLabels = Object.fromEntries(
+    this.methods.map(({ label, value }) => [value, label] as const),
+  );
+
   form = this.formBuilder.group({
     equationCount: [
       this.equationCount.toString(),
@@ -70,7 +74,6 @@ export class EquationsSolverComponent {
 
   showSteps = signal<boolean>(false);
   response = signal<SolveEquationsResponse | null>(null);
-  errorResponse = signal<string | null>(null);
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 

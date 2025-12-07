@@ -84,70 +84,46 @@
             </div>
           }
         </div>
-        @switch (form.get("method")?.value) {
-          @case ("gauss-elimination") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">Gauss Elimination Parameters</h1>
+        <div
+          class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
+        >
+          <h1 class="text-lg font-bold">
+            {{ methodLabels[form.get("method")?.value!] }} Parameters
+          </h1>
+          @switch (form.get("method")?.value) {
+            @case ("gauss-elimination") {
               <app-elimination-parameters
                 #parameters
                 formControlName="parameters"
               />
-            </div>
-          }
-          @case ("gauss-jordan-elimination") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">
-                Gauss-Jordan Elimination Parameters
-              </h1>
+            }
+            @case ("gauss-jordan-elimination") {
               <app-elimination-parameters
                 #parameters
                 formControlName="parameters"
               />
-            </div>
-          }
-          @case ("lu-decomposition") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">LU Decomposition Parameters</h1>
+            }
+            @case ("lu-decomposition") {
               <app-lu-parameters #parameters formControlName="parameters" />
-            </div>
-          }
-          @case ("jacobi-iteration") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
-            >
-              <h1 class="text-lg font-bold flex-0">
-                Jacobi Iteration Parameters
-              </h1>
+            }
+            @case ("jacobi-iteration") {
               <app-iteration-parameters
                 #parameters
                 class="flex-1"
                 formControlName="parameters"
                 [equationCount]="equationCount"
               />
-            </div>
-          }
-          @case ("gauss-seidel-iteration") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
-            >
-              <h1 class="text-lg font-bold flex-0">
-                Gauss-Seidel Iteration Parameters
-              </h1>
+            }
+            @case ("gauss-seidel-iteration") {
               <app-iteration-parameters
                 #parameters
                 class="flex-1"
                 formControlName="parameters"
                 [equationCount]="equationCount"
               />
-            </div>
+            }
           }
-        }
+        </div>
       </div>
       <button
         type="submit"

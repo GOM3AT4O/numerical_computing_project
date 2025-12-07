@@ -1,4 +1,11 @@
-import { Component, inject } from "@angular/core";
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from "@angular/core";
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -7,18 +14,30 @@ import {
   ValidationErrors,
 } from "@angular/forms";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { compile, EvalFunction, parse, SymbolNode } from "mathjs";
-import { PlotlyComponent } from "angular-plotly.js";
-import { PlotRelayoutEvent } from "plotly.js-dist-min";
+import { parse, SymbolNode } from "mathjs";
+import { PlotComponent } from "./components/plot/plot.component";
+import { ParametersComponent } from "./components/parameters/parameters.component";
+import { FindRootResponse } from "./models/find-root-response";
+import { IntervalParametersComponent } from "./components/parameters/interval-parameters/interval-parameters.component";
+import { OneGuessParametersComponent } from "./components/parameters/one-guess-parameters/one-guess-parameters.component";
+import { TwoGuessesParametersComponent } from "./components/parameters/two-guesses-parameters/two-guesses-parameters.component";
 
 @Component({
   selector: "app-root-finder",
-  imports: [ReactiveFormsModule, AutoSizeInputDirective, PlotlyComponent],
+  imports: [
+    ReactiveFormsModule,
+    AutoSizeInputDirective,
+    PlotComponent,
+    IntervalParametersComponent,
+    OneGuessParametersComponent,
+    TwoGuessesParametersComponent,
+  ],
   templateUrl: "./root-finder.component.html",
   styleUrl: "./root-finder.component.css",
 })
 export class RootFinderComponent {
   private formBuilder = inject(FormBuilder);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly allowedSymbols: string[] = [
     "e",
@@ -75,6 +94,10 @@ export class RootFinderComponent {
     { label: "Secant", value: "secant" },
   ] as const;
 
+  methodLabels = Object.fromEntries(
+    this.methods.map(({ label, value }) => [value, label] as const),
+  );
+
   form = this.formBuilder.group({
     function: ["", [Validators.required, this.functionValidator]],
     method: [
@@ -82,68 +105,54 @@ export class RootFinderComponent {
       Validators.required,
     ],
     precision: ["", [Validators.pattern(/^[1-9]\d*$/)]],
+    numberOfIterations: [
+      "",
+      [Validators.required, Validators.pattern(/^[1-9]\d*$/)],
+    ],
+    absoluteRelativeError: [
+      "",
+      [Validators.required, Validators.pattern(/^[-+]?\d+(\.\d+)?$/)],
+    ],
     parameters: [null as any],
   });
 
-  expression: EvalFunction | null = null;
+  functions: { [k: string]: string } = {};
 
-  minX = -10;
-  maxX = 10;
+  parameters = viewChild<ParametersComponent>("parameters");
+  parametersElement = viewChild("parameters", { read: ElementRef });
 
-  graph = {
-    data: [
-      {
-        x: [] as number[],
-        y: [] as number[],
-        type: "scatter",
-        mode: "lines",
-        name: "f(x)",
-      },
-    ],
-    layout: {
-      dragmode: "pan",
-      margin: { l: 40, r: 40, t: 40, b: 40 },
-      xaxis: { range: [this.minX, this.maxX], exponentformat: "power" },
-      yaxis: { range: [this.minX, this.maxX], exponentformat: "power" },
-      width: 400,
-      height: 350,
-      title: "A Fancy Plot",
-    },
-  };
+  response = signal<FindRootResponse | null>(null);
 
-  plot() {
-    const numberOfPoints = 200;
-    const step = (this.maxX - this.minX) / (numberOfPoints - 1);
-    const x = Array.from(
-      { length: numberOfPoints },
-      (_, i) => this.minX + i * step,
-    );
-    const y = x.map((x) => this.expression!.evaluate({ x }));
-
-    this.graph.data[0].x = x;
-    this.graph.data[0].y = y;
-  }
+  resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 
   ngOnInit() {
     this.form.get("function")?.valueChanges.subscribe((f) => {
-      if (this.form.get("function")?.invalid) {
-        return;
+      if (this.form.get("function")?.valid) {
+        if (this.form.get("method")?.value === "fixed-point") {
+          this.functions = { ...this.functions, ["g(x)"]: f! };
+        } else {
+          this.functions = { ...this.functions, ["f(x)"]: f! };
+        }
+      }
+    });
+
+    this.form.get("method")?.valueChanges.subscribe((method) => {
+      if (method === "fixed-point") {
+        this.functions = { ["g(x)"]: this.functions["f(x)"], ["x"]: "x" };
+      } else if (!this.functions["f(x)"]) {
+        this.functions = { ["f(x)"]: this.functions["g(x)"] };
       }
 
-      this.expression = compile(f!);
-      this.plot();
+      this.form.setControl("parameters", this.formBuilder.control(null));
+      this.changeDetectorRef.detectChanges();
+      // scroll to show the parameters section
+      setTimeout(() => {
+        this.parametersElement()?.nativeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
     });
-  }
-
-  onRelayout(event: any) {
-    if (
-      event["xaxis.range[0]"] !== undefined &&
-      event["xaxis.range[1]"] !== undefined
-    ) {
-      this.minX = event["xaxis.range[0]"] as number;
-      this.maxX = event["xaxis.range[1]"] as number;
-      this.plot();
-    }
   }
 
   solve() {

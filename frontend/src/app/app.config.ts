@@ -23,8 +23,6 @@ export const appConfig: ApplicationConfig = {
       routes,
       withViewTransitions({
         onViewTransitionCreated: ({ transition, from, to }) => {
-          console.log(from, to);
-
           const getOrder = (
             snapshot: ActivatedRouteSnapshot,
           ): number | undefined => {

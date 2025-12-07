@@ -9,34 +9,20 @@ export type Equations = {
   constants: string[];
 };
 
-export type SolveEquationsRequest =
+export type SolveEquationsRequest = {
+  equations: Equations;
+  precision?: number;
+} & (
   | {
-      equations: Equations;
-      method: "gauss-elimination";
+      method: "gauss-elimination" | "gauss-jordan-elimination";
       parameters: EliminationParameters;
-      precision?: number;
     }
   | {
-      equations: Equations;
-      method: "gauss-jordan-elimination";
-      parameters: EliminationParameters;
-      precision?: number;
-    }
-  | {
-      equations: Equations;
       method: "lu-decomposition";
       parameters: LUParameters;
-      precision?: number;
     }
   | {
-      equations: Equations;
-      method: "jacobi-iteration";
+      method: "jacobi-iteration" | "gauss-seidel-iteration";
       parameters: IterationParameters;
-      precision?: number;
     }
-  | {
-      equations: Equations;
-      method: "gauss-seidel-iteration";
-      parameters: IterationParameters;
-      precision?: number;
-    };
+);
