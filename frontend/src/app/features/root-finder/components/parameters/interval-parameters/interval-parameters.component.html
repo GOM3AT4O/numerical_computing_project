@@ -1,1 +1,44 @@
-<p>interval-parameters works!</p>
+<div class="flex flex-col justify-between h-full" [formGroup]="form">
+  <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
+    <label for="lower-bound" class="font-medium">Lower Bound:</label>
+    <input
+      id="lower-bound"
+      class="min-w-full h-fit"
+      type="text"
+      formControlName="lowerBound"
+      autoSizeInput
+      [minWidth]="64"
+      [extraWidth]="10"
+    />
+    <label for="upper-bound" class="font-medium">Upper Bound:</label>
+    <input
+      id="upper-bound"
+      class="min-w-full h-fit"
+      type="text"
+      formControlName="upperBound"
+      autoSizeInput
+      [minWidth]="64"
+      [extraWidth]="10"
+    />
+  </div>
+  @if (
+    form.get("lowerBound")?.invalid &&
+    (form.get("lowerBound")?.dirty || form.get("lowerBound")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid lower bound.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("upperBound")?.invalid &&
+    (form.get("upperBound")?.dirty || form.get("upperBound")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid upper bound.
+      </div>
+    </div>
+  }
+</div>

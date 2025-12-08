@@ -16,6 +16,8 @@ export class PlotComponent implements OnChanges {
   minX = -10;
   maxX = 10;
 
+  numberOfPoints = 1000;
+
   data: any[] = [];
 
   layout = {
@@ -50,10 +52,9 @@ export class PlotComponent implements OnChanges {
   }
 
   generateData() {
-    const numberOfPoints = 1000;
-    const step = (this.maxX - this.minX) / (numberOfPoints - 1);
+    const step = (this.maxX - this.minX) / (this.numberOfPoints - 1);
     const x = Array.from(
-      { length: numberOfPoints },
+      { length: this.numberOfPoints },
       (_, i) => this.minX + i * step,
     );
     this.data = Object.entries(this.compiledFunctions).map(([k, v]) => ({

@@ -6,7 +6,7 @@
           class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md row-1 col-1"
         >
           <h1 class="text-lg font-bold mb-8">Function</h1>
-          <app-plot class="mb-16" [functions]="functions" />
+          <app-plot class="mb-16 self-center" [functions]="functions" />
           <div class="flex flex-row items-center">
             <label for="function" class="font-medium">
               <math>
@@ -23,10 +23,12 @@
             </label>
             <input
               id="function"
-              class="min-w-128 h-fit text-left"
+              class="h-fit"
               type="text"
               formControlName="function"
               autoSizeInput
+              [minWidth]="128"
+              [extraWidth]="10"
             />
           </div>
           @if (
@@ -55,11 +57,13 @@
             <label for="precision" class="font-medium">Precision:</label>
             <input
               id="precision"
-              class="min-w-32 h-fit"
+              class="h-fit"
               type="text"
               placeholder="6"
               formControlName="precision"
               autoSizeInput
+              [minWidth]="32"
+              [extraWidth]="10"
             />
           </div>
 
@@ -80,15 +84,13 @@
           <div class="flex flex-col gap-8">
             <span class="font-bold">Stopping Conditions:</span>
             <div
-              class="pl-16 grid grid-cols-[max-content_max-content] gap-8 items-center"
+              class="grid grid-cols-[max-content_max-content] gap-8 items-center"
             >
-              <label
-                for="stopping-condition-number-of-iterations"
-                class="font-medium"
+              <label for="number-of-iterations" class="font-medium"
                 >Number of Iterations:</label
               >
               <input
-                id="stopping-condition-number-of-iterations"
+                id="number-of-iterations"
                 class="min-w-full h-fit"
                 type="text"
                 formControlName="numberOfIterations"
@@ -96,13 +98,11 @@
                 [minWidth]="64"
                 [extraWidth]="10"
               />
-              <label
-                for="stopping-condition-absolute-relative-error"
-                class="font-medium"
+              <label for="absolute-relative-error" class="font-medium"
                 >Absolute Relative Error:</label
               >
               <input
-                id="stopping-condition-absolute-relative-error"
+                id="absolute-relative-error"
                 class="min-w-full h-fit"
                 type="text"
                 formControlName="absoluteRelativeError"
@@ -171,7 +171,7 @@
               />
             }
             @case ("modified-newton-raphson") {
-              <app-one-guess-parameters
+              <app-one-guess-with-multiplicity-parameters
                 #parameters
                 formControlName="parameters"
               />

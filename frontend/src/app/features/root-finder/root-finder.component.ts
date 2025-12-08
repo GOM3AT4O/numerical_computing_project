@@ -21,6 +21,8 @@ import { FindRootResponse } from "./models/find-root-response";
 import { IntervalParametersComponent } from "./components/parameters/interval-parameters/interval-parameters.component";
 import { OneGuessParametersComponent } from "./components/parameters/one-guess-parameters/one-guess-parameters.component";
 import { TwoGuessesParametersComponent } from "./components/parameters/two-guesses-parameters/two-guesses-parameters.component";
+import { OneGuessWithMultiplicityParametersComponent } from "./components/parameters/one-guess-with-multiplicity-parameters/one-guess-with-multiplicity-parameters.component";
+import { FindRootRequest } from "./models/find-root-request";
 
 @Component({
   selector: "app-root-finder",
@@ -30,6 +32,7 @@ import { TwoGuessesParametersComponent } from "./components/parameters/two-guess
     PlotComponent,
     IntervalParametersComponent,
     OneGuessParametersComponent,
+    OneGuessWithMultiplicityParametersComponent,
     TwoGuessesParametersComponent,
   ],
   templateUrl: "./root-finder.component.html",
@@ -50,14 +53,25 @@ export class RootFinderComponent {
     "csc",
     "sec",
     "cot",
+    "sinh",
+    "cosh",
+    "tanh",
+    "csch",
+    "sech",
+    "coth",
     "asin",
     "acos",
     "atan",
     "acsc",
     "asec",
     "acot",
+    "asinh",
+    "acosh",
+    "atanh",
+    "acsch",
+    "asech",
+    "acoth",
     "log",
-    "ln",
     "exp",
   ] as const;
 
@@ -129,18 +143,29 @@ export class RootFinderComponent {
     this.form.get("function")?.valueChanges.subscribe((f) => {
       if (this.form.get("function")?.valid) {
         if (this.form.get("method")?.value === "fixed-point") {
-          this.functions = { ...this.functions, ["g(x)"]: f! };
+          this.functions = { ["g(x)"]: f!, ["x"]: "x" };
         } else {
-          this.functions = { ...this.functions, ["f(x)"]: f! };
+          this.functions = { ["f(x)"]: f! };
         }
       }
     });
 
     this.form.get("method")?.valueChanges.subscribe((method) => {
-      if (method === "fixed-point") {
-        this.functions = { ["g(x)"]: this.functions["f(x)"], ["x"]: "x" };
-      } else if (!this.functions["f(x)"]) {
-        this.functions = { ["f(x)"]: this.functions["g(x)"] };
+      if (
+        this.form.get("function")?.valid ||
+        this.functions["f(x)"] ||
+        this.functions["g(x)"]
+      ) {
+        if (method === "fixed-point") {
+          this.functions = {
+            ["g(x)"]: this.functions["f(x)"],
+            ["x"]: "x",
+          };
+        } else if (this.functions["g(x)"]) {
+          this.functions = {
+            ["f(x)"]: this.functions["g(x)"],
+          };
+        }
       }
 
       this.form.setControl("parameters", this.formBuilder.control(null));
@@ -159,11 +184,26 @@ export class RootFinderComponent {
     // check if the form is valid, otherwise mark all fields as touched to show validation errors
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.parameters()?.form.markAllAsTouched();
       return;
     }
 
     const value = this.form.value;
 
     console.log(value);
+
+    // construct the request object, replacing empty strings with the default values
+    const request: FindRootRequest = {
+      function: value.function!,
+      method: value.method!,
+      numberOfIterations: parseInt(value.numberOfIterations!, 10),
+      absoluteRelativeError: value.absoluteRelativeError!,
+      parameters: this.parameters()?.parameters as any,
+      precision: isNaN(parseInt(value.precision!, 10))
+        ? undefined
+        : parseInt(value.precision!, 10),
+    };
+
+    console.log(request);
   }
 }

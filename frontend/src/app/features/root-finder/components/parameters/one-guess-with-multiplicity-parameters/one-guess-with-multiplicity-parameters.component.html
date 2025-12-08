@@ -1,43 +1,43 @@
 <div class="flex flex-col justify-between h-full" [formGroup]="form">
   <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
-    <label for="first-guess" class="font-medium">First Guess:</label>
+    <label for="guess" class="font-medium">Guess:</label>
     <input
-      id="first-guess"
+      id="guess"
       class="min-w-full h-fit"
       type="text"
-      formControlName="firstGuess"
+      formControlName="guess"
       autoSizeInput
       [minWidth]="64"
       [extraWidth]="10"
     />
-    <label for="second-guess" class="font-medium">Second Guess:</label>
+    <label for="multiplicity" class="font-medium">Multiplicity:</label>
     <input
-      id="second-guess"
+      id="multiplicity"
       class="min-w-full h-fit"
       type="text"
-      formControlName="secondGuess"
+      formControlName="multiplicity"
       autoSizeInput
       [minWidth]="64"
       [extraWidth]="10"
     />
   </div>
   @if (
-    form.get("firstGuess")?.invalid &&
-    (form.get("firstGuess")?.dirty || form.get("firstGuess")?.touched)
+    form.get("guess")?.invalid &&
+    (form.get("guess")?.dirty || form.get("guess")?.touched)
   ) {
     <div class="w-full flex justify-center">
       <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
-        Please enter a valid first guess.
+        Please enter a valid guess.
       </div>
     </div>
   }
   @if (
-    form.get("secondGuess")?.invalid &&
-    (form.get("secondGuess")?.dirty || form.get("secondGuess")?.touched)
+    form.get("multiplicity")?.invalid &&
+    (form.get("multiplicity")?.dirty || form.get("multiplicity")?.touched)
   ) {
     <div class="w-full flex justify-center">
       <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
-        Please enter a valid second guess.
+        Please enter a valid multiplicity.
       </div>
     </div>
   }
