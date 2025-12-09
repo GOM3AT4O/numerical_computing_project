@@ -191,6 +191,51 @@
       >
         Solve
       </button>
+      @if (response()) {
+        <div
+          #result
+          class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
+        >
+          <h1 class="text-lg font-bold">Result</h1>
+          @if (response()!.message) {
+            <p>{{ response()!.message }}</p>
+          }
+          @if (response()!.solution) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Solution:</span>
+              <span class="select-text">
+                {{ response()!.solution }}
+              </span>
+            </div>
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Absolute Relative Error:</span>
+              <span class="select-text">
+                {{ response()!.absoluteRelativeError }}
+              </span>
+            </div>
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium"
+                >Number of Correct Significant Figures:</span
+              >
+              <span class="select-text">
+                {{ response()!.numberOfCorrectSignificantFigures }}
+              </span>
+            </div>
+          }
+          @if (response()!.numberOfIterations) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Number of Iterations:</span>
+              <span class="select-text">{{
+                response()!.numberOfIterations
+              }}</span>
+            </div>
+          }
+          <div class="flex flex-row items-center gap-8">
+            <span class="font-medium">Execution Time:</span>
+            <span class="select-text">{{ response()!.executionTime }}</span>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </form>

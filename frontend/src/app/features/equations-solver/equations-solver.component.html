@@ -139,10 +139,10 @@
           class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
         >
           <h1 class="text-lg font-bold">Result</h1>
+          @if (response()!.message) {
+            <p>{{ response()!.message }}</p>
+          }
           @if (response()!.solution) {
-            @if (response()!.message) {
-              <p>{{ response()!.message }}</p>
-            }
             @if (response()!.L && response()!.U) {
               <div
                 class="flex flex-row items-center gap-16 self-center flex-wrap"
@@ -238,10 +238,6 @@
                 }
               </table>
             </div>
-          } @else {
-            @if (response()!.message) {
-              <p>{{ response()!.message }}</p>
-            }
           }
           @if (response()!.numberOfIterations) {
             <div class="flex flex-row items-center gap-8">

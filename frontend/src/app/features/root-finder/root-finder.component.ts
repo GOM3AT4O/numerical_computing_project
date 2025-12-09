@@ -135,7 +135,14 @@ export class RootFinderComponent {
   parameters = viewChild<ParametersComponent>("parameters");
   parametersElement = viewChild("parameters", { read: ElementRef });
 
-  response = signal<FindRootResponse | null>(null);
+  response = signal<FindRootResponse | null>({
+    executionTime: 0.001150131226,
+    message: "Bisection method converged after 20 iterations",
+    solution: "1.41422",
+    absoluteRelativeError: "0.00001",
+    numberOfCorrectSignificantFigures: 5,
+    numberOfIterations: 20,
+  });
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 

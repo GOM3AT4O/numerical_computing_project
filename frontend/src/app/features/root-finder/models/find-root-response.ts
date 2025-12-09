@@ -1,6 +1,16 @@
 export type FindRootResponse = {
-  solution?: string;
   executionTime: number;
-  numberOfIterations?: number;
   message?: string;
-};
+  numberOfIterations: number;
+} & (
+  | {
+      solution: string;
+      absoluteRelativeError: string;
+      numberOfCorrectSignificantFigures: number;
+    }
+  | {
+      solution?: undefined;
+      absoluteRelativeError?: undefined;
+      numberOfCorrectSignificantFigures?: undefined;
+    }
+);
