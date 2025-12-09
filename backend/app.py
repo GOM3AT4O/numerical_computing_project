@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from solvers.Fixed_Point_solver import FixedPointSolver
 from exceptions import ValidationError
-from validator import LinearSystemValidator
+from validator import FunctionValidator, LinearSystemValidator
 from solver_factory import SolverFactory
 from decimal import Decimal, getcontext
 import signal
@@ -264,6 +265,47 @@ def get_methods():
         },
     }
     return jsonify(methods), 200
+
+# Fixed Point Solver Endpoint just for testing i will put it in the factory later with another end point to the whole open methods
+@app.route("/fixed-point", methods=["POST"])
+def fixed_point_solver():
+    """Endpoint to solve nonlinear equation using Fixed Point method"""
+    try:
+        data = request.get_json()
+
+        # Extract data
+        function_str = data.get("function")
+        guess = data.get("guess")
+        precision = data.get("precision")
+        epsilon = data.get("epsilon", 0.000001)
+        max_iterations = data.get("max_iterations", 50)
+
+        # Validate required fields
+        if not all([function_str, guess is not None]):
+            return jsonify(
+                {"error": "Missing required fields: function and guess are required"}
+            ), 400
+
+        # Validate precision
+        precision_value = LinearSystemValidator.validate_precision(precision)
+
+        function_str = FunctionValidator.validate_and_parse(function_str)
+
+        # Create and run solver
+        result = FixedPointSolver(
+            func=function_str,                   
+            guess=Decimal(str(guess)),   
+            precision=precision_value,
+            epsilon=Decimal(str(epsilon)),
+            max_iterations=max_iterations,
+        ).solve()
+
+        return jsonify(result), 200
+
+    except ValidationError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
 
 
 @app.route("/api/health", methods=["GET"])

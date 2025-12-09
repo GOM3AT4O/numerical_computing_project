@@ -75,7 +75,7 @@ class BisectionSolver:
                 )
             
             if iteration> 1:
-                relative_error = abs((xr -old_xr)) if xr != 0 else abs(xr-old_xr)
+                relative_error = abs((xr -old_xr))/abs(xr) if xr != 0 else abs(xr-old_xr)
                 if relative_error < self.epsilon:
                     execution_time = time.time() - start_time
                     return SolutionResult(
