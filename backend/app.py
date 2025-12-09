@@ -13,7 +13,7 @@ CORS(app)
 
 @app.route("/api/solve", methods=["POST"])
 def solve_system():
-    """Main endpoint to solve linear system"""
+    """Main endpoint to solve linear system or nonlinear equation"""
     try:
         data = request.get_json()
 
@@ -23,44 +23,66 @@ def solve_system():
         print(f"Data: {data}")
 
         # Extract data
-        A = data.get("A")
-        b = data.get("b")
         method = data.get("method")
         precision = data.get("precision")
         parameters = data.get("parameters", {})
 
-        print(f"A: {A}")
-        print(f"b: {b}")
         print(f"method: {method}")
         print(f"precision: {precision}")
         print(f"params: {parameters}")
-        print("=" * 50 + "\n")
-
-        A = [[+Decimal(x) for x in y] for y in A]
-        b = [+Decimal(x) for x in b]
 
         # set precision and rounding method for Decimal operations
         getcontext().prec = precision if precision is not None else 6
         getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields
-        if not all([A, b, method]):
-            return jsonify(
-                {"error": "Missing required fields: A, b, and method are required"}
-            ), 400
+        if not method:
+            return jsonify({"error": "Missing required field: method"}), 400
 
-        # Validate system
-        A_matrix, b_vector = LinearSystemValidator.validate_system(A, b)
-        precision_value = LinearSystemValidator.validate_precision(precision)
+        # Handle bisection method differently (nonlinear equation)
+        if method == "bisection" or method == "false-position":
+            print(f"Processing {method} method")
+            
+            # Validate precision
+            precision_value = LinearSystemValidator.validate_precision(precision)
+            
+            # Create and run solver
+            solver = SolverFactory.create_solver(
+                method, None, None, precision_value, parameters
+            )
+            
+            result = solver.solve()
+            print("=" * 50 + "\n")
+            return jsonify(result.to_dict()), 200
+        
+        # Handle linear system methods
+        else:
+            A = data.get("A")
+            b = data.get("b")
+            
+            print(f"A: {A}")
+            print(f"b: {b}")
 
-        # Create and run solver
-        solver = SolverFactory.create_solver(
-            method, A_matrix, b_vector, precision_value, parameters
-        )
+            if not all([A, b]):
+                return jsonify(
+                    {"error": "Missing required fields: A and b are required for linear system methods"}
+                ), 400
 
-        result = solver.solve()
+            A = [[+Decimal(x) for x in y] for y in A]
+            b = [+Decimal(x) for x in b]
 
-        return jsonify(result.to_dict()), 200
+            # Validate system
+            A_matrix, b_vector = LinearSystemValidator.validate_system(A, b)
+            precision_value = LinearSystemValidator.validate_precision(precision)
+
+            # Create and run solver
+            solver = SolverFactory.create_solver(
+                method, A_matrix, b_vector, precision_value, parameters
+            )
+
+            result = solver.solve()
+            print("=" * 50 + "\n")
+            return jsonify(result.to_dict()), 200
 
     except ValidationError as e:
         print(f"\n Validation Error: {str(e)}\n")
@@ -81,6 +103,7 @@ def get_methods():
     methods = {
         "gauss-elimination": {
             "name": "Gauss Elimination",
+            "type": "linear",
             "parameters": [
                 {
                     "name": "scaling",
@@ -90,8 +113,9 @@ def get_methods():
                 }
             ],
         },
-        "gauss-jordan_elimination": {
+        "gauss-jordan-elimination": {
             "name": "Gauss-Jordan Elimination",
+            "type": "linear",
             "parameters": [
                 {
                     "name": "scaling",
@@ -103,6 +127,7 @@ def get_methods():
         },
         "lu-decomposition": {
             "name": "LU Decomposition",
+            "type": "linear",
             "parameters": [
                 {
                     "name": "format",
@@ -115,6 +140,7 @@ def get_methods():
         },
         "jacobi-iteration": {
             "name": "Jacobi Iteration",
+            "type": "linear",
             "parameters": [
                 {
                     "name": "initial_guess",
@@ -138,6 +164,7 @@ def get_methods():
         },
         "gauss-seidel-iteration": {
             "name": "Gauss-Seidel Iteration",
+            "type": "linear",
             "parameters": [
                 {
                     "name": "initial_guess",
@@ -159,6 +186,82 @@ def get_methods():
                 },
             ],
         },
+        "bisection": {
+            "name": "Bisection Method",
+            "type": "nonlinear",
+            "parameters": [
+                {
+                    "name": "function",
+                    "type": "string",
+                    "required": True,
+                    "description": "Function expression (e.g., 'x**2 - 2' or 'x**3 - x - 1')",
+                },
+                {
+                    "name": "xl",
+                    "type": "float",
+                    "required": True,
+                    "description": "Lower bound of interval",
+                },
+                {
+                    "name": "xu",
+                    "type": "float",
+                    "required": True,
+                    "description": "Upper bound of interval",
+                },
+                {
+                    "name": "epsilon",
+                    "type": "float",
+                    "default": 1e-6,
+                    "required": False,
+                    "description": "Convergence tolerance",
+                },
+                {
+                    "name": "max_iterations",
+                    "type": "integer",
+                    "default": 100,
+                    "required": False,
+                    "description": "Maximum number of iterations",
+                },
+            ],
+        },
+        "false-position": {
+            "name": "False Position Method",
+            "type": "nonlinear",
+            "parameters": [
+                {
+                    "name": "function",
+                    "type": "string",
+                    "required": True,
+                    "description": "Function expression (e.g., 'x**2 - 2' or 'x**3 - x - 1')",
+                },
+                {
+                    "name": "xl",
+                    "type": "float",
+                    "required": True,
+                    "description": "Lower bound of interval",
+                },
+                {
+                    "name": "xu",
+                    "type": "float",
+                    "required": True,
+                    "description": "Upper bound of interval",
+                },
+                {
+                    "name": "epsilon",
+                    "type": "float",
+                    "default": 1e-6,
+                    "required": False,
+                    "description": "Convergence tolerance",
+                },
+                {
+                    "name": "max_iterations",
+                    "type": "integer",
+                    "default": 100,
+                    "required": False,
+                    "description": "Maximum number of iterations",
+                },
+            ],
+        },
     }
     return jsonify(methods), 200
 
@@ -166,7 +269,7 @@ def get_methods():
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """Health check endpoint"""
-    return jsonify({"status": "healthy", "message": "Linear Equations Solver API"}), 200
+    return jsonify({"status": "healthy", "message": "Numerical Methods Solver API"}), 200
 
 
 @app.route("/shutdown", methods=["POST"])
@@ -177,4 +280,4 @@ def shutdown():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
