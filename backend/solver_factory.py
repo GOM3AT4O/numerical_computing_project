@@ -84,17 +84,17 @@ class SolverFactory:
             def func(x: Decimal) -> Decimal:
                 try:
           
-                    import math
+                    
                     namespace = {
-                        'x': x,
+                        'x': float(x),
                         'Decimal': Decimal,
                         'abs': abs,
-                        'sin': lambda val: Decimal(str(math.sin(float(val)))),
-                        'cos': lambda val: Decimal(str(math.cos(float(val)))),
-                        'tan': lambda val: Decimal(str(math.tan(float(val)))),
-                        'exp': lambda val: Decimal(str(math.exp(float(val)))),
-                        'log': lambda val: Decimal(str(math.log(float(val)))),
-                        'sqrt': lambda val: Decimal(str(math.sqrt(float(val)))),
+                        'sin': math.sin,
+                        'cos': math.cos,
+                        'tan': math.tan,
+                        'exp': math.exp,
+                        'log': math.log,
+                        'sqrt': math.sqrt,
                     }
                     result = eval(func_expr, {"__builtins__": {}}, namespace)
                     if  not isinstance(result, Decimal):
@@ -139,15 +139,15 @@ class SolverFactory:
                 try:
 
                     namespace = {
-                        'x': x,
+                        'x': float(x),
                         'Decimal': Decimal,
                         'abs': abs,
-                        'sin': lambda val: Decimal(str(math.sin(float(val)))),
-                        'cos': lambda val: Decimal(str(math.cos(float(val)))),
-                        'tan': lambda val: Decimal(str(math.tan(float(val)))),
-                        'exp': lambda val: Decimal(str(math.exp(float(val)))),
-                        'log': lambda val: Decimal(str(math.log(float(val)))),
-                        'sqrt': lambda val: Decimal(str(math.sqrt(float(val)))),
+                        'sin': math.sin,
+                        'cos': math.cos,
+                        'tan': math.tan,
+                        'exp': math.exp,
+                        'log': math.log,
+                        'sqrt': math.sqrt,
                     }
                     result = eval(func_expr, {"__builtins__": {}}, namespace)
                     if not isinstance(result, Decimal):
