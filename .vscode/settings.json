@@ -1,7 +1,12 @@
 {
     "cSpell.words": [
+        "driff",
         "evalf",
         "getcontext",
-        "lambdify"
+        "lambdify",
+        "prec",
+        "Raphson",
+        "seidel",
+        "Sympify"
     ]
 }

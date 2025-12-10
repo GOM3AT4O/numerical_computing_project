@@ -71,7 +71,7 @@ class FunctionValidator:
         # try to parse the equation string into a SymPy expression
 
         try:
-            expr = sympify(equation_str)
+            expr = sympify(equation_str,rational=True)
         except (SympifyError, SyntaxError):
             raise ValidationError("Invalid equation format. Please check your syntax.")
 
@@ -79,6 +79,8 @@ class FunctionValidator:
         free_symbols = expr.free_symbols
         
         if len(free_symbols) != 1:
+            if len(free_symbols) == 0:
+                 raise ValidationError("Equation must contain a variable 'x'.")
             raise ValidationError(f"Equation must contain only one variable. Found: {free_symbols}")
         
         # check if the variable is 'x' or not

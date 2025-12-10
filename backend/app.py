@@ -41,7 +41,7 @@ def solve_system():
             return jsonify({"error": "Missing required field: method"}), 400
 
         # Handle bisection method differently (nonlinear equation)
-        if method == "bisection" or method == "false-position" or method == "secant":
+        if method == "bisection" or method == "false-position" or method == "secant" or method == "fixed-point" or method == "newton-raphson":
             print(f"Processing {method} method")
             
             # Validate precision
@@ -301,12 +301,83 @@ def get_methods():
                 },
             ],
         },
+        "fixed-point": {
+            "name": "Fixed Point Method",
+            "type": "nonlinear",
+            "parameters": [
+                {
+                    "name": "function",
+                    "type": "string",
+                    "required": True,
+                    "description": "Function expression (e.g., 'cos(x)' or '(x + 2) ** (1/3)')",
+                },
+                {
+                    "name": "guess",
+                    "type": "float",
+                    "required": True,
+                    "description": "Initial guess for the root",
+                },
+                {
+                    "name": "epsilon",
+                    "type": "float",
+                    "default": 1e-6,
+                    "required": False,
+                    "description": "Convergence tolerance",
+                },
+                {
+                    "name": "max_iterations",
+                    "type": "integer",
+                    "default": 50,
+                    "required": False,
+                    "description": "Maximum number of iterations",
+                }
+            ]
+        },
+        "newton-raphson": {
+            "name": "Newton Raphson Method",
+            "type": "nonlinear",
+            "parameters": [
+                {
+                    "name": "function",
+                    "type": "string",
+                    "required": True,
+                    "description": "Function expression (e.g., 'cos(x)' or '(x + 2) ** (1/3)')",
+                },
+                {
+                    "name": "guess",
+                    "type": "float",
+                    "required": True,
+                    "description": "Initial guess for the root",
+                },
+                {
+                    "name": "epsilon",
+                    "type": "float",
+                    "default": 1e-6,
+                    "required": False,
+                    "description": "Convergence tolerance",
+                },
+                {
+                    "name": "max_iterations",
+                    "type": "integer",
+                    "default": 50,
+                    "required": False,
+                    "description": "Maximum number of iterations",
+                },
+                {
+                    "name": "m -> multiplicity factor",
+                    "type": "integer",
+                    "default": 1,
+                    "required": False,
+                    "description": "Indicates the multiplicity of the root",
+                }
+            ]
+        }
     }
     return jsonify(methods), 200
 
 # Fixed Point Solver Endpoint just for testing i will put it in the factory later with another end point to the whole open methods
-@app.route("/fixed-point", methods=["POST"])
-def fixed_point_solver():
+# @app.route("/fixed-point", methods=["POST"])
+# def fixed_point_solver():
     """Endpoint to solve nonlinear equation using Fixed Point method"""
     try:
         data = request.get_json()
@@ -338,7 +409,7 @@ def fixed_point_solver():
             max_iterations=max_iterations,
         ).solve()
 
-        return jsonify(result), 200
+        return jsonify(result.to_dict()), 200
 
     except ValidationError as e:
         return jsonify({"error": str(e)}), 400

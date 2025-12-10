@@ -1,7 +1,9 @@
 import numpy as np
 from typing import Dict, Any
 from decimal import Decimal
+from validator import FunctionValidator
 from exceptions import ValidationError
+# Import all solver classes here
 from solvers.secant_solver import SecantSolver
 from solvers.gauss_elimination_solver import GaussEliminationSolver
 from solvers.gauss_jordan_elimination_solver import GaussJordanEliminationSolver
@@ -10,6 +12,8 @@ from solvers.jacobi_iteration_solver import JacobiIterationSolver
 from solvers.gauss_seidel_iteration_solver import GaussSeidelIterationSolver
 from solvers.Bisection_solver import BisectionSolver
 from solvers.False_Position_solver import FalsePositionSolver
+from solvers.Fixed_Point_solver import FixedPointSolver
+from solvers.Newton_Raphson_solver import NewtonRaphsonSolver
 import math
 
 class SolverFactory:
@@ -213,6 +217,60 @@ class SolverFactory:
                 epsilon=epsilon_decimal,
                 max_iterations=int(max_iterations),
             )
+        elif method== "fixed-point":
+            func_str = parameters.get("function")
+            guess = parameters.get("guess")
+            epsilon = parameters.get("epsilon", 0.00001)
+            max_iterations = parameters.get("max_iterations", 50)
+
+            print(func_str," ",guess," ",epsilon)
+            
+            if func_str is None or guess is None:
+                raise ValidationError("Fixed Point method requires 'function' and 'guess' parameters")
+
+            try:
+                func_expr = FunctionValidator.validate_and_parse(func_str)
+                guess_decimal = Decimal(str(float(guess)))
+                epsilon_decimal = Decimal(str(float(epsilon)))
+
+            except Exception as e:
+                raise ValidationError(f"Error preparing parameters for Fixed Point: {str(e)}")
+            
+            return FixedPointSolver(
+                guess=guess_decimal,
+                func=func_expr, 
+                precision=precision,
+                epsilon=epsilon_decimal,
+                max_iterations=int(max_iterations)
+            )
+        elif method== "newton-raphson":
+            func_str = parameters.get("function")
+            guess = parameters.get("guess")
+            epsilon = parameters.get("epsilon", 0.00001)
+            max_iterations = parameters.get("max_iterations", 50)
+            m= parameters.get("m", 1)
+
+            print(func_str," ",guess," ",epsilon)
+            
+            if func_str is None or guess is None:
+                raise ValidationError("Fixed Point method requires 'function' and 'guess' parameters")
+
+            try:
+                func_expr = FunctionValidator.validate_and_parse(func_str)
+                guess_decimal = Decimal(str(float(guess)))
+                epsilon_decimal = Decimal(str(float(epsilon)))
+
+            except Exception as e:
+                raise ValidationError(f"Error preparing parameters for Fixed Point: {str(e)}")
+            
+            return NewtonRaphsonSolver(
+                guess=guess_decimal,
+                func=func_expr, 
+                precision=precision,
+                epsilon=epsilon_decimal,
+                max_iterations=int(max_iterations),
+                m=int(m)
+            )
+
         else:
             raise ValidationError(f"Unknown method: {method}")
-            

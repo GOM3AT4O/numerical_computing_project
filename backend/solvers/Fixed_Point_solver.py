@@ -1,13 +1,15 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-from decimal import Decimal, getcontext
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from solution_result import SolutionResult
+from decimal import Decimal, InvalidOperation, getcontext
 from backend.utils import calculating_number_of_significant_digits
 from backend.exceptions import ValidationError
 from sympy import lambdify
 from sympy.core.expr import Expr
 import time
+import numpy as np
 
 class FixedPointSolver:
     def __init__(
@@ -25,9 +27,9 @@ class FixedPointSolver:
 
         self.x_symbol = list(func.free_symbols)[0]
 
-        self.g_func = lambdify(self.x_symbol, func, modules='sympy')
+        self.g_func = func
 
-    def solve(self):
+    def solve(self) -> SolutionResult:
 
         start_time = time.time()
         """
@@ -52,12 +54,20 @@ class FixedPointSolver:
         try:
             for i in range(self.max_iterations):
                 
-                val_sympy = self.g_func(current_x)
+                val_sympy = self.g_func.subs(self.x_symbol, current_x).evalf(n=self.precision, chop=True)
 
-                if hasattr(val_sympy, 'evalf'):
-                    val_sympy = val_sympy.evalf(n=self.precision)
+                    # if hasattr(val_sympy, 'evalf'):
+                    #     val_sympy = val_sympy.evalf(n=self.precision)
 
-                next_x = Decimal(str(val_sympy))
+                try:
+                    if not val_sympy.is_real:
+                        
+                        val_sympy = val_sympy.as_real_imag()[0]
+                    
+                    next_x = Decimal(str(val_sympy))
+                    
+                except (InvalidOperation, ValueError):
+                    raise ValidationError(f"Calculation Error: Resulted in undefined or complex value: {val_sympy}")
 
                 iterates.append(str(next_x))
 
@@ -74,15 +84,26 @@ class FixedPointSolver:
                 if es < self.epsilon:
                     number_of_significant_digits = calculating_number_of_significant_digits(es*100, self.precision)
                     execution_time = time.time() - start_time
-                    return {
-                        "root": str(next_x),
-                        "iterations": i + 1,
-                        "significant_digits": str(number_of_significant_digits),
-                        "execution_time": execution_time,
-                        "converged": True,
-                        "steps": iterates,
-                        "relative_errors": relative_errors,
-                    }
+
+                    return SolutionResult(
+                        solution=np.array([next_x]),
+                        number_of_iterations=i + 1,
+                        execution_time=execution_time,
+                        message=f"Fixed Point method converges. Root was found successfully",
+                        significant_digits=str(number_of_significant_digits),
+                        converged=True,
+                        iterations_steps=iterates,
+                        relative_errors=relative_errors
+                    )
+                    # return {
+                    #     "root": str(next_x),
+                    #     "iterations": i + 1,
+                    #     "significant_digits": str(number_of_significant_digits),
+                    #     "execution_time": execution_time,
+                    #     "converged": True,
+                    #     "steps": iterates,
+                    #     "relative_errors": relative_errors,
+                    # }
 
                 current_x = next_x
 
@@ -90,15 +111,27 @@ class FixedPointSolver:
             execution_time = time.time() - start_time
             # If we reach here, it means we didn't converge
 
-            return {
-                "error": "oops! Max iterations reached without convergence",
-                "root": str(current_x),
-                "converged": False,
-                "significant_digits": str(number_of_significant_digits),
-                "execution_time": execution_time,
-                "iterations": self.max_iterations,
-                "steps": iterates,
-            }
+
+            return SolutionResult(                
+                solution=np.array([current_x]),
+                number_of_iterations=self.max_iterations,
+                execution_time=execution_time,
+                message=f"Fixed Point method didn't converge",
+                significant_digits=str(number_of_significant_digits),
+                converged=False,
+                iterations_steps=iterates,
+                relative_errors=relative_errors
+            )
+
+            # return {
+            #     "error": "oops! Max iterations reached without convergence",
+            #     "root": str(current_x),
+            #     "converged": False,
+            #     "significant_digits": str(number_of_significant_digits),
+            #     "execution_time": execution_time,
+            #     "iterations": self.max_iterations,
+            #     "steps": iterates,
+            # }
         
         except OverflowError:
             raise ValidationError("error : Divergence detected: values are growing too large.")
