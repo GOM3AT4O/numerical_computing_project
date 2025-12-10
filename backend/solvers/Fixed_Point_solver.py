@@ -7,6 +7,7 @@ from backend.utils import calculating_number_of_significant_digits
 from backend.exceptions import ValidationError
 from sympy import lambdify
 from sympy.core.expr import Expr
+import time
 
 class FixedPointSolver:
     def __init__(
@@ -27,6 +28,8 @@ class FixedPointSolver:
         self.g_func = lambdify(self.x_symbol, func, modules='sympy')
 
     def solve(self):
+
+        start_time = time.time()
         """
         Performs the Fixed Point Iteration method to find a root.
         1. Sets the decimal precision for calculations.
@@ -70,11 +73,12 @@ class FixedPointSolver:
                 # (Convergence check)
                 if es < self.epsilon:
                     number_of_significant_digits = calculating_number_of_significant_digits(es*100, self.precision)
-
+                    execution_time = time.time() - start_time
                     return {
                         "root": str(next_x),
                         "iterations": i + 1,
                         "significant_digits": str(number_of_significant_digits),
+                        "execution_time": execution_time,
                         "converged": True,
                         "steps": iterates,
                         "relative_errors": relative_errors,
@@ -83,13 +87,15 @@ class FixedPointSolver:
                 current_x = next_x
 
             number_of_significant_digits = calculating_number_of_significant_digits(es*100, self.precision)
-
+            execution_time = time.time() - start_time
+            # If we reach here, it means we didn't converge
 
             return {
                 "error": "oops! Max iterations reached without convergence",
                 "root": str(current_x),
                 "converged": False,
                 "significant_digits": str(number_of_significant_digits),
+                "execution_time": execution_time,
                 "iterations": self.max_iterations,
                 "steps": iterates,
             }
