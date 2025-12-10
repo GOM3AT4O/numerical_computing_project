@@ -82,15 +82,14 @@ class NewtonRaphsonSolver:
 
                 print( f_value," ",f_driff_value)
 
-                if f_value == Decimal("0"):
-                    number_of_significant_digits = calculating_number_of_significant_digits(es * Decimal("100"), self.precision)
+                if abs(f_value) < self.epsilon:
                     execution_time = time.time() - start_time
                     return SolutionResult(
                         solution=np.array([current_x]),
                         iterations_steps=iterates,
                         relative_errors=relative_errors,
                         number_of_iterations=i+1,
-                        significant_digits=str(number_of_significant_digits),
+                        significant_digits=str(self.precision),
                         converged=True,
                         execution_time=execution_time,
                         message=f"Newton-Raphson method converges. Root was found successfully ",

@@ -5,6 +5,7 @@ import time
 from solution_result import SolutionResult
 from exceptions import ValidationError
 from decimal import Decimal, ROUND_HALF_UP
+from utils import calculating_number_of_significant_digits
 
 class FalsePositionSolver:
 
@@ -51,6 +52,10 @@ class FalsePositionSolver:
         xr = Decimal(0)
         old_xr = Decimal(0)  
 
+        iteration_steps = []
+        relative_errors = []
+        number_of_significant_digits=0
+
 
         for iteration in range(1 , self.max_iterations+1):
 
@@ -64,11 +69,13 @@ class FalsePositionSolver:
                     solution=np.array([xr]),
                     number_of_iterations=iteration,
                     execution_time=execution_time,
-                    message=f"False Position method an't got no solution cannot be used sorry for that."
+                    message=f"False Position method an't got no solution cannot be used sorry for that.",
+                    converged=False
                 )
             
 
             xr = (xl * f_xu - xu * f_xl) / (f_xu - f_xl)
+            iteration_steps.append(str(xr))
 
             f_xr = self.func(xr)
 
@@ -78,12 +85,17 @@ class FalsePositionSolver:
                     solution=np.array([xr]),
                     number_of_iterations=iteration,
                     execution_time=execution_time,
-                    message=f"False Position method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})"
+                    message=f"False Position method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})",
+                    relative_errors=relative_errors,
+                    significant_digits=str(self.precision),
+                    converged=True,
+                    iterations_steps=iteration_steps
                 )
 
             if iteration > 1 :
-                relative_error = abs((xr - old_xr)) 
-
+                relative_error = abs((xr - old_xr)) / abs(xr) if xr != 0 else abs(xr - old_xr)
+                relative_errors.append(str(relative_error))
+                number_of_significant_digits= calculating_number_of_significant_digits(relative_error * Decimal("100"), self.precision)
                 if relative_error < self.epsilon:
                     execution_time = time.time() - start_time
                     return SolutionResult(
@@ -91,6 +103,10 @@ class FalsePositionSolver:
                         number_of_iterations=iteration,
                         execution_time=execution_time,
                         message=f"False Position method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})"
+                        ,relative_errors=relative_errors,
+                        significant_digits=str(number_of_significant_digits),
+                        converged=True,
+                        iterations_steps=iteration_steps
                     )
                 
             old_xr = xr
@@ -107,7 +123,11 @@ class FalsePositionSolver:
                 solution=  np.array([xr]),
                 number_of_iterations=iteration,
                 execution_time=execution_time,
-                message=f"False Position method didn't converge after {self.max_iterations} iterations. The root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})"
+                message=f"False Position method didn't converge after {self.max_iterations} iterations. The root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})",
+                converged=False,
+                relative_errors=relative_errors,
+                significant_digits=str(number_of_significant_digits),
+                iterations_steps=iteration_steps
             )
             
 
