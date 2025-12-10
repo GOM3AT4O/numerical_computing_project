@@ -2,6 +2,7 @@ import numpy as np
 from typing import Dict, Any
 from decimal import Decimal
 from exceptions import ValidationError
+from solvers.secant_solver import SecantSolver
 from solvers.gauss_elimination_solver import GaussEliminationSolver
 from solvers.gauss_jordan_elimination_solver import GaussJordanEliminationSolver
 from solvers.lu_decomposition_solver import LUDecompositionSolver
@@ -159,6 +160,54 @@ class SolverFactory:
             return FalsePositionSolver(
                 xl=xl_decimal,
                 xu=xu_decimal,
+                precision=precision,
+                func=func,
+                epsilon=epsilon_decimal,
+                max_iterations=int(max_iterations),
+            )
+        elif method == "secant":
+            func_expr = parameters.get("function")
+            x0 = parameters.get("x0")
+            x1 = parameters.get("x1")
+            epsilon = parameters.get("epsilon", 0.00001)
+            max_iterations = parameters.get("max_iterations", 50)
+            
+            if func_expr is None or x0 is None or x1 is None:
+                raise ValidationError(
+                    "Secant method requires function, x0, and x1 parameters"
+                )
+            
+            try:
+                x0_decimal = Decimal(str(float(x0)))
+                x1_decimal = Decimal(str(float(x1)))
+                epsilon_decimal = Decimal(str(float(epsilon)))
+            except (ValueError, TypeError) as e:
+                raise ValidationError(f"Error converting parameters: x0={x0}, x1={x1}, epsilon={epsilon}. Error: {str(e)}")
+            
+            
+            def func(x: Decimal) -> Decimal:
+                try:
+                    namespace = {
+                        'x': float(x),
+                        'Decimal': Decimal,
+                        'abs': abs,
+                        'sin': math.sin,
+                        'cos': math.cos,
+                        'tan': math.tan,
+                        'exp': math.exp,
+                        'log': math.log,
+                        'sqrt': math.sqrt,
+                    }
+                    result = eval(func_expr, {"__builtins__": {}}, namespace)
+                    if not isinstance(result, Decimal):
+                        result = Decimal(str(result))
+                    return result
+                except Exception as e:
+                    raise ValidationError(f"Error evaluating function '{func_expr}': {str(e)}")
+            
+            return SecantSolver(
+                x0=x0_decimal,
+                x1=x1_decimal,
                 precision=precision,
                 func=func,
                 epsilon=epsilon_decimal,

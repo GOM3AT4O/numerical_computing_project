@@ -41,7 +41,7 @@ def solve_system():
             return jsonify({"error": "Missing required field: method"}), 400
 
         # Handle bisection method differently (nonlinear equation)
-        if method == "bisection" or method == "false-position":
+        if method == "bisection" or method == "false-position" or method == "secant":
             print(f"Processing {method} method")
             
             # Validate precision
@@ -246,6 +246,44 @@ def get_methods():
                     "type": "float",
                     "required": True,
                     "description": "Upper bound of interval",
+                },
+                {
+                    "name": "epsilon",
+                    "type": "float",
+                    "default": 1e-6,
+                    "required": False,
+                    "description": "Convergence tolerance",
+                },
+                {
+                    "name": "max_iterations",
+                    "type": "integer",
+                    "default": 100,
+                    "required": False,
+                    "description": "Maximum number of iterations",
+                },
+            ],
+        },
+        "secant": {
+            "name": "Secant Method",
+            "type": "nonlinear",
+            "parameters": [
+                {
+                    "name": "function",
+                    "type": "string",
+                    "required": True,
+                    "description": "Function expression (e.g., 'x**2 - 2')",
+                },
+                {
+                    "name": "x0",
+                    "type": "float",
+                    "required": True,
+                    "description": "First initial guess (x_i-1)",
+                },
+                {
+                    "name": "x1",
+                    "type": "float",
+                    "required": True,
+                    "description": "Second initial guess (x_i)",
                 },
                 {
                     "name": "epsilon",
