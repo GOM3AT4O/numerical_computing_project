@@ -4,7 +4,6 @@ from result import Result
 from typing import Callable
 from decimal import Decimal
 from utils import calculating_number_of_correct_significant_figures
-from exceptions import ValidationError
 import time
 
 
@@ -35,7 +34,7 @@ class OneGuessFinder(Finder):
     def iterate(self, x: Decimal) -> Decimal:
         pass
 
-    def solve(self) -> Result:
+    def find(self) -> Result:
         start_time = time.time()
 
         x: Decimal = self.guess
@@ -43,56 +42,53 @@ class OneGuessFinder(Finder):
 
         absolute_relative_error = Decimal("infinity")
 
-        try:
-            for iteration in range(1, self.maximum_number_of_iterations + 1):
-                try:
-                    new_x = self.iterate(x)
-                except ValueError as e:
+        for iteration in range(1, self.maximum_number_of_iterations + 1):
+            try:
+                new_x = self.iterate(x)
+            except ValueError as e:
+                execution_time = time.time() - start_time
+                return Result(
+                    root=x,
+                    number_of_iterations=iteration,
+                    execution_time=execution_time,
+                    message=e.args[0],
+                )
+
+            if iteration > 1:
+                # Calculate relative error
+                # Avoid division by zero so i will use absolute error in this case for now.
+                absolute_relative_error = (
+                    abs((new_x - x)) / abs(new_x) if new_x != 0 else abs(new_x - x)
+                )
+
+                f_new_x = self.function(new_x)
+
+                # (Convergence check)
+                if absolute_relative_error < self.epsilon or f_new_x < self.epsilon:
+                    number_of_correct_significant_figures = (
+                        calculating_number_of_correct_significant_figures(
+                            absolute_relative_error * Decimal("100"), self.precision
+                        )
+                    )
                     execution_time = time.time() - start_time
                     return Result(
-                        root=x,
+                        root=new_x,
                         number_of_iterations=iteration,
+                        number_of_correct_significant_figures=number_of_correct_significant_figures,
                         execution_time=execution_time,
-                        message=e.args[0],
+                        message="Newton-Raphson method converges. Root was approximately found successfully",
                     )
-
-                if iteration > 1:
-                    # Calculate relative error
-                    # Avoid division by zero so i will use absolute error in this case for now.
-                    absolute_relative_error = (
-                        abs((new_x - x)) / abs(new_x) if new_x != 0 else abs(new_x - x)
-                    )
-
-                    f_new_x = self.function(new_x)
-
-                    # (Convergence check)
-                    if absolute_relative_error < self.epsilon or f_new_x < self.epsilon:
-                        number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
-                                absolute_relative_error * Decimal("100"), self.precision
-                            )
-                        )
-                        execution_time = time.time() - start_time
-                        return Result(
-                            root=new_x,
-                            number_of_iterations=iteration,
-                            number_of_correct_significant_figures=number_of_correct_significant_figures,
-                            execution_time=execution_time,
-                            message="Newton-Raphson method converges. Root was approximately found successfully",
-                        )
-                x = new_x
-            number_of_correct_significant_figures = (
-                calculating_number_of_correct_significant_figures(
-                    absolute_relative_error * Decimal("100"), self.precision
-                )
+            x = new_x
+        number_of_correct_significant_figures = (
+            calculating_number_of_correct_significant_figures(
+                absolute_relative_error * Decimal("100"), self.precision
             )
-            execution_time = time.time() - start_time
-            return Result(
-                root=new_x,
-                number_of_correct_significant_figures=number_of_correct_significant_figures,
-                number_of_iterations=self.maximum_number_of_iterations,
-                execution_time=execution_time,
-                message="Newton-Raphson method did not converge within the maximum number of iterations.",
-            )
-        except Exception as e:
-            raise ValidationError(f"error : Math error during calculation: {str(e)}")
+        )
+        execution_time = time.time() - start_time
+        return Result(
+            root=new_x,
+            number_of_correct_significant_figures=number_of_correct_significant_figures,
+            number_of_iterations=self.maximum_number_of_iterations,
+            execution_time=execution_time,
+            message="Newton-Raphson method did not converge within the maximum number of iterations.",
+        )

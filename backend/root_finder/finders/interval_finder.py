@@ -53,7 +53,7 @@ class IntervalFinder(Finder):
     ) -> Decimal:
         pass
 
-    def solve(self) -> Result:
+    def find(self) -> Result:
         start_time = time.time()
 
         xl: Decimal = self.lower_bound
