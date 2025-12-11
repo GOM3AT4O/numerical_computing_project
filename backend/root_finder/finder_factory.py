@@ -93,7 +93,7 @@ class FinderFactory:
             )
         elif method == "secant":
             first_guess = parameters.get("first_guess")
-            second_guess = parameters.get("upper_bound")
+            second_guess = parameters.get("second_guess")
 
             if first_guess is None or second_guess is None:
                 raise ValidationError(

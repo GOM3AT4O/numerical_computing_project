@@ -7,8 +7,8 @@ import {
 export type FindRootRequest = {
   function: string;
   precision?: number;
-  numberOfIterations: number;
-  absoluteRelativeError: string;
+  numberOfIterations?: number;
+  absoluteRelativeError?: string;
 } & (
   | {
       method: "bisection" | "false-position";

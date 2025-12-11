@@ -23,6 +23,7 @@ import { OneGuessParametersComponent } from "./components/parameters/one-guess-p
 import { TwoGuessesParametersComponent } from "./components/parameters/two-guesses-parameters/two-guesses-parameters.component";
 import { OneGuessWithMultiplicityParametersComponent } from "./components/parameters/one-guess-with-multiplicity-parameters/one-guess-with-multiplicity-parameters.component";
 import { FindRootRequest } from "./models/find-root-request";
+import { RootFinderService } from "./services/root-finder.service";
 
 @Component({
   selector: "app-root-finder",
@@ -39,6 +40,7 @@ import { FindRootRequest } from "./models/find-root-request";
   styleUrl: "./root-finder.component.css",
 })
 export class RootFinderComponent {
+  private rootFinderService = inject(RootFinderService);
   private formBuilder = inject(FormBuilder);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -119,14 +121,8 @@ export class RootFinderComponent {
       Validators.required,
     ],
     precision: ["", [Validators.pattern(/^[1-9]\d*$/)]],
-    numberOfIterations: [
-      "",
-      [Validators.required, Validators.pattern(/^[1-9]\d*$/)],
-    ],
-    absoluteRelativeError: [
-      "",
-      [Validators.required, Validators.pattern(/^[-+]?\d+(\.\d+)?$/)],
-    ],
+    numberOfIterations: ["", [Validators.pattern(/^[1-9]\d*$/)]],
+    absoluteRelativeError: ["", [Validators.pattern(/^[-+]?\d+(\.\d+)?$/)]],
     parameters: [null as any],
   });
 
@@ -135,14 +131,7 @@ export class RootFinderComponent {
   parameters = viewChild<ParametersComponent>("parameters");
   parametersElement = viewChild("parameters", { read: ElementRef });
 
-  response = signal<FindRootResponse | null>({
-    executionTime: 0.001150131226,
-    message: "Bisection method converged after 20 iterations",
-    solution: "1.41422",
-    absoluteRelativeError: "0.00001",
-    numberOfCorrectSignificantFigures: 5,
-    numberOfIterations: 20,
-  });
+  response = signal<FindRootResponse | null>(null);
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 
@@ -203,14 +192,32 @@ export class RootFinderComponent {
     const request: FindRootRequest = {
       function: value.function!,
       method: value.method!,
-      numberOfIterations: parseInt(value.numberOfIterations!, 10),
-      absoluteRelativeError: value.absoluteRelativeError!,
-      parameters: this.parameters()?.parameters as any,
+      numberOfIterations: isNaN(parseInt(value.numberOfIterations!, 10))
+        ? undefined
+        : parseInt(value.numberOfIterations!, 10),
+      absoluteRelativeError:
+        value.absoluteRelativeError!.trim() === ""
+          ? undefined
+          : value.absoluteRelativeError!,
       precision: isNaN(parseInt(value.precision!, 10))
         ? undefined
         : parseInt(value.precision!, 10),
+      parameters: this.parameters()?.parameters as any,
     };
 
-    console.log(request);
+    // send the request to the service
+    this.rootFinderService.findRoot(request).subscribe((response) => {
+      console.log(response);
+      // hide steps and show the result
+      this.response.set(response);
+      this.changeDetectorRef.detectChanges();
+      // scroll to show the result
+      setTimeout(() => {
+        this.resultElement()?.nativeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+    });
   }
 }

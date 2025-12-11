@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { SolveEquationsRequest } from "../models/solve-equations-request";
 import { SolveEquationsResponse } from "../models/solve-equations-response";
-import { map, Observable, tap } from "rxjs";
+import { map, Observable } from "rxjs";
 import { Step } from "../models/step";
 
 @Injectable({
@@ -66,7 +66,7 @@ export class EquationsSolverService {
         number_of_iterations?: number;
         execution_time: number;
         message: string;
-      }>(`${this.baseUrl}/solve`, this.mapRequest(request))
+      }>(`${this.baseUrl}/solve-equations`, this.mapRequest(request))
       .pipe(map((response) => this.mapResponse(response)));
   }
 }

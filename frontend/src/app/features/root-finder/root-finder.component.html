@@ -93,6 +93,7 @@
                 id="number-of-iterations"
                 class="min-w-full h-fit"
                 type="text"
+                placeholder="50"
                 formControlName="numberOfIterations"
                 autoSizeInput
                 [minWidth]="64"
@@ -105,9 +106,10 @@
                 id="absolute-relative-error"
                 class="min-w-full h-fit"
                 type="text"
+                placeholder="0.00001"
                 formControlName="absoluteRelativeError"
                 autoSizeInput
-                [minWidth]="64"
+                [minWidth]="84"
                 [extraWidth]="10"
               />
             </div>
@@ -200,27 +202,31 @@
           @if (response()!.message) {
             <p>{{ response()!.message }}</p>
           }
-          @if (response()!.solution) {
+          @if (response()!.root) {
             <div class="flex flex-row items-center gap-8">
-              <span class="font-medium">Solution:</span>
+              <span class="font-medium">Root:</span>
               <span class="select-text">
-                {{ response()!.solution }}
+                {{ response()!.root }}
               </span>
             </div>
-            <div class="flex flex-row items-center gap-8">
-              <span class="font-medium">Absolute Relative Error:</span>
-              <span class="select-text">
-                {{ response()!.absoluteRelativeError }}
-              </span>
-            </div>
-            <div class="flex flex-row items-center gap-8">
-              <span class="font-medium"
-                >Number of Correct Significant Figures:</span
-              >
-              <span class="select-text">
-                {{ response()!.numberOfCorrectSignificantFigures }}
-              </span>
-            </div>
+            @if (response()!.absoluteRelativeError) {
+              <div class="flex flex-row items-center gap-8">
+                <span class="font-medium">Absolute Relative Error:</span>
+                <span class="select-text">
+                  {{ response()!.absoluteRelativeError }}
+                </span>
+              </div>
+            }
+            @if (response()!.numberOfCorrectSignificantFigures) {
+              <div class="flex flex-row items-center gap-8">
+                <span class="font-medium"
+                  >Number of Correct Significant Figures:</span
+                >
+                <span class="select-text">
+                  {{ response()!.numberOfCorrectSignificantFigures }}
+                </span>
+              </div>
+            }
           }
           @if (response()!.numberOfIterations) {
             <div class="flex flex-row items-center gap-8">
@@ -230,10 +236,12 @@
               }}</span>
             </div>
           }
-          <div class="flex flex-row items-center gap-8">
-            <span class="font-medium">Execution Time:</span>
-            <span class="select-text">{{ response()!.executionTime }}</span>
-          </div>
+          @if (response()!.executionTime) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Execution Time:</span>
+              <span class="select-text">{{ response()!.executionTime }}</span>
+            </div>
+          }
         </div>
       }
     </div>
