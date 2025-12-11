@@ -3,7 +3,7 @@ from decimal import Decimal
 from finders.interval_finder import IntervalFinder
 
 
-class FalsePositionSolver(IntervalFinder):
+class FalsePositionFinder(IntervalFinder):
     @property
     def method_name(self) -> str:
         return "False-Position"

@@ -210,7 +210,7 @@ def get_methods():
                     "description": "Upper bound of interval",
                 },
                 {
-                    "name": "epsilon",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -248,7 +248,7 @@ def get_methods():
                     "description": "Upper bound of interval",
                 },
                 {
-                    "name": "epsilon",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -286,7 +286,7 @@ def get_methods():
                     "description": "Second initial guess (x_i)",
                 },
                 {
-                    "name": "epsilon",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -318,7 +318,7 @@ def get_methods():
                     "description": "Initial guess for the root",
                 },
                 {
-                    "name": "epsilon",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -350,7 +350,7 @@ def get_methods():
                     "description": "Initial guess for the root",
                 },
                 {
-                    "name": "epsilon",
+                    "name": "absolute_relative_error",
                     "type": "float",
                     "default": 1e-6,
                     "required": False,
@@ -386,7 +386,7 @@ def get_methods():
         function_str = data.get("function")
         guess = data.get("guess")
         precision = data.get("precision")
-        epsilon = data.get("epsilon", 0.000001)
+        absolute_relative_error = data.get("absolute_relative_error", 0.000001)
         max_iterations = data.get("max_iterations", 50)
 
         # Validate required fields
@@ -405,7 +405,7 @@ def get_methods():
             func=function_str,                   
             guess=Decimal(str(guess)),   
             precision=precision_value,
-            epsilon=Decimal(str(epsilon)),
+            absolute_relative_error=Decimal(str(absolute_relative_error)),
             max_iterations=max_iterations,
         ).solve()
 

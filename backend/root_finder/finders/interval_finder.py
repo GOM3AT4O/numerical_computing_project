@@ -1,7 +1,7 @@
 import time
 from abc import abstractmethod
 from decimal import Decimal
-from typing import Callable
+from typing import Callable, Optional
 
 from exceptions import ValidationError
 from finder import Finder
@@ -17,13 +17,13 @@ class IntervalFinder(Finder):
         self,
         function: Callable[[Decimal], Decimal],
         absolute_relative_error: Decimal,
-        maximum_number_of_iterations: int,
+        number_of_iterations: int,
         precision: int,
         lower_bound: Decimal,
         upper_bound: Decimal,
     ):
         super().__init__(
-            function, absolute_relative_error, maximum_number_of_iterations, precision
+            function, absolute_relative_error, number_of_iterations, precision
         )
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -60,9 +60,10 @@ class IntervalFinder(Finder):
         xu: Decimal = self.upper_bound
         xr = Decimal(0)
 
-        absolute_relative_error = Decimal("infinity")
+        absolute_relative_error: Optional[Decimal] = None
+        number_of_correct_significant_figures: Optional[int] = None
 
-        for iteration in range(1, self.maximum_number_of_iterations + 1):
+        for iteration in range(1, self.number_of_iterations + 1):
             old_xr = xr
 
             f_xl = self.function(xl)
@@ -71,9 +72,17 @@ class IntervalFinder(Finder):
             try:
                 xr = self.iterate(xl, xu, f_xl, f_xu)
             except ValueError as e:
+                if absolute_relative_error is not None:
+                    number_of_correct_significant_figures = (
+                        calculating_number_of_correct_significant_figures(
+                            absolute_relative_error * Decimal("100"), self.precision
+                        )
+                    )
                 execution_time = time.time() - start_time
                 return Result(
                     root=xr,
+                    absolute_relative_error=absolute_relative_error,
+                    number_of_correct_significant_figures=number_of_correct_significant_figures,
                     number_of_iterations=iteration,
                     execution_time=execution_time,
                     message=e.args[0],
@@ -85,7 +94,7 @@ class IntervalFinder(Finder):
                 absolute_relative_error = (
                     abs((xr - old_xr)) / abs(xr) if xr != 0 else abs(xr - old_xr)
                 )
-                if absolute_relative_error < self.epsilon or abs(f_xr) < self.epsilon:
+                if absolute_relative_error < self.absolute_relative_error:
                     execution_time = time.time() - start_time
                     number_of_correct_significant_figures = (
                         calculating_number_of_correct_significant_figures(
@@ -98,7 +107,7 @@ class IntervalFinder(Finder):
                         number_of_correct_significant_figures=number_of_correct_significant_figures,
                         number_of_iterations=iteration,
                         execution_time=execution_time,
-                        message=f"{self.method_name} method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})",
+                        message=f"{self.method_name} method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.absolute_relative_error})",
                     )
 
             if f_xl * f_xr < 0:
@@ -107,29 +116,33 @@ class IntervalFinder(Finder):
                 xl = xr
             else:
                 execution_time = time.time() - start_time
-                number_of_correct_significant_figures = (
-                    calculating_number_of_correct_significant_figures(
-                        absolute_relative_error * Decimal("100"), self.precision
+                if absolute_relative_error is not None:
+                    number_of_correct_significant_figures = (
+                        calculating_number_of_correct_significant_figures(
+                            absolute_relative_error * Decimal("100"), self.precision
+                        )
                     )
-                )
                 return Result(
                     root=xr,
+                    absolute_relative_error=absolute_relative_error,
+                    number_of_correct_significant_figures=number_of_correct_significant_figures,
                     number_of_iterations=iteration,
                     execution_time=execution_time,
-                    message=f"{self.method_name} method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.epsilon})",
-                    number_of_correct_significant_figures=number_of_correct_significant_figures,
+                    message=f"{self.method_name} method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.absolute_relative_error})",
                 )
 
-        execution_time = time.time() - start_time
-        number_of_correct_significant_figures = (
-            calculating_number_of_correct_significant_figures(
-                absolute_relative_error * Decimal("100"), self.precision
+        if absolute_relative_error is not None:
+            number_of_correct_significant_figures = (
+                calculating_number_of_correct_significant_figures(
+                    absolute_relative_error * Decimal("100"), self.precision
+                )
             )
-        )
+        execution_time = time.time() - start_time
         return Result(
             root=xr,
+            absolute_relative_error=absolute_relative_error,
             number_of_correct_significant_figures=number_of_correct_significant_figures,
-            number_of_iterations=self.maximum_number_of_iterations,
+            number_of_iterations=self.number_of_iterations,
             execution_time=execution_time,
-            message=f"{self.method_name} method didn't converge after {self.maximum_number_of_iterations} iterations sorry the bst we got is x= {xr:.{self.precision}f} with f(x) = {self.function(xr):.{self.precision}f} tolerance is going to be : {self.epsilon})",
+            message=f"{self.method_name} method didn't converge after {self.number_of_iterations} iterations sorry the bst we got is x= {xr:.{self.precision}f} with f(x) = {self.function(xr):.{self.precision}f} tolerance is going to be : {self.absolute_relative_error})",
         )

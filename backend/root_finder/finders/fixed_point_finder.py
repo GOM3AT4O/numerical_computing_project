@@ -2,7 +2,7 @@ from finders.one_guess_finder import OneGuessFinder
 from decimal import Decimal
 
 
-class FixedPointSolver(OneGuessFinder):
+class FixedPointFinder(OneGuessFinder):
     @property
     def method_name(self) -> str:
         return "Fixed-Point"

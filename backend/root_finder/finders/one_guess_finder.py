@@ -1,10 +1,11 @@
-from finder import Finder
-from abc import abstractmethod
-from result import Result
-from typing import Callable
-from decimal import Decimal
-from utils import calculating_number_of_correct_significant_figures
 import time
+from abc import abstractmethod
+from decimal import Decimal
+from typing import Callable, Optional
+
+from finder import Finder
+from result import Result
+from utils import calculating_number_of_correct_significant_figures
 
 
 class OneGuessFinder(Finder):
@@ -14,12 +15,12 @@ class OneGuessFinder(Finder):
         self,
         function: Callable[[Decimal], Decimal],
         absolute_relative_error: Decimal,
-        maximum_number_of_iterations: int,
+        number_of_iterations: int,
         precision: int,
         guess: Decimal,
     ):
         super().__init__(
-            function, absolute_relative_error, maximum_number_of_iterations, precision
+            function, absolute_relative_error, number_of_iterations, precision
         )
         self.guess = guess
 
@@ -37,18 +38,27 @@ class OneGuessFinder(Finder):
     def find(self) -> Result:
         start_time = time.time()
 
-        x: Decimal = self.guess
+        x = self.guess
         new_x = x
 
-        absolute_relative_error = Decimal("infinity")
+        absolute_relative_error: Optional[Decimal] = None
+        number_of_correct_significant_figures: Optional[int] = None
 
-        for iteration in range(1, self.maximum_number_of_iterations + 1):
+        for iteration in range(1, self.number_of_iterations + 1):
             try:
                 new_x = self.iterate(x)
             except ValueError as e:
+                if absolute_relative_error is not None:
+                    number_of_correct_significant_figures = (
+                        calculating_number_of_correct_significant_figures(
+                            absolute_relative_error * Decimal("100"), self.precision
+                        )
+                    )
                 execution_time = time.time() - start_time
                 return Result(
                     root=x,
+                    absolute_relative_error=absolute_relative_error,
+                    number_of_correct_significant_figures=number_of_correct_significant_figures,
                     number_of_iterations=iteration,
                     execution_time=execution_time,
                     message=e.args[0],
@@ -61,10 +71,8 @@ class OneGuessFinder(Finder):
                     abs((new_x - x)) / abs(new_x) if new_x != 0 else abs(new_x - x)
                 )
 
-                f_new_x = self.function(new_x)
-
                 # (Convergence check)
-                if absolute_relative_error < self.epsilon or f_new_x < self.epsilon:
+                if absolute_relative_error < self.absolute_relative_error:
                     number_of_correct_significant_figures = (
                         calculating_number_of_correct_significant_figures(
                             absolute_relative_error * Decimal("100"), self.precision
@@ -73,22 +81,45 @@ class OneGuessFinder(Finder):
                     execution_time = time.time() - start_time
                     return Result(
                         root=new_x,
-                        number_of_iterations=iteration,
+                        absolute_relative_error=absolute_relative_error,
                         number_of_correct_significant_figures=number_of_correct_significant_figures,
+                        number_of_iterations=iteration,
                         execution_time=execution_time,
                         message="Newton-Raphson method converges. Root was approximately found successfully",
                     )
+
+            f_new_x = self.function(new_x)
+
+            if f_new_x == "0":
+                if absolute_relative_error is not None:
+                    number_of_correct_significant_figures = (
+                        calculating_number_of_correct_significant_figures(
+                            absolute_relative_error * Decimal("100"), self.precision
+                        )
+                    )
+                execution_time = time.time() - start_time
+                return Result(
+                    root=new_x,
+                    absolute_relative_error=absolute_relative_error,
+                    number_of_correct_significant_figures=number_of_correct_significant_figures,
+                    number_of_iterations=iteration,
+                    execution_time=execution_time,
+                    message="Newton-Raphson method converges. Root was approximately found successfully",
+                )
+
             x = new_x
-        number_of_correct_significant_figures = (
-            calculating_number_of_correct_significant_figures(
-                absolute_relative_error * Decimal("100"), self.precision
+        if absolute_relative_error is not None:
+            number_of_correct_significant_figures = (
+                calculating_number_of_correct_significant_figures(
+                    absolute_relative_error * Decimal("100"), self.precision
+                )
             )
-        )
         execution_time = time.time() - start_time
         return Result(
             root=new_x,
+            absolute_relative_error=absolute_relative_error,
             number_of_correct_significant_figures=number_of_correct_significant_figures,
-            number_of_iterations=self.maximum_number_of_iterations,
+            number_of_iterations=self.number_of_iterations,
             execution_time=execution_time,
             message="Newton-Raphson method did not converge within the maximum number of iterations.",
         )

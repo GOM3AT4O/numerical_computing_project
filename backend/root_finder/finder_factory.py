@@ -1,15 +1,15 @@
-from typing import Dict, Any
+from typing import Callable, Dict, Any
 from decimal import Decimal
 from validator import FunctionValidator
 from exceptions import ValidationError
 
 # Import all finder classes here
-from finders.secant_finder import SecantFinder
 from finders.bisection_finder import BisectionFinder
 from finders.false_position_finder import FalsePositionFinder
 from finders.fixed_point_finder import FixedPointFinder
 from finders.newton_raphson_finder import NewtonRaphsonFinder
-import math
+from finders.secant_finder import SecantFinder
+from sympy import Expr, symbols, lambdify
 
 
 class FinderFactory:
@@ -19,225 +19,136 @@ class FinderFactory:
         method: str,
         absolute_relative_error: Decimal,
         number_of_iterations: int,
+        precision: int,
         parameters: Dict[str, Any],
     ):
-        if method == "bisection":
-            func_expr = parameters.get("function")
-            xl = parameters.get("xl")
-            xu = parameters.get("xu")
-            epsilon = parameters.get("epsilon", 0.00001)
-            max_iterations = parameters.get("max_iterations", 50)
+        f_expr: Expr = FunctionValidator.validate_and_parse(function)
 
-            if func_expr is None or xl is None or xu is None:
+        x = symbols("x")
+
+        f: Callable[[Decimal], Decimal] = lambdify(x, f_expr, "math")
+
+        if method == "bisection":
+            lower_bound = parameters.get("lower_bound")
+            second_guess = parameters.get("upper_bound")
+
+            if lower_bound is None or second_guess is None:
                 raise ValidationError(
-                    "Bisection method requires function xl and xu parameters"
+                    "Bisection method requires function lower bound and upper bound parameters"
                 )
 
             try:
-                xl_decimal = Decimal(str(float(xl)))
-                xu_decimal = Decimal(str(float(xu)))
-                epsilon_decimal = Decimal(str(float(epsilon)))
+                lower_bound = Decimal(lower_bound)
+                second_guess = Decimal(second_guess)
             except (ValueError, TypeError) as e:
                 raise ValidationError(
-                    f"Error converting parameters: xl={xl}, xu={xu}, epsilon={epsilon}. Error: {str(e)}"
+                    f"Error converting parameters: lower bound={lower_bound}, upper bound={second_guess}, absolute_relative_error={absolute_relative_error}. Error: {str(e)}"
                 )
 
-            def func(x: Decimal) -> Decimal:
-                try:
-                    namespace = {
-                        "x": float(x),
-                        "Decimal": Decimal,
-                        "abs": abs,
-                        "sin": math.sin,
-                        "cos": math.cos,
-                        "tan": math.tan,
-                        "exp": math.exp,
-                        "log": math.log,
-                        "sqrt": math.sqrt,
-                    }
-                    result = eval(func_expr, {"__builtins__": {}}, namespace)
-                    if not isinstance(result, Decimal):
-                        result = Decimal(str(result))
-                    return result
-
-                except Exception as e:
-                    raise ValidationError(
-                        f"Error evaluating function '{func_expr}': {str(e)}"
-                    )
-
             return BisectionFinder(
-                xl=xl_decimal,
-                xu=xu_decimal,
+                function=f,
+                absolute_relative_error=absolute_relative_error,
+                number_of_iterations=number_of_iterations,
                 precision=precision,
-                func=func,
-                epsilon=epsilon_decimal,
-                max_iterations=int(max_iterations),
+                lower_bound=lower_bound,
+                upper_bound=second_guess,
             )
 
         elif method == "false-position":
-            func_expr = parameters.get("function")
-            xl = parameters.get("xl")
-            xu = parameters.get("xu")
-            epsilon = parameters.get("epsilon", 0.00001)
-            max_iterations = parameters.get("max_iterations", 50)
+            lower_bound = parameters.get("lower_bound")
+            second_guess = parameters.get("upper_bound")
 
-            if func_expr is None or xl is None or xu is None:
+            if lower_bound is None or second_guess is None:
                 raise ValidationError(
-                    "flase-position method requires function xl and xu parameters"
+                    "False-Position method requires lower bound and upper bound parameters"
                 )
 
             try:
-                xl_decimal = Decimal(str(float(xl)))
-                xu_decimal = Decimal(str(float(xu)))
-                epsilon_decimal = Decimal(str(float(epsilon)))
-
+                lower_bound = Decimal(lower_bound)
+                second_guess = Decimal(second_guess)
             except (ValueError, TypeError) as e:
                 raise ValidationError(
-                    f"Error converting parameters: xl={xl}, xu={xu}, epsilon={epsilon}. Error: {str(e)}"
+                    f"Error converting parameters: lower bound={lower_bound}, upper bound={second_guess}. Error: {str(e)}"
                 )
-
-            def func(x: Decimal) -> Decimal:
-                try:
-                    namespace = {
-                        "x": float(x),
-                        "Decimal": Decimal,
-                        "abs": abs,
-                        "sin": math.sin,
-                        "cos": math.cos,
-                        "tan": math.tan,
-                        "exp": math.exp,
-                        "log": math.log,
-                        "sqrt": math.sqrt,
-                    }
-                    result = eval(func_expr, {"__builtins__": {}}, namespace)
-                    if not isinstance(result, Decimal):
-                        result = Decimal(str(result))
-                    return result
-                except Exception as e:
-                    raise ValidationError(
-                        f"Error evaluating function '{func_expr}': {str(e)}"
-                    )
 
             return FalsePositionFinder(
-                xl=xl_decimal,
-                xu=xu_decimal,
+                function=f,
+                absolute_relative_error=absolute_relative_error,
+                number_of_iterations=number_of_iterations,
                 precision=precision,
-                func=func,
-                epsilon=epsilon_decimal,
-                max_iterations=int(max_iterations),
+                lower_bound=lower_bound,
+                upper_bound=second_guess,
             )
         elif method == "secant":
-            func_expr = parameters.get("function")
-            x0 = parameters.get("x0")
-            x1 = parameters.get("x1")
-            epsilon = parameters.get("epsilon", 0.00001)
-            max_iterations = parameters.get("max_iterations", 50)
+            first_guess = parameters.get("first_guess")
+            second_guess = parameters.get("upper_bound")
 
-            if func_expr is None or x0 is None or x1 is None:
+            if first_guess is None or second_guess is None:
                 raise ValidationError(
-                    "Secant method requires function, x0, and x1 parameters"
+                    "Secant method requires first guess and second guess parameters"
                 )
 
             try:
-                x0_decimal = Decimal(str(float(x0)))
-                x1_decimal = Decimal(str(float(x1)))
-                epsilon_decimal = Decimal(str(float(epsilon)))
+                first_guess = Decimal(first_guess)
+                second_guess = Decimal(second_guess)
             except (ValueError, TypeError) as e:
                 raise ValidationError(
-                    f"Error converting parameters: x0={x0}, x1={x1}, epsilon={epsilon}. Error: {str(e)}"
+                    f"Error converting parameters: first guess={first_guess}, second guess={second_guess}. Error: {str(e)}"
                 )
-
-            def func(x: Decimal) -> Decimal:
-                try:
-                    namespace = {
-                        "x": float(x),
-                        "Decimal": Decimal,
-                        "abs": abs,
-                        "sin": math.sin,
-                        "cos": math.cos,
-                        "tan": math.tan,
-                        "exp": math.exp,
-                        "log": math.log,
-                        "sqrt": math.sqrt,
-                    }
-                    result = eval(func_expr, {"__builtins__": {}}, namespace)
-                    if not isinstance(result, Decimal):
-                        result = Decimal(str(result))
-                    return result
-                except Exception as e:
-                    raise ValidationError(
-                        f"Error evaluating function '{func_expr}': {str(e)}"
-                    )
 
             return SecantFinder(
-                x0=x0_decimal,
-                x1=x1_decimal,
+                function=f,
+                absolute_relative_error=absolute_relative_error,
+                number_of_iterations=number_of_iterations,
                 precision=precision,
-                func=func,
-                epsilon=epsilon_decimal,
-                max_iterations=int(max_iterations),
+                first_guess=first_guess,
+                second_guess=second_guess,
             )
         elif method == "fixed-point":
-            func_str = parameters.get("function")
             guess = parameters.get("guess")
-            epsilon = parameters.get("epsilon", 0.00001)
-            max_iterations = parameters.get("max_iterations", 50)
 
-            print(func_str, " ", guess, " ", epsilon)
-
-            if func_str is None or guess is None:
-                raise ValidationError(
-                    "Fixed Point method requires 'function' and 'guess' parameters"
-                )
+            if guess is None:
+                raise ValidationError("Fixed-Point method requires guess parameter")
 
             try:
-                func_expr = FunctionValidator.validate_and_parse(func_str)
-                guess_decimal = Decimal(str(float(guess)))
-                epsilon_decimal = Decimal(str(float(epsilon)))
-
-            except Exception as e:
+                guess = Decimal(guess)
+            except (ValueError, TypeError) as e:
                 raise ValidationError(
-                    f"Error preparing parameters for Fixed Point: {str(e)}"
+                    f"Error converting parameters: guess={guess}. Error: {str(e)}"
                 )
 
             return FixedPointFinder(
-                guess=guess_decimal,
-                func=func_expr,
+                function=f,
+                absolute_relative_error=absolute_relative_error,
+                number_of_iterations=number_of_iterations,
                 precision=precision,
-                epsilon=epsilon_decimal,
-                max_iterations=int(max_iterations),
+                guess=guess,
             )
-        elif method == "newton-raphson":
-            func_str = parameters.get("function")
+        elif method == "newton-raphson" or method == "modified-newton-raphson":
             guess = parameters.get("guess")
-            epsilon = parameters.get("epsilon", 0.00001)
-            max_iterations = parameters.get("max_iterations", 50)
-            m = parameters.get("m", 1)
+            multiplicity = parameters.get("multiplicity", 1)
 
-            print(func_str, " ", guess, " ", epsilon)
-
-            if func_str is None or guess is None:
-                raise ValidationError(
-                    "Fixed Point method requires 'function' and 'guess' parameters"
-                )
+            if guess is None:
+                raise ValidationError("Newton-Raphson method requires guess parameter")
 
             try:
-                func_expr = FunctionValidator.validate_and_parse(func_str)
-                guess_decimal = Decimal(str(float(guess)))
-                epsilon_decimal = Decimal(str(float(epsilon)))
-
-            except Exception as e:
+                guess = Decimal(guess)
+            except (ValueError, TypeError) as e:
                 raise ValidationError(
-                    f"Error preparing parameters for Fixed Point: {str(e)}"
+                    f"Error converting parameters: guess={guess}. Error: {str(e)}"
                 )
 
+            df_expr = f_expr.diff(x)
+            df: Callable[[Decimal], Decimal] = lambdify(x, df_expr, "math")
+
             return NewtonRaphsonFinder(
-                guess=guess_decimal,
-                func=func_expr,
+                function=f,
+                absolute_relative_error=absolute_relative_error,
+                number_of_iterations=number_of_iterations,
                 precision=precision,
-                epsilon=epsilon_decimal,
-                max_iterations=int(max_iterations),
-                m=int(m),
+                guess=guess,
+                derivative=df,
+                multiplicity=multiplicity,
             )
 
         else:

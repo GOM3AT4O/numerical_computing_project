@@ -3,7 +3,7 @@ from typing import Callable
 from finders.one_guess_finder import OneGuessFinder
 
 
-class NewtonRaphsonSolver(OneGuessFinder):
+class NewtonRaphsonFinder(OneGuessFinder):
     derivative: Callable[[Decimal], Decimal]
     multiplicity: int
 
@@ -11,7 +11,7 @@ class NewtonRaphsonSolver(OneGuessFinder):
         self,
         function: Callable[[Decimal], Decimal],
         absolute_relative_error: Decimal,
-        maximum_number_of_iterations: int,
+        number_of_iterations: int,
         precision: int,
         guess: Decimal,
         derivative: Callable[[Decimal], Decimal],
@@ -20,7 +20,7 @@ class NewtonRaphsonSolver(OneGuessFinder):
         super().__init__(
             function,
             absolute_relative_error,
-            maximum_number_of_iterations,
+            number_of_iterations,
             precision,
             guess,
         )
