@@ -1,6 +1,7 @@
 import time
-from solvers.elimination_solver import EliminationSolver
-from result import Result
+
+from equations_solver.result import Result
+from equations_solver.solvers.elimination_solver import EliminationSolver
 
 
 class GaussEliminationSolver(EliminationSolver):

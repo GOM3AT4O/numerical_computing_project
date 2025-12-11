@@ -1,13 +1,14 @@
-from decimal import Decimal
-import numpy as np
 import time
-from steps.crout_decomposition_step import CroutDecompositionStep
-from steps.cholesky_decomposition_step import CholeskyDecompositionStep
-from steps.substitution_step import SubstitutionStep
-from steps.show_matrices_step import ShowMatricesStep
-from steps.row_operation_step import RowOperationStep
-from solver import Solver
-from result import Result
+from decimal import Decimal
+
+import numpy as np
+from equations_solver.result import Result
+from equations_solver.solver import Solver
+from equations_solver.steps.cholesky_decomposition_step import CholeskyDecompositionStep
+from equations_solver.steps.crout_decomposition_step import CroutDecompositionStep
+from equations_solver.steps.row_operation_step import RowOperationStep
+from equations_solver.steps.show_matrices_step import ShowMatricesStep
+from equations_solver.steps.substitution_step import SubstitutionStep
 from exceptions import ValidationError
 
 

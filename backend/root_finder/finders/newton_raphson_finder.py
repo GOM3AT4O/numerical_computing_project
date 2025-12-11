@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Callable
-from finders.one_guess_finder import OneGuessFinder
+from root_finder.finders.one_guess_finder import OneGuessFinder
 
 
 class NewtonRaphsonFinder(OneGuessFinder):

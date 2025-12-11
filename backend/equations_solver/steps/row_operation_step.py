@@ -1,7 +1,8 @@
-import numpy as np
 from decimal import Decimal
 from typing import Any, Dict, Optional
-from step import Step
+
+import numpy as np
+from equations_solver.step import Step
 from utils import remove_trailing_zeros
 
 

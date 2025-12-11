@@ -1,8 +1,9 @@
 from decimal import Decimal
 from typing import Any, Dict
+
 import numpy as np
+from equations_solver.step import Step
 from utils import remove_trailing_zeros
-from step import Step
 
 
 class IterationStep(Step):

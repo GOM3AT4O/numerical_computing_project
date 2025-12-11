@@ -1,14 +1,14 @@
 from typing import Callable, Dict, Any
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from validator import FunctionValidator
 from exceptions import ValidationError
 
 # Import all finder classes here
-from finders.bisection_finder import BisectionFinder
-from finders.false_position_finder import FalsePositionFinder
-from finders.fixed_point_finder import FixedPointFinder
-from finders.newton_raphson_finder import NewtonRaphsonFinder
-from finders.secant_finder import SecantFinder
+from root_finder.finders.bisection_finder import BisectionFinder
+from root_finder.finders.false_position_finder import FalsePositionFinder
+from root_finder.finders.fixed_point_finder import FixedPointFinder
+from root_finder.finders.newton_raphson_finder import NewtonRaphsonFinder
+from root_finder.finders.secant_finder import SecantFinder
 from sympy import Expr, symbols, lambdify
 
 
@@ -24,9 +24,21 @@ class FinderFactory:
     ):
         f_expr: Expr = FunctionValidator.validate_and_parse(function)
 
-        x = symbols("x")
+        x_symbol = symbols("x")
 
-        f: Callable[[Decimal], Decimal] = lambdify(x, f_expr, "math")
+        def f(x):
+            val_sympy = f_expr.subs(x_symbol, x).evalf(n=precision)
+
+            try:
+                if not val_sympy.is_real:
+                    val_sympy = val_sympy.as_real_imag()[0]
+                y = +Decimal(float(val_sympy))
+            except (InvalidOperation, ValueError):
+                raise ValidationError(
+                    f"Calculation Error: Resulted in undefined or complex value: {val_sympy}"
+                )
+
+            return y
 
         if method == "bisection":
             lower_bound = parameters.get("lower_bound")
@@ -138,8 +150,21 @@ class FinderFactory:
                     f"Error converting parameters: guess={guess}. Error: {str(e)}"
                 )
 
-            df_expr = f_expr.diff(x)
-            df: Callable[[Decimal], Decimal] = lambdify(x, df_expr, "math")
+            df_expr = f_expr.diff(x_symbol)
+
+            def df(x):
+                val_sympy = df_expr.subs(x_symbol, x).evalf(n=precision)
+
+                try:
+                    if not val_sympy.is_real:
+                        val_sympy = val_sympy.as_real_imag()[0]
+                    y = +Decimal(float(val_sympy))
+                except (InvalidOperation, ValueError):
+                    raise ValidationError(
+                        f"Calculation Error: Resulted in undefined or complex value: {val_sympy}"
+                    )
+
+                return y
 
             return NewtonRaphsonFinder(
                 function=f,

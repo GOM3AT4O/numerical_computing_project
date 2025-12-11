@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Callable
 from abc import ABC, abstractmethod
-from result import Result
+from root_finder.result import Result
 
 
 # base class for all root finding methods

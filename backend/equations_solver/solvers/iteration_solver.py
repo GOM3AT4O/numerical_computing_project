@@ -1,10 +1,11 @@
+import time
 from abc import abstractmethod
 from decimal import Decimal
+
 import numpy as np
-from solver import Solver
+from equations_solver.result import Result
+from equations_solver.solver import Solver
 from exceptions import ValidationError
-import time
-from result import Result
 
 
 # base class for iterative solvers (like Jacobi, Gauss-Seidel, etc.)

@@ -66,6 +66,8 @@ class FunctionValidator:
 
         # try to parse the equation string into a SymPy expression
 
+        x = symbols("x")
+
         try:
             transformations = (
                 repeated_decimals,
@@ -73,7 +75,9 @@ class FunctionValidator:
                 implicit_multiplication_application,
                 convert_xor,
             )
-            expr = parse_expr(equation_str, transformations=transformations)
+            expr = parse_expr(
+                equation_str, local_dict={"x": x}, transformations=transformations
+            )
         except (SympifyError, SyntaxError):
             raise ValidationError("Invalid equation format. Please check your syntax.")
 

@@ -3,8 +3,8 @@ from abc import abstractmethod
 from decimal import Decimal
 from typing import Callable, Optional
 
-from finder import Finder
-from result import Result
+from root_finder.finder import Finder
+from root_finder.result import Result
 from utils import calculating_number_of_correct_significant_figures
 
 

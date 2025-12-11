@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import Callable, Optional
 
 from exceptions import ValidationError
-from finder import Finder
-from result import Result
+from root_finder.finder import Finder
+from root_finder.result import Result
 from utils import calculating_number_of_correct_significant_figures
 
 
@@ -122,8 +122,14 @@ class IntervalFinder(Finder):
                             absolute_relative_error * Decimal("100"), self.precision
                         )
                     )
+                if f_xr == 0:
+                    root = xr
+                elif f_xl == 0:
+                    root = xl
+                else:
+                    root = xu
                 return Result(
-                    root=xr,
+                    root=root,
                     absolute_relative_error=absolute_relative_error,
                     number_of_correct_significant_figures=number_of_correct_significant_figures,
                     number_of_iterations=iteration,

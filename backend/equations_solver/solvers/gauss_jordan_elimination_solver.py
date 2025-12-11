@@ -1,9 +1,10 @@
-import numpy as np
-from decimal import Decimal
 import time
-from solvers.elimination_solver import EliminationSolver
-from steps.row_operation_step import RowOperationStep
-from result import Result
+from decimal import Decimal
+
+import numpy as np
+from equations_solver.solvers.elimination_solver import EliminationSolver
+from equations_solver.steps.row_operation_step import RowOperationStep
+from equations_solver.result import Result
 
 
 class GaussJordanEliminationSolver(EliminationSolver):

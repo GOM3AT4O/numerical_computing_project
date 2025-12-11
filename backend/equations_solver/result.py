@@ -1,6 +1,7 @@
+from typing import Any, Dict, List, Optional
+
 import numpy as np
-from typing import Dict, List, Optional, Any
-from step import Step
+from equations_solver.step import Step
 from utils import remove_trailing_zeros
 
 

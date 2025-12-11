@@ -1,8 +1,9 @@
-import numpy as np
 from abc import ABC, abstractmethod
 from typing import List
-from step import Step
-from result import Result
+
+import numpy as np
+from equations_solver.result import Result
+from equations_solver.step import Step
 
 
 # base class for all solvers

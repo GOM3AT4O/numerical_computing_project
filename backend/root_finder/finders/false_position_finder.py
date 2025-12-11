@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from finders.interval_finder import IntervalFinder
+from root_finder.finders.interval_finder import IntervalFinder
 
 
 class FalsePositionFinder(IntervalFinder):

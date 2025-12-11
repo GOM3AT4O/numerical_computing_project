@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from solvers.Fixed_Point_solver import FixedPointSolver
 from exceptions import ValidationError
-from validator import FunctionValidator, LinearSystemValidator
-from solver_factory import SolverFactory
+from validator import LinearSystemValidator
+from equations_solver.solver_factory import SolverFactory
+from root_finder.finder_factory import FinderFactory
 from decimal import Decimal, getcontext
 import signal
 import os
@@ -12,8 +12,8 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/api/solve", methods=["POST"])
-def solve_system():
+@app.route("/api/solve-equations", methods=["POST"])
+def solve_equations():
     """Main endpoint to solve linear system or nonlinear equation"""
     try:
         data = request.get_json()
@@ -25,7 +25,7 @@ def solve_system():
 
         # Extract data
         method = data.get("method")
-        precision = data.get("precision")
+        precision = data.get("precision", 6)
         parameters = data.get("parameters", {})
 
         print(f"method: {method}")
@@ -33,57 +33,105 @@ def solve_system():
         print(f"params: {parameters}")
 
         # set precision and rounding method for Decimal operations
-        getcontext().prec = precision if precision is not None else 6
+        getcontext().prec = precision
         getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields
         if not method:
             return jsonify({"error": "Missing required field: method"}), 400
 
-        # Handle bisection method differently (nonlinear equation)
-        if method == "bisection" or method == "false-position" or method == "secant" or method == "fixed-point" or method == "newton-raphson":
-            print(f"Processing {method} method")
-            
-            # Validate precision
-            precision_value = LinearSystemValidator.validate_precision(precision)
-            
-            # Create and run solver
-            solver = SolverFactory.create_solver(
-                method, None, None, precision_value, parameters
-            )
-            
-            result = solver.solve()
-            print("=" * 50 + "\n")
-            return jsonify(result.to_dict()), 200
-        
-        # Handle linear system methods
-        else:
-            A = data.get("A")
-            b = data.get("b")
-            
-            print(f"A: {A}")
-            print(f"b: {b}")
+        A = data.get("A")
+        b = data.get("b")
 
-            if not all([A, b]):
-                return jsonify(
-                    {"error": "Missing required fields: A and b are required for linear system methods"}
-                ), 400
+        print(f"A: {A}")
+        print(f"b: {b}")
 
-            A = [[+Decimal(x) for x in y] for y in A]
-            b = [+Decimal(x) for x in b]
+        if not all([A, b]):
+            return jsonify(
+                {
+                    "error": "Missing required fields: A and b are required for linear system methods"
+                }
+            ), 400
 
-            # Validate system
-            A_matrix, b_vector = LinearSystemValidator.validate_system(A, b)
-            precision_value = LinearSystemValidator.validate_precision(precision)
+        A = [[+Decimal(x) for x in y] for y in A]
+        b = [+Decimal(x) for x in b]
 
-            # Create and run solver
-            solver = SolverFactory.create_solver(
-                method, A_matrix, b_vector, precision_value, parameters
-            )
+        # Validate system
+        A_matrix, b_vector = LinearSystemValidator.validate_system(A, b)
+        precision_value = LinearSystemValidator.validate_precision(precision)
 
-            result = solver.solve()
-            print("=" * 50 + "\n")
-            return jsonify(result.to_dict()), 200
+        # Create and run solver
+        solver = SolverFactory.create_solver(
+            method, A_matrix, b_vector, precision_value, parameters
+        )
+
+        result = solver.solve()
+        print("=" * 50 + "\n")
+        return jsonify(result.to_dict()), 200
+
+    except ValidationError as e:
+        print(f"\n Validation Error: {str(e)}\n")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        print(f"\n Exception occurred: {str(e)}")
+        import traceback
+
+        print("Full traceback:")
+        traceback.print_exc()
+        print("\n")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+
+@app.route("/api/find-root", methods=["POST"])
+def find_root():
+    try:
+        data = request.get_json()
+
+        # Debug logging
+        print("\n" + "=" * 50)
+        print("Received request:")
+        print(f"Data: {data}")
+
+        # Extract data
+        function = data.get("function")
+        method = data.get("method")
+        absolute_relative_error = data.get("absolute_relative_error", "0.00001")
+        number_of_iterations = data.get("number_of_iterations", 50)
+        precision = data.get("precision", 6)
+        parameters = data.get("parameters", {})
+
+        print(f"method: {method}")
+        print(f"precision: {precision}")
+        print(f"params: {parameters}")
+
+        # set precision and rounding method for Decimal operations
+        getcontext().prec = precision
+        getcontext().rounding = "ROUND_HALF_UP"
+
+        # Validate required fields
+        if not method:
+            return jsonify({"error": "Missing required field: method"}), 400
+
+        if not all([function]):
+            return jsonify(
+                {"error": "Missing required fields: function for root finding methods"}
+            ), 400
+
+        precision_value = LinearSystemValidator.validate_precision(precision)
+
+        # Create and run finder
+        finder = FinderFactory.create_finder(
+            function=function,
+            method=method,
+            absolute_relative_error=Decimal(absolute_relative_error),
+            number_of_iterations=number_of_iterations,
+            precision=precision_value,
+            parameters=parameters,
+        )
+
+        result = finder.find()
+        print("=" * 50 + "\n")
+        return jsonify(result.to_dict()), 200
 
     except ValidationError as e:
         print(f"\n Validation Error: {str(e)}\n")
@@ -330,8 +378,8 @@ def get_methods():
                     "default": 50,
                     "required": False,
                     "description": "Maximum number of iterations",
-                }
-            ]
+                },
+            ],
         },
         "newton-raphson": {
             "name": "Newton Raphson Method",
@@ -369,58 +417,19 @@ def get_methods():
                     "default": 1,
                     "required": False,
                     "description": "Indicates the multiplicity of the root",
-                }
-            ]
-        }
+                },
+            ],
+        },
     }
     return jsonify(methods), 200
-
-# Fixed Point Solver Endpoint just for testing i will put it in the factory later with another end point to the whole open methods
-# @app.route("/fixed-point", methods=["POST"])
-# def fixed_point_solver():
-    """Endpoint to solve nonlinear equation using Fixed Point method"""
-    try:
-        data = request.get_json()
-
-        # Extract data
-        function_str = data.get("function")
-        guess = data.get("guess")
-        precision = data.get("precision")
-        absolute_relative_error = data.get("absolute_relative_error", 0.000001)
-        max_iterations = data.get("max_iterations", 50)
-
-        # Validate required fields
-        if not all([function_str, guess is not None]):
-            return jsonify(
-                {"error": "Missing required fields: function and guess are required"}
-            ), 400
-
-        # Validate precision
-        precision_value = LinearSystemValidator.validate_precision(precision)
-
-        function_str = FunctionValidator.validate_and_parse(function_str)
-
-        # Create and run solver
-        result = FixedPointSolver(
-            func=function_str,                   
-            guess=Decimal(str(guess)),   
-            precision=precision_value,
-            absolute_relative_error=Decimal(str(absolute_relative_error)),
-            max_iterations=max_iterations,
-        ).solve()
-
-        return jsonify(result.to_dict()), 200
-
-    except ValidationError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
 
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """Health check endpoint"""
-    return jsonify({"status": "healthy", "message": "Numerical Methods Solver API"}), 200
+    return jsonify(
+        {"status": "healthy", "message": "Numerical Methods Solver API"}
+    ), 200
 
 
 @app.route("/shutdown", methods=["POST"])

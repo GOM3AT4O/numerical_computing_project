@@ -1,9 +1,10 @@
 from decimal import Decimal
-import numpy as np
-from steps.substitution_step import SubstitutionStep
-from solver import Solver
 from typing import Tuple
-from steps.row_operation_step import RowOperationStep
+
+import numpy as np
+from equations_solver.solver import Solver
+from equations_solver.steps.row_operation_step import RowOperationStep
+from equations_solver.steps.substitution_step import SubstitutionStep
 
 
 # base class for elimination solvers (like Gauss elimination, Gauss-Jordan elimination, etc.)

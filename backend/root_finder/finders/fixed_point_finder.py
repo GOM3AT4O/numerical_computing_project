@@ -1,4 +1,4 @@
-from finders.one_guess_finder import OneGuessFinder
+from root_finder.finders.one_guess_finder import OneGuessFinder
 from decimal import Decimal
 
 

@@ -1,13 +1,18 @@
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
-from exceptions import ValidationError
 
 # Import all solver classes here
-from solvers.gauss_elimination_solver import GaussEliminationSolver
-from solvers.gauss_jordan_elimination_solver import GaussJordanEliminationSolver
-from solvers.lu_decomposition_solver import LUDecompositionSolver
-from solvers.jacobi_iteration_solver import JacobiIterationSolver
-from solvers.gauss_seidel_iteration_solver import GaussSeidelIterationSolver
+from equations_solver.solvers.gauss_elimination_solver import GaussEliminationSolver
+from equations_solver.solvers.gauss_jordan_elimination_solver import (
+    GaussJordanEliminationSolver,
+)
+from equations_solver.solvers.gauss_seidel_iteration_solver import (
+    GaussSeidelIterationSolver,
+)
+from equations_solver.solvers.jacobi_iteration_solver import JacobiIterationSolver
+from equations_solver.solvers.lu_decomposition_solver import LUDecompositionSolver
+from exceptions import ValidationError
 
 
 class SolverFactory:

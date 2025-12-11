@@ -1,7 +1,8 @@
 from decimal import Decimal
+
 import numpy as np
-from steps.iteration_step import IterationStep
-from solvers.iteration_solver import IterationSolver
+from equations_solver.solvers.iteration_solver import IterationSolver
+from equations_solver.steps.iteration_step import IterationStep
 
 
 class JacobiIterationSolver(IterationSolver):
