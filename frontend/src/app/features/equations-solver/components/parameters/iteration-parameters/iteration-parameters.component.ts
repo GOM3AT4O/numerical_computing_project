@@ -1,6 +1,6 @@
 import { Component, forwardRef, input } from "@angular/core";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { RangePipe } from "../../../pipes/range.pipe";
+import { RangePipe } from "../../../../../shared/pipes/range.pipe";
 import {
   NG_VALIDATORS,
   NG_VALUE_ACCESSOR,

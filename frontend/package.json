@@ -21,8 +21,11 @@
     "@tauri-apps/plugin-http": "^2.5.4",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2.3.3",
+    "angular-plotly.js": "^20.0.0",
     "lucide-angular": "^0.553.0",
+    "mathjs": "^15.1.0",
     "ngx-autosize-input": "^20.0.5",
+    "plotly.js-dist-min": "^3.3.0",
     "postcss": "^8.5.6",
     "rxjs": "~7.8.2",
     "tailwindcss": "^4.1.16",
@@ -34,6 +37,7 @@
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.4",
     "@tauri-apps/cli": "^2",
+    "@types/plotly.js-dist-min": "^2.3.4",
     "typescript": "~5.8.3"
   }
 }

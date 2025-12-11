@@ -26,13 +26,13 @@
       />
     </div>
     <div class="flex flex-col gap-8">
-      <span class="font-medium">Stopping Condition:</span>
-      <div class="grid grid-cols-[max-content_max-content] gap-8">
-        <label for="stopping-condition-number-of-iterations" class="font-medium"
+      <span class="font-bold">Stopping Conditions:</span>
+      <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
+        <label for="number-of-iterations" class="font-medium"
           >Number of Iterations:</label
         >
         <input
-          id="stopping-condition-number-of-iterations"
+          id="number-of-iterations"
           class="min-w-full h-fit"
           type="text"
           formControlName="numberOfIterations"
@@ -40,13 +40,11 @@
           [minWidth]="64"
           [extraWidth]="10"
         />
-        <label
-          for="stopping-condition-absolute-relative-error"
-          class="font-medium"
+        <label for="absolute-relative-error" class="font-medium"
           >Absolute Relative Error:</label
         >
         <input
-          id="stopping-condition-absolute-relative-error"
+          id="absolute-relative-error"
           class="min-w-full h-fit"
           type="text"
           formControlName="absoluteRelativeError"

@@ -52,7 +52,9 @@
           }
         </div>
         <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
-          <div class="grid grid-cols-[max-content_max-content] gap-8">
+          <div
+            class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+          >
             <label for="method" class="font-medium">Method:</label>
             <select id="method" formControlName="method">
               @for (method of methods; track method) {
@@ -62,78 +64,68 @@
             <label for="precision" class="font-medium">Precision:</label>
             <input
               id="precision"
-              class="min-w-32 h-fit"
+              class="h-fit"
               type="text"
               placeholder="6"
               formControlName="precision"
               autoSizeInput
+              [minWidth]="32"
+              [extraWidth]="10"
             />
           </div>
+          @if (
+            form.get("precision")?.invalid &&
+            (form.get("precision")?.touched || form.get("precision")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid precision.
+              </div>
+            </div>
+          }
         </div>
-        @switch (form.get("method")?.value) {
-          @case ("gauss-elimination") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">Gauss Elimination Parameters</h1>
+        <div
+          class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
+        >
+          <h1 class="text-lg font-bold">
+            {{ methodLabels[form.get("method")?.value!] }} Parameters
+          </h1>
+          @switch (form.get("method")?.value) {
+            @case ("gauss-elimination") {
               <app-elimination-parameters
                 #parameters
                 formControlName="parameters"
               />
-            </div>
-          }
-          @case ("gauss-jordan-elimination") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">
-                Gauss-Jordan Elimination Parameters
-              </h1>
+            }
+            @case ("gauss-jordan-elimination") {
               <app-elimination-parameters
                 #parameters
                 formControlName="parameters"
               />
-            </div>
-          }
-          @case ("lu-decomposition") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
-            >
-              <h1 class="text-lg font-bold">LU Decomposition Parameters</h1>
+            }
+            @case ("lu-decomposition") {
               <app-lu-parameters #parameters formControlName="parameters" />
-            </div>
-          }
-          @case ("jacobi-iteration") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
-            >
-              <h1 class="text-lg font-bold flex-0">
-                Jacobi Iteration Parameters
-              </h1>
+            }
+            @case ("jacobi-iteration") {
               <app-iteration-parameters
                 #parameters
                 class="flex-1"
                 formControlName="parameters"
                 [equationCount]="equationCount"
               />
-            </div>
-          }
-          @case ("gauss-seidel-iteration") {
-            <div
-              class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md md:col-2 md:row-span-2"
-            >
-              <h1 class="text-lg font-bold flex-0">
-                Gauss-Seidel Iteration Parameters
-              </h1>
+            }
+            @case ("gauss-seidel-iteration") {
               <app-iteration-parameters
                 #parameters
                 class="flex-1"
                 formControlName="parameters"
                 [equationCount]="equationCount"
               />
-            </div>
+            }
           }
-        }
+        </div>
       </div>
       <button
         type="submit"
@@ -147,10 +139,10 @@
           class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
         >
           <h1 class="text-lg font-bold">Result</h1>
+          @if (response()!.message) {
+            <p>{{ response()!.message }}</p>
+          }
           @if (response()!.solution) {
-            @if (response()!.message) {
-              <p>{{ response()!.message }}</p>
-            }
             @if (response()!.L && response()!.U) {
               <div
                 class="flex flex-row items-center gap-16 self-center flex-wrap"
@@ -246,10 +238,6 @@
                 }
               </table>
             </div>
-          } @else {
-            @if (response()!.message) {
-              <p>{{ response()!.message }}</p>
-            }
           }
           @if (response()!.numberOfIterations) {
             <div class="flex flex-row items-center gap-8">

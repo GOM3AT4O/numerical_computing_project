@@ -1,3 +1,28 @@
-<main class="box-border p-32 flex flex-col overflow-auto">
-  <router-outlet />
-</main>
+<div class="overflow-auto box-border py-32 flex flex-col gap-16">
+  <header class="flex w-full px-32 items-center justify-center">
+    <div class="relative flex flex-row w-fit rounded-md bg-gray-100 shadow-md">
+      <div
+        class="grid items-center justify-items-center"
+        [style.gridTemplateColumns]="
+          'repeat(' + tabs.length + ', minmax(0, 1fr))'
+        "
+      >
+        @for (tab of tabs; track tab.path) {
+          <a
+            [routerLink]="tab.path"
+            class="w-fit px-16 py-6 rounded-md border-b-3 border-transparent cursor-pointer transition duration-200"
+            >{{ tab.label }}</a
+          >
+        }
+      </div>
+      <div
+        class="absolute bottom-0 left-0 h-3 bg-blue-500 rounded-md transition-transform duration-300"
+        [style.transform]="'translateX(' + activeTabIndex * 100 + '%)'"
+        [style.width.%]="100 / tabs.length"
+      ></div>
+    </div>
+  </header>
+  <main class="px-32">
+    <router-outlet />
+  </main>
+</div>

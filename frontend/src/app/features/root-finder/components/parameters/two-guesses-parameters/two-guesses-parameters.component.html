@@ -1,0 +1,44 @@
+<div class="flex flex-col justify-between h-full" [formGroup]="form">
+  <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
+    <label for="first-guess" class="font-medium">First Guess:</label>
+    <input
+      id="first-guess"
+      class="min-w-full h-fit"
+      type="text"
+      formControlName="firstGuess"
+      autoSizeInput
+      [minWidth]="64"
+      [extraWidth]="10"
+    />
+    <label for="second-guess" class="font-medium">Second Guess:</label>
+    <input
+      id="second-guess"
+      class="min-w-full h-fit"
+      type="text"
+      formControlName="secondGuess"
+      autoSizeInput
+      [minWidth]="64"
+      [extraWidth]="10"
+    />
+  </div>
+  @if (
+    form.get("firstGuess")?.invalid &&
+    (form.get("firstGuess")?.dirty || form.get("firstGuess")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid first guess.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("secondGuess")?.invalid &&
+    (form.get("secondGuess")?.dirty || form.get("secondGuess")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid second guess.
+      </div>
+    </div>
+  }
+</div>

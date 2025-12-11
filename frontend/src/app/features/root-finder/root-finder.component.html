@@ -1,0 +1,241 @@
+<form [formGroup]="form" (ngSubmit)="solve()">
+  <div class="flex flex-col items-center">
+    <div class="flex flex-col gap-16 items-center">
+      <div class="grid gap-16 w-full">
+        <div
+          class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md row-1 col-1"
+        >
+          <h1 class="text-lg font-bold mb-8">Function</h1>
+          <app-plot class="mb-16 self-center" [functions]="functions" />
+          <div class="flex flex-row items-center">
+            <label for="function" class="font-medium">
+              <math>
+                <mrow>
+                  <mi>{{
+                    form.get("method")?.value === "fixed-point" ? "g" : "f"
+                  }}</mi>
+                  <mo>(</mo>
+                  <mi>x</mi>
+                  <mo>)</mo>
+                </mrow>
+                <mo>=</mo>
+              </math>
+            </label>
+            <input
+              id="function"
+              class="h-fit"
+              type="text"
+              formControlName="function"
+              autoSizeInput
+              [minWidth]="128"
+              [extraWidth]="10"
+            />
+          </div>
+          @if (
+            form.get("function")?.invalid &&
+            (form.get("function")?.touched || form.get("function")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid function of x.
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
+          <div
+            class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+          >
+            <label for="method" class="font-medium">Method:</label>
+            <select id="method" formControlName="method">
+              @for (method of methods; track method) {
+                <option [value]="method.value">{{ method.label }}</option>
+              }
+            </select>
+            <label for="precision" class="font-medium">Precision:</label>
+            <input
+              id="precision"
+              class="h-fit"
+              type="text"
+              placeholder="6"
+              formControlName="precision"
+              autoSizeInput
+              [minWidth]="32"
+              [extraWidth]="10"
+            />
+          </div>
+
+          @if (
+            form.get("precision")?.invalid &&
+            (form.get("precision")?.touched || form.get("precision")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid precision.
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-24 rounded-md bg-gray-100 shadow-md row-3 col-1">
+          <div class="flex flex-col gap-8">
+            <span class="font-bold">Stopping Conditions:</span>
+            <div
+              class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+            >
+              <label for="number-of-iterations" class="font-medium"
+                >Number of Iterations:</label
+              >
+              <input
+                id="number-of-iterations"
+                class="min-w-full h-fit"
+                type="text"
+                formControlName="numberOfIterations"
+                autoSizeInput
+                [minWidth]="64"
+                [extraWidth]="10"
+              />
+              <label for="absolute-relative-error" class="font-medium"
+                >Absolute Relative Error:</label
+              >
+              <input
+                id="absolute-relative-error"
+                class="min-w-full h-fit"
+                type="text"
+                formControlName="absoluteRelativeError"
+                autoSizeInput
+                [minWidth]="64"
+                [extraWidth]="10"
+              />
+            </div>
+          </div>
+          @if (
+            form.get("numberOfIterations")?.invalid &&
+            (form.get("numberOfIterations")?.dirty ||
+              form.get("numberOfIterations")?.touched)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-xs"
+              >
+                Please enter a valid number of iterations.
+              </div>
+            </div>
+          }
+          @if (
+            form.get("absoluteRelativeError")?.invalid &&
+            (form.get("absoluteRelativeError")?.dirty ||
+              form.get("absoluteRelativeError")?.touched)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-xs"
+              >
+                Please enter a valid absolute relative error threshold.
+              </div>
+            </div>
+          }
+        </div>
+        <div
+          class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
+        >
+          <h1 class="text-lg font-bold">
+            {{ methodLabels[form.get("method")?.value!] }} Parameters
+          </h1>
+          @switch (form.get("method")?.value) {
+            @case ("bisection") {
+              <app-interval-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("false-position") {
+              <app-interval-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("fixed-point") {
+              <app-one-guess-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("newton-raphson") {
+              <app-one-guess-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("modified-newton-raphson") {
+              <app-one-guess-with-multiplicity-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("secant") {
+              <app-two-guesses-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+          }
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="w-fit px-16 py-6 border-none rounded-lg outline-none bg-blue-500 text-white shadow-sm cursor-pointer transition duration-200 hover:bg-blue-400 hover:-translate-y-2 hover:shadow-md active:bg-blue-600 active:translate-y-0 active:shadow-sm"
+      >
+        Solve
+      </button>
+      @if (response()) {
+        <div
+          #result
+          class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
+        >
+          <h1 class="text-lg font-bold">Result</h1>
+          @if (response()!.message) {
+            <p>{{ response()!.message }}</p>
+          }
+          @if (response()!.solution) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Solution:</span>
+              <span class="select-text">
+                {{ response()!.solution }}
+              </span>
+            </div>
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Absolute Relative Error:</span>
+              <span class="select-text">
+                {{ response()!.absoluteRelativeError }}
+              </span>
+            </div>
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium"
+                >Number of Correct Significant Figures:</span
+              >
+              <span class="select-text">
+                {{ response()!.numberOfCorrectSignificantFigures }}
+              </span>
+            </div>
+          }
+          @if (response()!.numberOfIterations) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Number of Iterations:</span>
+              <span class="select-text">{{
+                response()!.numberOfIterations
+              }}</span>
+            </div>
+          }
+          <div class="flex flex-row items-center gap-8">
+            <span class="font-medium">Execution Time:</span>
+            <span class="select-text">{{ response()!.executionTime }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</form>

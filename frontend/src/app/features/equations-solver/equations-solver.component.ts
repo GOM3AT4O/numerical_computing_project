@@ -7,16 +7,16 @@ import {
   viewChild,
 } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
-import { EquationsComponent } from "../equations/equations.component";
+import { EquationsComponent } from "./components/equations/equations.component";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { LUParametersComponent } from "../parameters/lu-parameters/lu-parameters.component";
-import { IterationParametersComponent } from "../parameters/iteration-parameters/iteration-parameters.component";
-import { EquationsSolverService } from "../../services/equations-solver.service";
-import { SolveEquationsRequest } from "../../models/solve-equations-request";
-import { SolveEquationsResponse } from "../../models/solve-equations-response";
-import { ParametersComponent } from "../parameters/parameters.component";
-import { StepComponent } from "../step/step.component";
-import { EliminationParametersComponent } from "../parameters/elimination-parameters/elimination-parameters.component";
+import { LUParametersComponent } from "./components/parameters/lu-parameters/lu-parameters.component";
+import { IterationParametersComponent } from "./components/parameters/iteration-parameters/iteration-parameters.component";
+import { EquationsSolverService } from "./services/equations-solver.service";
+import { SolveEquationsRequest } from "./models/solve-equations-request";
+import { SolveEquationsResponse } from "./models/solve-equations-response";
+import { ParametersComponent } from "./components/parameters/parameters.component";
+import { StepComponent } from "./components/step/step.component";
+import { EliminationParametersComponent } from "./components/parameters/elimination-parameters/elimination-parameters.component";
 
 @Component({
   selector: "app-equations-solver",
@@ -48,6 +48,10 @@ export class EquationsSolverComponent {
     { label: "Gauss-Seidel Iteration", value: "gauss-seidel-iteration" },
   ] as const;
 
+  methodLabels = Object.fromEntries(
+    this.methods.map(({ label, value }) => [value, label] as const),
+  );
+
   form = this.formBuilder.group({
     equationCount: [
       this.equationCount.toString(),
@@ -70,7 +74,6 @@ export class EquationsSolverComponent {
 
   showSteps = signal<boolean>(false);
   response = signal<SolveEquationsResponse | null>(null);
-  errorResponse = signal<string | null>(null);
 
   resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
 

@@ -1,0 +1,216 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from "@angular/core";
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from "@angular/forms";
+import { AutoSizeInputDirective } from "ngx-autosize-input";
+import { parse, SymbolNode } from "mathjs";
+import { PlotComponent } from "./components/plot/plot.component";
+import { ParametersComponent } from "./components/parameters/parameters.component";
+import { FindRootResponse } from "./models/find-root-response";
+import { IntervalParametersComponent } from "./components/parameters/interval-parameters/interval-parameters.component";
+import { OneGuessParametersComponent } from "./components/parameters/one-guess-parameters/one-guess-parameters.component";
+import { TwoGuessesParametersComponent } from "./components/parameters/two-guesses-parameters/two-guesses-parameters.component";
+import { OneGuessWithMultiplicityParametersComponent } from "./components/parameters/one-guess-with-multiplicity-parameters/one-guess-with-multiplicity-parameters.component";
+import { FindRootRequest } from "./models/find-root-request";
+
+@Component({
+  selector: "app-root-finder",
+  imports: [
+    ReactiveFormsModule,
+    AutoSizeInputDirective,
+    PlotComponent,
+    IntervalParametersComponent,
+    OneGuessParametersComponent,
+    OneGuessWithMultiplicityParametersComponent,
+    TwoGuessesParametersComponent,
+  ],
+  templateUrl: "./root-finder.component.html",
+  styleUrl: "./root-finder.component.css",
+})
+export class RootFinderComponent {
+  private formBuilder = inject(FormBuilder);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+
+  readonly allowedSymbols: string[] = [
+    "e",
+    "pi",
+    "sqrt",
+    "cbrt",
+    "sin",
+    "cos",
+    "tan",
+    "csc",
+    "sec",
+    "cot",
+    "sinh",
+    "cosh",
+    "tanh",
+    "csch",
+    "sech",
+    "coth",
+    "asin",
+    "acos",
+    "atan",
+    "acsc",
+    "asec",
+    "acot",
+    "asinh",
+    "acosh",
+    "atanh",
+    "acsch",
+    "asech",
+    "acoth",
+    "log",
+    "exp",
+  ] as const;
+
+  readonly functionValidator = (
+    control: AbstractControl,
+  ): ValidationErrors | null => {
+    if (!control.value) {
+      return null;
+    }
+
+    try {
+      const node = parse(control.value);
+      const variables = node
+        .filter((n) => n.type === "SymbolNode")
+        .map((n) => (n as SymbolNode).name)
+        .filter((n) => !this.allowedSymbols.includes(n));
+
+      if (variables.length !== 0 && variables.some((v) => v !== "x")) {
+        return { invalidFunction: true };
+      }
+
+      return null;
+    } catch {
+      return { invalidFunction: true };
+    }
+  };
+
+  readonly methods = [
+    { label: "Bisection", value: "bisection" },
+    { label: "False-Position", value: "false-position" },
+    { label: "Fixed-Point", value: "fixed-point" },
+    { label: "Newton-Raphson", value: "newton-raphson" },
+    { label: "Modified Newton-Raphson", value: "modified-newton-raphson" },
+    { label: "Secant", value: "secant" },
+  ] as const;
+
+  methodLabels = Object.fromEntries(
+    this.methods.map(({ label, value }) => [value, label] as const),
+  );
+
+  form = this.formBuilder.group({
+    function: ["", [Validators.required, this.functionValidator]],
+    method: [
+      this.methods[0].value as (typeof this.methods)[number]["value"],
+      Validators.required,
+    ],
+    precision: ["", [Validators.pattern(/^[1-9]\d*$/)]],
+    numberOfIterations: [
+      "",
+      [Validators.required, Validators.pattern(/^[1-9]\d*$/)],
+    ],
+    absoluteRelativeError: [
+      "",
+      [Validators.required, Validators.pattern(/^[-+]?\d+(\.\d+)?$/)],
+    ],
+    parameters: [null as any],
+  });
+
+  functions: { [k: string]: string } = {};
+
+  parameters = viewChild<ParametersComponent>("parameters");
+  parametersElement = viewChild("parameters", { read: ElementRef });
+
+  response = signal<FindRootResponse | null>({
+    executionTime: 0.001150131226,
+    message: "Bisection method converged after 20 iterations",
+    solution: "1.41422",
+    absoluteRelativeError: "0.00001",
+    numberOfCorrectSignificantFigures: 5,
+    numberOfIterations: 20,
+  });
+
+  resultElement = viewChild<ElementRef<HTMLDivElement>>("result");
+
+  ngOnInit() {
+    this.form.get("function")?.valueChanges.subscribe((f) => {
+      if (this.form.get("function")?.valid) {
+        if (this.form.get("method")?.value === "fixed-point") {
+          this.functions = { ["g(x)"]: f!, ["x"]: "x" };
+        } else {
+          this.functions = { ["f(x)"]: f! };
+        }
+      }
+    });
+
+    this.form.get("method")?.valueChanges.subscribe((method) => {
+      if (
+        this.form.get("function")?.valid ||
+        this.functions["f(x)"] ||
+        this.functions["g(x)"]
+      ) {
+        if (method === "fixed-point") {
+          this.functions = {
+            ["g(x)"]: this.functions["f(x)"],
+            ["x"]: "x",
+          };
+        } else if (this.functions["g(x)"]) {
+          this.functions = {
+            ["f(x)"]: this.functions["g(x)"],
+          };
+        }
+      }
+
+      this.form.setControl("parameters", this.formBuilder.control(null));
+      this.changeDetectorRef.detectChanges();
+      // scroll to show the parameters section
+      setTimeout(() => {
+        this.parametersElement()?.nativeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+    });
+  }
+
+  solve() {
+    // check if the form is valid, otherwise mark all fields as touched to show validation errors
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.parameters()?.form.markAllAsTouched();
+      return;
+    }
+
+    const value = this.form.value;
+
+    console.log(value);
+
+    // construct the request object, replacing empty strings with the default values
+    const request: FindRootRequest = {
+      function: value.function!,
+      method: value.method!,
+      numberOfIterations: parseInt(value.numberOfIterations!, 10),
+      absoluteRelativeError: value.absoluteRelativeError!,
+      parameters: this.parameters()?.parameters as any,
+      precision: isNaN(parseInt(value.precision!, 10))
+        ? undefined
+        : parseInt(value.precision!, 10),
+    };
+
+    console.log(request);
+  }
+}
