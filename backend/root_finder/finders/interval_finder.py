@@ -6,7 +6,10 @@ from typing import Callable, Optional
 from exceptions import ValidationError
 from root_finder.finder import Finder
 from root_finder.result import Result
-from utils import calculating_number_of_correct_significant_figures
+from utils import (
+    calculate_absolute_relative_error,
+    calculate_number_of_correct_significant_figures,
+)
 
 
 class IntervalFinder(Finder):
@@ -75,7 +78,7 @@ class IntervalFinder(Finder):
                 except ValueError as e:
                     if absolute_relative_error is not None:
                         number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
+                            calculate_number_of_correct_significant_figures(
                                 absolute_relative_error, self.precision
                             )
                         )
@@ -92,13 +95,13 @@ class IntervalFinder(Finder):
                 f_xr = self.function(xr)
 
                 if iteration > 1:
-                    absolute_relative_error = (
-                        abs((xr - old_xr)) / abs(xr) if xr != 0 else abs(xr - old_xr)
+                    absolute_relative_error = calculate_absolute_relative_error(
+                        xr, old_xr
                     )
                     if absolute_relative_error < self.absolute_relative_error:
                         execution_time = time.time() - start_time
                         number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
+                            calculate_number_of_correct_significant_figures(
                                 absolute_relative_error, self.precision
                             )
                         )
@@ -108,7 +111,7 @@ class IntervalFinder(Finder):
                             number_of_correct_significant_figures=number_of_correct_significant_figures,
                             number_of_iterations=iteration,
                             execution_time=execution_time,
-                            message=f"{self.method_name} method converges after {iteration} iterations alright? the root was found in x = {xr:.{self.precision}f} with f(x) = 0 (tolerance: {self.absolute_relative_error})",
+                            message=f"{self.method_name} method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
                         )
 
                 if f_xl * f_xr < 0:
@@ -119,7 +122,7 @@ class IntervalFinder(Finder):
                     execution_time = time.time() - start_time
                     if absolute_relative_error is not None:
                         number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
+                            calculate_number_of_correct_significant_figures(
                                 absolute_relative_error, self.precision
                             )
                         )
@@ -141,7 +144,7 @@ class IntervalFinder(Finder):
                 execution_time = time.time() - start_time
                 if absolute_relative_error is not None:
                     number_of_correct_significant_figures = (
-                        calculating_number_of_correct_significant_figures(
+                        calculate_number_of_correct_significant_figures(
                             absolute_relative_error, self.precision
                         )
                     )
@@ -156,7 +159,7 @@ class IntervalFinder(Finder):
 
         if absolute_relative_error is not None:
             number_of_correct_significant_figures = (
-                calculating_number_of_correct_significant_figures(
+                calculate_number_of_correct_significant_figures(
                     absolute_relative_error, self.precision
                 )
             )

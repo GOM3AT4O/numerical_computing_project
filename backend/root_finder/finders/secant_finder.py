@@ -5,7 +5,10 @@ from typing import Callable, Optional
 from exceptions import ValidationError
 from root_finder.finder import Finder
 from root_finder.result import Result
-from utils import calculating_number_of_correct_significant_figures
+from utils import (
+    calculate_absolute_relative_error,
+    calculate_number_of_correct_significant_figures,
+)
 
 
 class SecantFinder(Finder):
@@ -60,10 +63,8 @@ class SecantFinder(Finder):
                 x_new = x_curr - (f_curr * (x_curr - x_prev) / denominator)
 
                 # Calculate relative error
-                absolute_relative_error = (
-                    abs((x_new - x_curr)) / abs(x_new)
-                    if x_new != 0
-                    else abs(x_new - x_curr)
+                absolute_relative_error = calculate_absolute_relative_error(
+                    x_new, x_curr
                 )
 
                 # 1. Check if function value is close to zero
@@ -72,7 +73,7 @@ class SecantFinder(Finder):
                 if f_new == 0:
                     if absolute_relative_error is not None:
                         number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
+                            calculate_number_of_correct_significant_figures(
                                 absolute_relative_error, self.precision
                             )
                         )
@@ -88,7 +89,7 @@ class SecantFinder(Finder):
                 if absolute_relative_error < self.absolute_relative_error:
                     if absolute_relative_error is not None:
                         number_of_correct_significant_figures = (
-                            calculating_number_of_correct_significant_figures(
+                            calculate_number_of_correct_significant_figures(
                                 absolute_relative_error, self.precision
                             )
                         )
@@ -111,7 +112,7 @@ class SecantFinder(Finder):
                 execution_time = time.time() - start_time
                 if absolute_relative_error is not None:
                     number_of_correct_significant_figures = (
-                        calculating_number_of_correct_significant_figures(
+                        calculate_number_of_correct_significant_figures(
                             absolute_relative_error, self.precision
                         )
                     )
@@ -127,7 +128,7 @@ class SecantFinder(Finder):
         # If loop finishes without any return
         if absolute_relative_error is not None:
             number_of_correct_significant_figures = (
-                calculating_number_of_correct_significant_figures(
+                calculate_number_of_correct_significant_figures(
                     absolute_relative_error, self.precision
                 )
             )

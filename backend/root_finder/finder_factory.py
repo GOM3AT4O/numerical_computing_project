@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any
+from typing import Dict, Any
 from decimal import Decimal, InvalidOperation
 from validator import FunctionValidator
 from exceptions import ValidationError
@@ -9,7 +9,7 @@ from root_finder.finders.false_position_finder import FalsePositionFinder
 from root_finder.finders.fixed_point_finder import FixedPointFinder
 from root_finder.finders.newton_raphson_finder import NewtonRaphsonFinder
 from root_finder.finders.secant_finder import SecantFinder
-from sympy import Expr, symbols, lambdify
+from sympy import Expr, symbols
 
 
 class FinderFactory:
@@ -171,8 +171,8 @@ class FinderFactory:
                 absolute_relative_error=absolute_relative_error,
                 number_of_iterations=number_of_iterations,
                 precision=precision,
-                guess=guess,
                 derivative=df,
+                guess=guess,
                 multiplicity=multiplicity,
             )
 
