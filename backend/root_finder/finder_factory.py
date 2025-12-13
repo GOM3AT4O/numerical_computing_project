@@ -24,14 +24,16 @@ class FinderFactory:
     ):
         f_expr: Expr = FunctionValidator.validate_and_parse(function)
 
-        x_symbol = symbols("x")
+        x_symbol = symbols("x", real=True)
 
         def f(x):
-            val_sympy = f_expr.subs(x_symbol, x).evalf(n=precision)
+            val_sympy = f_expr.subs(x_symbol, x).evalf(n=precision, chop=True)
 
             try:
                 if not val_sympy.is_real:
-                    val_sympy = val_sympy.as_real_imag()[0]
+                    raise ValueError(
+                        "calculation resulted in undefined or complex value"
+                    )
                 y = +Decimal(str(val_sympy))
             except (InvalidOperation, ValueError):
                 raise ValueError("calculation resulted in undefined or complex value")
@@ -153,11 +155,13 @@ class FinderFactory:
             df_expr = f_expr.diff(x_symbol)
 
             def df(x):
-                val_sympy = df_expr.subs(x_symbol, x).evalf(n=precision)
+                val_sympy = df_expr.subs(x_symbol, x).evalf(n=precision, chop=True)
 
                 try:
                     if not val_sympy.is_real:
-                        val_sympy = val_sympy.as_real_imag()[0]
+                        raise ValueError(
+                            "calculation resulted in undefined or complex value"
+                        )
                     y = +Decimal(str(val_sympy))
                 except (InvalidOperation, ValueError):
                     raise ValueError(

@@ -1,7 +1,9 @@
 import { Component, input, OnChanges, SimpleChanges } from "@angular/core";
-import { compile, EvalFunction } from "mathjs";
+import { all, create, EvalFunction } from "mathjs";
 import { PlotlyComponent } from "angular-plotly.js";
 import { PlotRelayoutEvent } from "plotly.js-dist-min";
+
+const math = create(all, { predictable: true });
 
 @Component({
   selector: "app-plot",
@@ -47,7 +49,7 @@ export class PlotComponent implements OnChanges {
     this.compiledFunctions = Object.fromEntries(
       Object.entries(this.functions())
         .filter(([_, v]) => v)
-        .map(([k, v]) => [k, compile(v)]),
+        .map(([k, v]) => [k, math.compile(v)]),
     );
   }
 

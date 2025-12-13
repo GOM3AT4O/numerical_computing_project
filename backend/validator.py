@@ -2,7 +2,7 @@ from decimal import Decimal
 import numpy as np
 from typing import List, Tuple, Optional
 from exceptions import ValidationError
-from sympy import parse_expr, symbols, lambdify
+from sympy import parse_expr, symbols
 from sympy.parsing.sympy_parser import (
     repeated_decimals,
     auto_number,
@@ -10,7 +10,6 @@ from sympy.parsing.sympy_parser import (
     convert_xor,
 )
 from sympy.core.sympify import SympifyError
-import re
 
 
 class LinearSystemValidator:
@@ -66,7 +65,7 @@ class FunctionValidator:
 
         # try to parse the equation string into a SymPy expression
 
-        x = symbols("x")
+        x = symbols("x", real=True)
 
         try:
             transformations = (

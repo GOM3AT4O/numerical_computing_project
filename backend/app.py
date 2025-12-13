@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import sympy
+from sympy import Pow, real_root, sympify
 from exceptions import ValidationError
 from validator import LinearSystemValidator
 from equations_solver.solver_factory import SolverFactory
@@ -441,5 +443,16 @@ if __name__ == "__main__":
     getcontext().rounding = "ROUND_HALF_UP"
     getcontext().Emax = MAX_EMAX
     getcontext().Emin = MIN_EMIN
+
+    old_pow = Pow
+
+    def RealPow(base, exp, **kwargs):
+        base, exp = sympify(base), sympify(exp)
+        if exp.is_Rational and exp.q != 1:
+            return real_root(base, exp.q)
+        return old_pow(base, exp, **kwargs)
+
+    sympy.Pow = RealPow
+    sympy.cbrt = lambda x: real_root(x, 3)
 
     app.run(host="0.0.0.0", port=5000, debug=True)

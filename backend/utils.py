@@ -13,8 +13,8 @@ def remove_trailing_zeros(value: Decimal) -> Decimal:
     )
 
 
+# calculate the approximate absolute relative error between the root from a root finding iteration
 def calculate_absolute_relative_error(new_root: Decimal, old_root: Decimal):
-    print(abs(new_root))
     return (
         (new_root - old_root).copy_abs() / new_root.copy_abs()
         if new_root != 0
