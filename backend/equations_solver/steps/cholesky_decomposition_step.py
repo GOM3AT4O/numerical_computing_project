@@ -1,0 +1,25 @@
+from typing import Any, Dict
+
+import numpy as np
+from equations_solver.step import Step
+from utils import remove_trailing_zeros
+
+
+class CholeskyDecompositionStep(Step):
+    A: np.ndarray
+    L: np.ndarray
+
+    def __init__(self, A: np.ndarray, L: np.ndarray):
+        super().__init__("cholesky-decomposition")
+
+        self.A = A
+        self.L = L
+
+    def to_dict(self) -> Dict[str, Any]:
+        result = {
+            "step_type": self.step_type,
+            "A": np.vectorize(remove_trailing_zeros)(self.A).tolist(),
+            "L": np.vectorize(remove_trailing_zeros)(self.L).tolist(),
+        }
+
+        return result

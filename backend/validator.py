@@ -2,9 +2,16 @@ from decimal import Decimal
 import numpy as np
 from typing import List, Tuple, Optional
 from exceptions import ValidationError
-from sympy import sympify
+from sympy import parse_expr, symbols, lambdify
+from sympy.parsing.sympy_parser import (
+    repeated_decimals,
+    auto_number,
+    implicit_multiplication_application,
+    convert_xor,
+)
 from sympy.core.sympify import SympifyError
 import re
+
 
 class LinearSystemValidator:
     @staticmethod
@@ -46,48 +53,49 @@ class LinearSystemValidator:
             return prec
         except (ValueError, TypeError):
             raise ValidationError("Precision  must be an integer")
-        
+
+
 class FunctionValidator:
     @staticmethod
     def validate_and_parse(equation_str: str):
-        """Validates and parses a mathematical equation string into a SymPy expression.
-        """
+        """Validates and parses a mathematical equation string into a SymPy expression."""
 
         # if the equation string is empty or None, raise an error
         if not equation_str or not equation_str.strip():
             raise ValidationError("Equation cannot be empty.")
-        
 
-        # preprocess the equation string to replace common mathematical notations
-        # e.g., replace '^' with '**' for exponentiation
-        # and replace 'e' with 'E' for scientific notation 
-        # to make it compatible with SymPy syntax also be sure that if the user is writing sec(x) or cosec(x) the function will not covert the e to E
-        try:
-            equation_str = equation_str.replace("^", "**")
-            equation_str = re.sub(r'\be\b', 'E', equation_str)
-        except Exception as e:
-            raise ValidationError(f"Error in preprocessing the equation: {str(e)}")
-        
         # try to parse the equation string into a SymPy expression
 
+        x = symbols("x")
+
         try:
-            expr = sympify(equation_str,rational=True)
+            transformations = (
+                repeated_decimals,
+                auto_number,
+                implicit_multiplication_application,
+                convert_xor,
+            )
+            expr = parse_expr(
+                equation_str, local_dict={"x": x}, transformations=transformations
+            )
         except (SympifyError, SyntaxError):
             raise ValidationError("Invalid equation format. Please check your syntax.")
 
         # check if the number of free symbols in the expression is only 1 or not
         free_symbols = expr.free_symbols
-        
+
         if len(free_symbols) != 1:
             if len(free_symbols) == 0:
-                 raise ValidationError("Equation must contain a variable 'x'.")
-            raise ValidationError(f"Equation must contain only one variable. Found: {free_symbols}")
-        
+                raise ValidationError("Equation must contain a variable 'x'.")
+            raise ValidationError(
+                f"Equation must contain only one variable. Found: {free_symbols}"
+            )
+
         # check if the variable is 'x' or not
         variable = list(free_symbols)[0]
-        if variable.name != 'x':
+        if variable.name != "x":
             raise ValidationError(f"Variable must be 'x'. Found: '{variable.name}'")
-        
+
         # All validations passed, return the parsed expression
         # The return type is sympy expression
         return expr

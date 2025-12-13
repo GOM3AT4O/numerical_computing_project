@@ -1,0 +1,319 @@
+<form [formGroup]="form" (ngSubmit)="solve()">
+  <div class="flex flex-col items-center">
+    <div class="flex flex-col gap-16 items-center">
+      <div class="grid gap-16 w-full">
+        <div
+          class="flex flex-col p-24 rounded-md bg-gray-100 shadow-md row-1 col-1"
+        >
+          <h1 class="text-lg font-bold mb-8">System of Linear Equations</h1>
+          <div class="flex flex-row items-center">
+            <label for="equation-count" class="font-medium"
+              >Number of Equations:</label
+            >
+            <input
+              id="equation-count"
+              class="min-w-32 h-fit ml-8"
+              type="text"
+              [placeholder]="equationCount"
+              formControlName="equationCount"
+              autoSizeInput
+            />
+            <button class="ml-16" type="button" (click)="clear()">Clear</button>
+          </div>
+          <app-equations
+            class="mt-16 self-center"
+            formControlName="equations"
+            [equationCount]="equationCount"
+          />
+          @if (
+            form.get("equationCount")?.invalid &&
+            (form.get("equationCount")?.touched ||
+              form.get("equationCount")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid number of equations.
+              </div>
+            </div>
+          }
+          @if (
+            form.get("equations")?.invalid &&
+            (form.get("equations")?.touched || form.get("equations")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please ensure all coefficients and constants are valid numbers.
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-24 rounded-md bg-gray-100 shadow-md row-2 col-1">
+          <div
+            class="grid grid-cols-[max-content_max-content] gap-8 items-center"
+          >
+            <label for="method" class="font-medium">Method:</label>
+            <select id="method" formControlName="method">
+              @for (method of methods; track method) {
+                <option [value]="method.value">{{ method.label }}</option>
+              }
+            </select>
+            <label for="precision" class="font-medium">Precision:</label>
+            <input
+              id="precision"
+              class="h-fit"
+              type="text"
+              placeholder="6"
+              formControlName="precision"
+              autoSizeInput
+              [minWidth]="32"
+              [extraWidth]="10"
+            />
+          </div>
+          @if (
+            form.get("precision")?.invalid &&
+            (form.get("precision")?.touched || form.get("precision")?.dirty)
+          ) {
+            <div class="w-full flex justify-center">
+              <div
+                class="text-sm text-red-600 font-medium text-center mt-8 max-w-2xs"
+              >
+                Please enter a valid precision.
+              </div>
+            </div>
+          }
+        </div>
+        <div
+          class="flex flex-col gap-8 p-24 rounded-md bg-gray-100 shadow-md col-1"
+        >
+          <h1 class="text-lg font-bold">
+            {{ methodLabels[form.get("method")?.value!] }} Parameters
+          </h1>
+          @switch (form.get("method")?.value) {
+            @case ("gauss-elimination") {
+              <app-elimination-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("gauss-jordan-elimination") {
+              <app-elimination-parameters
+                #parameters
+                formControlName="parameters"
+              />
+            }
+            @case ("lu-decomposition") {
+              <app-lu-parameters #parameters formControlName="parameters" />
+            }
+            @case ("jacobi-iteration") {
+              <app-iteration-parameters
+                #parameters
+                class="flex-1"
+                formControlName="parameters"
+                [equationCount]="equationCount"
+              />
+            }
+            @case ("gauss-seidel-iteration") {
+              <app-iteration-parameters
+                #parameters
+                class="flex-1"
+                formControlName="parameters"
+                [equationCount]="equationCount"
+              />
+            }
+          }
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="w-fit px-16 py-6 border-none rounded-lg outline-none bg-blue-500 text-white shadow-sm cursor-pointer transition duration-200 hover:bg-blue-400 hover:-translate-y-2 hover:shadow-md active:bg-blue-600 active:translate-y-0 active:shadow-sm"
+      >
+        Solve
+      </button>
+      @if (response()) {
+        <div
+          #result
+          class="flex flex-col gap-8 w-full p-24 rounded-md bg-gray-100 shadow-md row-2 col-1"
+        >
+          <h1 class="text-lg font-bold">Result</h1>
+          @if (response()!.message) {
+            <p>{{ response()!.message }}</p>
+          }
+          @if (response()!.solution) {
+            @if (response()!.L && response()!.U) {
+              <div
+                class="flex flex-row items-center gap-16 self-center flex-wrap"
+              >
+                <div class="flex flex-row items-center gap-8 self-center">
+                  <span>L</span>
+                  <span>=</span>
+                  <table
+                    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                  >
+                    @for (row of response()!.L; track $index) {
+                      <tr>
+                        @for (value of row; track $index) {
+                          <td class="min-w-24">
+                            <span>{{ value }}</span>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </table>
+                </div>
+                <div class="flex flex-row items-center gap-8 self-center">
+                  <span>U</span>
+                  <span>=</span>
+                  <table
+                    class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                  >
+                    @for (row of response()!.U; track $index) {
+                      <tr>
+                        @for (value of row; track $index) {
+                          <td class="min-w-24">
+                            <span>{{ value }}</span>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </table>
+                </div>
+                @if (response()!.P) {
+                  <div class="flex flex-row items-center gap-8 self-center">
+                    <span>P</span>
+                    <span>=</span>
+                    <table
+                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                    >
+                      @for (row of response()!.P; track $index) {
+                        <tr>
+                          @for (value of row; track $index) {
+                            <td class="min-w-24">
+                              <span>{{ value }}</span>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </table>
+                  </div>
+                }
+              </div>
+            }
+            <div class="flex flex-row items-center gap-8 self-center">
+              <table
+                class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+              >
+                @for (
+                  value of response()!.solution;
+                  track $index;
+                  let i = $index
+                ) {
+                  <tr>
+                    <td class="min-w-24">
+                      <math>
+                        <msub>
+                          <mi>x</mi>
+                          <mn> {{ i + 1 }} </mn>
+                        </msub>
+                      </math>
+                    </td>
+                  </tr>
+                }
+              </table>
+              <span>=</span>
+              <table
+                class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+              >
+                @for (value of response()!.solution; track $index) {
+                  <tr>
+                    <td class="min-w-24">
+                      <math>
+                        <mn class="select-text">{{ value }}</mn>
+                      </math>
+                    </td>
+                  </tr>
+                }
+              </table>
+            </div>
+          }
+          @if (response()!.numberOfIterations) {
+            <div class="flex flex-row items-center gap-8">
+              <span class="font-medium">Number of Iterations:</span>
+              <span class="select-text">{{
+                response()!.numberOfIterations
+              }}</span>
+            </div>
+          }
+          <div class="flex flex-row items-center gap-8">
+            <span class="font-medium">Execution Time:</span>
+            <span class="select-text">{{ response()!.executionTime }}</span>
+          </div>
+          @if (response()!.steps) {
+            <button type="button" (click)="toggleShowSteps()">
+              {{ showSteps() ? "Hide Steps" : "Show Steps" }}
+            </button>
+            @if (showSteps()) {
+              <div #steps class="flex flex-col gap-16 pt-8">
+                @for (step of response()!.steps; track $index) {
+                  <div class="flex flex-col gap-8">
+                    <div class="flex flex-row items-start gap-8">
+                      <span class="font-medium text-nowrap"
+                        >Step {{ $index + 1 }}:
+                      </span>
+                      <app-step [step]="step" />
+                    </div>
+                  </div>
+                }
+                <div class="flex flex-row items-start gap-8">
+                  <span class="font-medium text-nowrap"
+                    >Step {{ response()!.steps!.length + 1 }}:
+                  </span>
+
+                  <div class="flex flex-row items-center gap-8">
+                    <table
+                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                    >
+                      @for (
+                        value of response()!.solution;
+                        track $index;
+                        let i = $index
+                      ) {
+                        <tr>
+                          <td class="min-w-24">
+                            <math>
+                              <msub>
+                                <mi>x</mi>
+                                <mn> {{ i + 1 }} </mn>
+                              </msub>
+                            </math>
+                          </td>
+                        </tr>
+                      }
+                    </table>
+                    <span>=</span>
+                    <table
+                      class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+                    >
+                      @for (value of response()!.solution; track $index) {
+                        <tr>
+                          <td class="min-w-24">
+                            <math>
+                              <mn class="select-text">{{ value }}</mn>
+                            </math>
+                          </td>
+                        </tr>
+                      }
+                    </table>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+</form>

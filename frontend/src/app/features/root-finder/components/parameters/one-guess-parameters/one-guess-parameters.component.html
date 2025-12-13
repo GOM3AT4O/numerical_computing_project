@@ -1,0 +1,24 @@
+<div class="flex flex-col justify-between h-full" [formGroup]="form">
+  <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
+    <label for="guess" class="font-medium">Guess:</label>
+    <input
+      id="guess"
+      class="min-w-full h-fit"
+      type="text"
+      formControlName="guess"
+      autoSizeInput
+      [minWidth]="64"
+      [extraWidth]="10"
+    />
+  </div>
+  @if (
+    form.get("guess")?.invalid &&
+    (form.get("guess")?.dirty || form.get("guess")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid guess.
+      </div>
+    </div>
+  }
+</div>

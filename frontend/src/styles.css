@@ -159,4 +159,77 @@
     font-weight: inherit;
     font-size: inherit;
   }
+
+  .slide-left main {
+    view-transition-name: slide-left;
+  }
+
+  .slide-right main {
+    view-transition-name: slide-right;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 300ms;
+    animation-timing-function: ease-in-out;
+  }
+
+  ::view-transition-old(slide-left) {
+    animation-name: slide-out-left;
+  }
+
+  ::view-transition-new(slide-left) {
+    animation-name: slide-in-right;
+  }
+
+  ::view-transition-old(slide-right) {
+    animation-name: slide-out-right;
+  }
+
+  ::view-transition-new(slide-right) {
+    animation-name: slide-in-left;
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0.5;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-out-left {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100%);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+      opacity: 0.5;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-out-right {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0.5;
+    }
+  }
 }

@@ -1,0 +1,90 @@
+<div class="flex flex-col justify-between h-full" [formGroup]="form">
+  <div class="flex flex-col gap-24">
+    <div class="flex flex-row items-center gap-8">
+      <label for="initial-guess" class="font-medium">Initial Guess:</label>
+      <table
+        class="border-separate border-spacing-6 border-x-2 rounded-md text-center"
+      >
+        @for (i of equationCount() | range; track $index) {
+          <tr>
+            <td class="min-w-16">
+              <math>
+                <msub>
+                  <mi>x</mi>
+                  <mn> {{ i + 1 }} </mn>
+                </msub>
+              </math>
+            </td>
+          </tr>
+        }
+      </table>
+      <span>=</span>
+      <app-matrix
+        formControlName="initialGuess"
+        [rowCount]="equationCount()"
+        [columnCount]="1"
+      />
+    </div>
+    <div class="flex flex-col gap-8">
+      <span class="font-bold">Stopping Conditions:</span>
+      <div class="grid grid-cols-[max-content_max-content] gap-8 items-center">
+        <label for="number-of-iterations" class="font-medium"
+          >Number of Iterations:</label
+        >
+        <input
+          id="number-of-iterations"
+          class="min-w-full h-fit"
+          type="text"
+          formControlName="numberOfIterations"
+          autoSizeInput
+          [minWidth]="64"
+          [extraWidth]="10"
+        />
+        <label for="absolute-relative-error" class="font-medium"
+          >Absolute Relative Error:</label
+        >
+        <input
+          id="absolute-relative-error"
+          class="min-w-full h-fit"
+          type="text"
+          formControlName="absoluteRelativeError"
+          autoSizeInput
+          [minWidth]="64"
+          [extraWidth]="10"
+        />
+      </div>
+    </div>
+  </div>
+  @if (
+    form.get("initialGuess")?.invalid &&
+    (form.get("initialGuess")?.dirty || form.get("initialGuess")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please ensure all values of the initial guess are valid numbers.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("numberOfIterations")?.invalid &&
+    (form.get("numberOfIterations")?.dirty ||
+      form.get("numberOfIterations")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid number of iterations.
+      </div>
+    </div>
+  }
+  @if (
+    form.get("absoluteRelativeError")?.invalid &&
+    (form.get("absoluteRelativeError")?.dirty ||
+      form.get("absoluteRelativeError")?.touched)
+  ) {
+    <div class="w-full flex justify-center">
+      <div class="text-sm text-red-600 font-medium text-center mt-8 max-w-3xs">
+        Please enter a valid absolute relative error threshold.
+      </div>
+    </div>
+  }
+</div>

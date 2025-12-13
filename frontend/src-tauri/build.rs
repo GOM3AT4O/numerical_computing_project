@@ -4,7 +4,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../../backend/app.py");
     println!("cargo:rerun-if-changed=../../backend/");
 
-    let status = Command::new("pyinstaller")
+    let status = Command::new("../../backend/venv/bin/pyinstaller")
         .args([
             "--onefile",
             "--distpath",
