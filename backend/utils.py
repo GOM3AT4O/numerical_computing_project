@@ -13,12 +13,12 @@ def remove_trailing_zeros(value: Decimal) -> Decimal:
     )
 
 
-def calculate_absolute_relative_error(new_root, old_root):
-    print(new_root, old_root)
+def calculate_absolute_relative_error(new_root: Decimal, old_root: Decimal):
+    print(abs(new_root))
     return (
-        abs((new_root - old_root)) / abs(new_root)
+        (new_root - old_root).copy_abs() / new_root.copy_abs()
         if new_root != 0
-        else abs(new_root - old_root)
+        else (new_root - old_root).copy_abs()
     )
 
 

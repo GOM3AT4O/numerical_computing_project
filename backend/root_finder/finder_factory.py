@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, Overflow
 from validator import FunctionValidator
 from exceptions import ValidationError
 
@@ -32,11 +32,11 @@ class FinderFactory:
             try:
                 if not val_sympy.is_real:
                     val_sympy = val_sympy.as_real_imag()[0]
-                y = +Decimal(float(val_sympy))
+                y = +Decimal(str(val_sympy))
             except (InvalidOperation, ValueError):
-                raise ValueError(
-                    f"calculation resulted in undefined or complex value: {val_sympy}"
-                )
+                raise ValueError("calculation resulted in undefined or complex value")
+            except Overflow:
+                raise ValueError("calculation resulted in overflow")
 
             return y
 
@@ -161,7 +161,7 @@ class FinderFactory:
                     y = +Decimal(float(val_sympy))
                 except (InvalidOperation, ValueError):
                     raise ValueError(
-                        f"calculation resulted in undefined or complex value: {val_sympy}"
+                        "calculation resulted in undefined or complex value"
                     )
 
                 return y

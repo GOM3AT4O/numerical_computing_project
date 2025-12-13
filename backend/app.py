@@ -4,7 +4,7 @@ from exceptions import ValidationError
 from validator import LinearSystemValidator
 from equations_solver.solver_factory import SolverFactory
 from root_finder.finder_factory import FinderFactory
-from decimal import Decimal, getcontext
+from decimal import MAX_EMAX, MIN_EMIN, Decimal, getcontext
 import signal
 import os
 
@@ -32,9 +32,8 @@ def solve_equations():
         print(f"precision: {precision}")
         print(f"params: {parameters}")
 
-        # set precision and rounding method for Decimal operations
+        # set precision for Decimal operations
         getcontext().prec = precision
-        getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields
         if not method:
@@ -104,9 +103,8 @@ def find_root():
         print(f"precision: {precision}")
         print(f"params: {parameters}")
 
-        # set precision and rounding method for Decimal operations
+        # set precision for Decimal operations
         getcontext().prec = precision
-        getcontext().rounding = "ROUND_HALF_UP"
 
         # Validate required fields
         if not method:
@@ -440,4 +438,8 @@ def shutdown():
 
 
 if __name__ == "__main__":
+    getcontext().rounding = "ROUND_HALF_UP"
+    getcontext().Emax = MAX_EMAX
+    getcontext().Emin = MIN_EMIN
+
     app.run(host="0.0.0.0", port=5000, debug=True)
