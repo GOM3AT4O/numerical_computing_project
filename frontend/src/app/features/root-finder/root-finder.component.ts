@@ -14,7 +14,7 @@ import {
   ValidationErrors,
 } from "@angular/forms";
 import { AutoSizeInputDirective } from "ngx-autosize-input";
-import { parse, SymbolNode } from "mathjs";
+import { FunctionNode, OperatorNode, parse, SymbolNode } from "mathjs";
 import { PlotComponent } from "./components/plot/plot.component";
 import { ParametersComponent } from "./components/parameters/parameters.component";
 import { FindRootResponse } from "./models/find-root-response";
@@ -44,9 +44,9 @@ export class RootFinderComponent {
   private formBuilder = inject(FormBuilder);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
-  readonly allowedSymbols: string[] = [
-    "e",
-    "pi",
+  readonly allowedConstants = new Set(["e", "pi"]);
+
+  readonly allowedFunctions = new Set([
     "sqrt",
     "cbrt",
     "sin",
@@ -75,7 +75,9 @@ export class RootFinderComponent {
     "acoth",
     "log",
     "exp",
-  ] as const;
+  ]);
+
+  readonly allowedOperators = new Set(["+", "-", "*", "/", "^"]);
 
   readonly functionValidator = (
     control: AbstractControl,
@@ -86,12 +88,53 @@ export class RootFinderComponent {
 
     try {
       const node = parse(control.value);
-      const variables = node
+
+      if (
+        node.filter(
+          (n) =>
+            ![
+              "ConstantNode",
+              "FunctionNode",
+              "OperatorNode",
+              "ParenthesisNode",
+              "SymbolNode",
+            ].includes(n.type),
+        ).length > 0
+      ) {
+        return { invalidFunction: true };
+      }
+
+      const operators = node
+        .filter((n) => n.type === "OperatorNode")
+        .map((n) => (n as OperatorNode).op)
+        .filter((op) => !this.allowedOperators.has(op));
+
+      if (operators.length !== 0) {
+        return { invalidFunction: true };
+      }
+
+      const functions = node.filter(
+        (n, _, p) =>
+          n.type === "SymbolNode" &&
+          this.allowedFunctions.has((n as SymbolNode).name) &&
+          !(p && p.type === "FunctionNode" && (p as FunctionNode).fn == n),
+      );
+
+      if (functions.length !== 0) {
+        return { invalidFunction: true };
+      }
+
+      const symbols = node
         .filter((n) => n.type === "SymbolNode")
         .map((n) => (n as SymbolNode).name)
-        .filter((n) => !this.allowedSymbols.includes(n));
+        .filter(
+          (n) =>
+            n !== "x" &&
+            !this.allowedConstants.has(n) &&
+            !this.allowedFunctions.has(n),
+        );
 
-      if (variables.length !== 0 && variables.some((v) => v !== "x")) {
+      if (symbols.length !== 0) {
         return { invalidFunction: true };
       }
 
@@ -186,8 +229,6 @@ export class RootFinderComponent {
 
     const value = this.form.value;
 
-    console.log(value);
-
     // construct the request object, replacing empty strings with the default values
     const request: FindRootRequest = {
       function: value.function!,
@@ -207,7 +248,6 @@ export class RootFinderComponent {
 
     // send the request to the service
     this.rootFinderService.findRoot(request).subscribe((response) => {
-      console.log(response);
       // hide steps and show the result
       this.response.set(response);
       this.changeDetectorRef.detectChanges();

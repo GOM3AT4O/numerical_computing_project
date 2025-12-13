@@ -158,11 +158,13 @@ class FinderFactory:
                 try:
                     if not val_sympy.is_real:
                         val_sympy = val_sympy.as_real_imag()[0]
-                    y = +Decimal(float(val_sympy))
+                    y = +Decimal(str(val_sympy))
                 except (InvalidOperation, ValueError):
                     raise ValueError(
                         "calculation resulted in undefined or complex value"
                     )
+                except Overflow:
+                    raise ValueError("calculation resulted in overflow")
 
                 return y
 
