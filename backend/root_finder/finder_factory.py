@@ -34,8 +34,8 @@ class FinderFactory:
                     val_sympy = val_sympy.as_real_imag()[0]
                 y = +Decimal(float(val_sympy))
             except (InvalidOperation, ValueError):
-                raise ValidationError(
-                    f"Calculation Error: Resulted in undefined or complex value: {val_sympy}"
+                raise ValueError(
+                    f"calculation resulted in undefined or complex value: {val_sympy}"
                 )
 
             return y
@@ -160,8 +160,8 @@ class FinderFactory:
                         val_sympy = val_sympy.as_real_imag()[0]
                     y = +Decimal(float(val_sympy))
                 except (InvalidOperation, ValueError):
-                    raise ValidationError(
-                        f"Calculation Error: Resulted in undefined or complex value: {val_sympy}"
+                    raise ValueError(
+                        f"calculation resulted in undefined or complex value: {val_sympy}"
                     )
 
                 return y

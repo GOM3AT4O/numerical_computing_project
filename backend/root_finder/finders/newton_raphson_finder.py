@@ -34,9 +34,9 @@ class NewtonRaphsonFinder(OneGuessFinder):
     def iterate(self, x: Decimal) -> Decimal:
         derivative_value = self.derivative(x)
 
-        if derivative_value == Decimal("0"):
+        if derivative_value == 0:
             raise ValueError(
-                f"{self.method_name} method failed: Derivative too close to zero"
+                f"{self.method_name} method can't continue: Derivative is too close to zero"
             )
 
         return x - (self.function(x) / derivative_value) * self.multiplicity

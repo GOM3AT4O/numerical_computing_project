@@ -32,6 +32,7 @@ class SecantFinder(Finder):
 
         x_prev = self.first_guess
         x_curr = self.second_guess
+        x_new = x_curr
 
         try:
             f_prev = self.function(x_prev)
@@ -44,73 +45,90 @@ class SecantFinder(Finder):
 
         # Start Iterations
         for iteration in range(1, self.number_of_iterations + 1):
-            # Check for division by zero
-            denominator = f_curr - f_prev
-            if abs(denominator) < Decimal("1e-20"):
-                execution_time = time.time() - start_time
-                return Result(
-                    root=x_curr,
-                    number_of_iterations=iteration,
-                    execution_time=execution_time,
-                    message=f"Secant method failed: Division by zero encountered at iteration {iteration}. f(x{iteration}) is too close to f(x{iteration - 1}).",
+            try:
+                # Check for division by zero
+                denominator = f_curr - f_prev
+                if abs(denominator) < Decimal("1e-20"):
+                    execution_time = time.time() - start_time
+                    return Result(
+                        root=x_curr,
+                        number_of_iterations=iteration,
+                        execution_time=execution_time,
+                        message=f"Secant method can't continue: Division by zero encountered at iteration {iteration}. f(x{iteration}) is too close to f(x{iteration - 1}).",
+                    )
+
+                x_new = x_curr - (f_curr * (x_curr - x_prev) / denominator)
+
+                # Calculate relative error
+                absolute_relative_error = (
+                    abs((x_new - x_curr)) / abs(x_new)
+                    if x_new != 0
+                    else abs(x_new - x_curr)
                 )
 
-            x_new = x_curr - (f_curr * (x_curr - x_prev) / denominator)
+                # 1. Check if function value is close to zero
+                f_new = self.function(x_new)
 
-            # Calculate relative error
-            absolute_relative_error = (
-                abs((x_new - x_curr)) / abs(x_new)
-                if x_new != 0
-                else abs(x_new - x_curr)
-            )
+                if f_new == 0:
+                    if absolute_relative_error is not None:
+                        number_of_correct_significant_figures = (
+                            calculating_number_of_correct_significant_figures(
+                                absolute_relative_error, self.precision
+                            )
+                        )
+                    execution_time = time.time() - start_time
+                    return Result(
+                        root=x_new,
+                        number_of_iterations=iteration,
+                        execution_time=execution_time,
+                        message=f"Secant method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
+                    )
 
-            # 1. Check if function value is close to zero
-            f_new = self.function(x_new)
+                # 2. Check if relative error is within tolerance
+                if absolute_relative_error < self.absolute_relative_error:
+                    if absolute_relative_error is not None:
+                        number_of_correct_significant_figures = (
+                            calculating_number_of_correct_significant_figures(
+                                absolute_relative_error, self.precision
+                            )
+                        )
+                    execution_time = time.time() - start_time
+                    return Result(
+                        root=x_new,
+                        absolute_relative_error=absolute_relative_error,
+                        number_of_correct_significant_figures=number_of_correct_significant_figures,
+                        number_of_iterations=iteration,
+                        execution_time=execution_time,
+                        message=f"Secant method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
+                    )
 
-            if abs(f_new) == Decimal("0"):
+                # Update
+                x_prev = x_curr
+                f_prev = f_curr
+                x_curr = x_new
+                f_curr = f_new
+            except ValueError as e:
+                execution_time = time.time() - start_time
                 if absolute_relative_error is not None:
                     number_of_correct_significant_figures = (
                         calculating_number_of_correct_significant_figures(
-                            absolute_relative_error * Decimal("100"), self.precision
+                            absolute_relative_error, self.precision
                         )
                     )
-                execution_time = time.time() - start_time
-                return Result(
-                    root=x_new,
-                    number_of_iterations=iteration,
-                    execution_time=execution_time,
-                    message=f"Secant method converges after {iteration} iterations. Root found at x = {x_new:.{self.precision}f} (tolerance: {self.absolute_relative_error})",
-                )
-
-            # 2. Check if relative error is within tolerance
-            if absolute_relative_error < self.absolute_relative_error:
-                if absolute_relative_error is not None:
-                    number_of_correct_significant_figures = (
-                        calculating_number_of_correct_significant_figures(
-                            absolute_relative_error * Decimal("100"), self.precision
-                        )
-                    )
-                execution_time = time.time() - start_time
                 return Result(
                     root=x_new,
                     absolute_relative_error=absolute_relative_error,
                     number_of_correct_significant_figures=number_of_correct_significant_figures,
                     number_of_iterations=iteration,
                     execution_time=execution_time,
-                    message=f"Secant method converges after {iteration} iterations. Root found at x = {x_new:.{self.precision}f} (tolerance: {self.absolute_relative_error})",
+                    message=f"Secant method can't continue: {e.args[0]}",
                 )
-
-            # Update
-            x_prev = x_curr
-            f_prev = f_curr
-            x_curr = x_new
-            f_curr = f_new
 
         # If loop finishes without any return
         if absolute_relative_error is not None:
             number_of_correct_significant_figures = (
                 calculating_number_of_correct_significant_figures(
-                    absolute_relative_error * Decimal("100"), self.precision
+                    absolute_relative_error, self.precision
                 )
             )
         execution_time = time.time() - start_time
@@ -118,5 +136,5 @@ class SecantFinder(Finder):
             root=x_curr,
             number_of_iterations=self.number_of_iterations,
             execution_time=execution_time,
-            message=f"Secant method didn't converge after {self.number_of_iterations} iterations. Best approximation: x = {x_curr:.{self.precision}f}",
+            message=f"Secant method did not converge within {self.number_of_iterations} iterations (Absolute Relative Error: {self.absolute_relative_error})",
         )

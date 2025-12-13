@@ -13,7 +13,7 @@ class FalsePositionFinder(IntervalFinder):
     ) -> Decimal:
         if f_xl == f_xu:
             raise ValueError(
-                f"{self.method_name} method failed: f(xl) and f(xu) cannot be equal"
+                f"{self.method_name} method can't continue: f(xl) and f(xu) cannot be equal"
             )
 
         return (xl * f_xu - xu * f_xl) / (f_xu - f_xl)
