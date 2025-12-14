@@ -82,7 +82,7 @@ class SecantFinder(Finder):
                         root=x_new,
                         number_of_iterations=iteration,
                         execution_time=execution_time,
-                        message=f"Secant method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
+                        message=f"Secant method converged after {iteration} iterations, the function at the root is zero (Absolute Relative Error: {self.absolute_relative_error})",
                     )
 
                 # 2. Check if relative error is within tolerance

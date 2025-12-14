@@ -2,12 +2,12 @@ from decimal import Decimal
 import numpy as np
 from typing import List, Tuple, Optional
 from exceptions import ValidationError
-from sympy import parse_expr, symbols
+from sympy import parse_expr, real_root, symbols
 from sympy.parsing.sympy_parser import (
-    repeated_decimals,
-    auto_number,
+    standard_transformations,
     implicit_multiplication_application,
     convert_xor,
+    rationalize,
 )
 from sympy.core.sympify import SympifyError
 
@@ -68,14 +68,18 @@ class FunctionValidator:
         x = symbols("x", real=True)
 
         try:
-            transformations = (
-                repeated_decimals,
-                auto_number,
+            transformations = standard_transformations + (
                 implicit_multiplication_application,
                 convert_xor,
+                rationalize,
             )
             expr = parse_expr(
                 equation_str, local_dict={"x": x}, transformations=transformations
+            )
+
+            expr = expr.replace(
+                lambda x: x.is_Pow and x.exp.is_Rational and x.exp.q % 2 == 1,
+                lambda x: real_root(x.base**x.exp.p, x.exp.q),
             )
         except (SympifyError, SyntaxError):
             raise ValidationError("Invalid equation format. Please check your syntax.")

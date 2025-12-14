@@ -104,7 +104,7 @@ class NewtonRaphsonFinder(Finder):
                         number_of_correct_significant_figures=number_of_correct_significant_figures,
                         number_of_iterations=iteration,
                         execution_time=execution_time,
-                        message=f"Newton-Raphson method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
+                        message=f"Newton-Raphson method converged after {iteration} iterations, the function at the root is zero (Absolute Relative Error: {self.absolute_relative_error})",
                     )
 
                 x = new_x

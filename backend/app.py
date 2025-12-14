@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sympy
-from sympy import Pow, real_root, sympify
+from sympy import real_root
 from exceptions import ValidationError
 from validator import LinearSystemValidator
 from equations_solver.solver_factory import SolverFactory

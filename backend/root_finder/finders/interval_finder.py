@@ -138,7 +138,7 @@ class IntervalFinder(Finder):
                         number_of_correct_significant_figures=number_of_correct_significant_figures,
                         number_of_iterations=iteration,
                         execution_time=execution_time,
-                        message=f"{self.method_name} method converged after {iteration} iterations (Absolute Relative Error: {self.absolute_relative_error})",
+                        message=f"{self.method_name} method converged after {iteration} iterations, the function at the root is zero (Absolute Relative Error: {self.absolute_relative_error})",
                     )
             except ValueError as e:
                 execution_time = time.time() - start_time
