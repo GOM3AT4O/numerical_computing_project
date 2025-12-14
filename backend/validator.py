@@ -2,7 +2,7 @@ from decimal import Decimal
 import numpy as np
 from typing import List, Tuple, Optional
 from exceptions import ValidationError
-from sympy import parse_expr, real_root, symbols
+from sympy import parse_expr, real_root, symbols, E, pi
 from sympy.parsing.sympy_parser import (
     standard_transformations,
     implicit_multiplication_application,
@@ -74,7 +74,9 @@ class FunctionValidator:
                 rationalize,
             )
             expr = parse_expr(
-                equation_str, local_dict={"x": x}, transformations=transformations
+                equation_str,
+                local_dict={"x": x, "e": E, "pi": pi},
+                transformations=transformations,
             )
 
             expr = expr.replace(
