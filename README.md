@@ -24,9 +24,11 @@
 
 ## Download
 
-| ![Windows](https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=white&style=for-the-badge)                                                                    | ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)                                                                        | ![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black&style=for-the-badge)                                                                      |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| [Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_x64_en-US.msi) | [Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_aarch64.dmg) | [Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_amd64.deb) | See [releases](https://github.com/TarekSaeed0/numerical_computing_project/releases) for all available installers |
+|![Windows](https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=white&style=for-the-badge)|![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)|![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black&style=for-the-badge)|
+|---|---|---|
+|[Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_x64_en-US.msi)|[Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_aarch64.dmg)|[Download](https://github.com/TarekSaeed0/numerical_computing_project/releases/download/numerical_computing_project-v0.1.0/numerical_computing_project_0.1.0_amd64.deb)|
+
+See [releases](https://github.com/TarekSaeed0/numerical_computing_project/releases) for all available installers
 
 ## Build
 
