@@ -4,7 +4,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../../backend/app.py");
     println!("cargo:rerun-if-changed=../../backend/");
 
-    let status = Command::new("../../backend/venv/bin/pyinstaller")
+    let status = Command::new("pyinstaller")
         .args([
             "--onefile",
             "--distpath",
@@ -24,15 +24,7 @@ fn main() {
         panic!("PyInstaller build failed");
     }
 
-    let output = Command::new("rustc")
-        .arg("-vV")
-        .output()
-        .expect("failed to run rustc -vV");
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let target_triple = stdout
-        .lines()
-        .find_map(|line| line.strip_prefix("host: "))
-        .expect("failed to find host triple in rustc -vV output");
+    let target_triple = std::env::var("TARGET").expect("TARGET environment variable not set");
 
     let extension = if cfg!(target_os = "windows") {
         ".exe"
