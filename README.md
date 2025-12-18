@@ -1,4 +1,8 @@
-<h1 align="center">Numerical Computing Project</h1>
+<div align="center">
+
+<a href="https://git.io/typing-svg">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&weight=900&size=40&pause=1000&color=94E2D5;F9E2AF;74C7EC&center=true&vCenter=true&width=700&lines=Numerical+Computing+Project;Numerical+Computing+Project;Numerical+Computing+Project" alt="Typing SVG" />
+</a>
 
 <p align="center">A full-stack application for numerical analysis</p>
 
@@ -14,7 +18,9 @@
     </a>
 </div>
 
-## Features
+</div>
+
+## 🚀 Features
 
 - Solving systems of simultaneous linear equations
 - Solving non-linear equations
@@ -22,7 +28,7 @@
 - Setting a precision for the calculations to be done in
 - Step by step solution
 
-## Download
+## 📫 Download
 
 |![Windows](https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=white&style=for-the-badge)|![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)|![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black&style=for-the-badge)|
 |---|---|---|
@@ -30,7 +36,7 @@
 
 See [releases](https://github.com/TarekSaeed0/numerical_computing_project/releases) for all available installers
 
-## Build
+## 🏗️ Build
 
 ### Dependencies
 
