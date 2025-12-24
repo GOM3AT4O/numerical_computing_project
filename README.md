@@ -20,6 +20,15 @@
 
 </div>
 
+---
+<div align="center">
+  
+![App Demo](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnB2d3Mzd3pvcGlscXFjMTBlNWJoMmlianI5bTYxcXhlMm1xMHZvZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zPbnEgxsPJOJSD3qfr/giphy.gif)
+</div>
+
+
+---
+
 ## 🚀 Features
 
 - Solving systems of simultaneous linear equations
